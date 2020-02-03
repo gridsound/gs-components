@@ -31,6 +31,7 @@ class GSDrums {
 
 		uiDrums.onchange = ( act, ...args ) => this._dawcore.callAction( act, this._patternId, ...args );
 		uiDrums.drumrows.onchange = ( ...args ) => this._dawcore.callAction( ...args );
+		this._uiDrums.toggleShadow( true );
 	}
 
 	// .........................................................................
@@ -87,6 +88,7 @@ class GSDrums {
 		this._uiDrums.timeSignature( a, b );
 	}
 	clear() {
+		this._uiDrums.toggleShadow( true );
 		this._dataDrums.clear();
 		this._dataDrumrows.clear();
 	}
