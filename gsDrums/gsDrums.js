@@ -8,9 +8,7 @@ class GSDrums {
 				dataCallbacks: {
 					addDrumrow: id => uiDrumrows.addDrumrow( id, uiDrums.createDrumrow( id ) ),
 					removeDrumrow: id => uiDrumrows.removeDrumrow( id ),
-					renameDrumrow: ( id, name ) => uiDrumrows.renameDrumrow( id, name ),
-					toggleDrumrow: ( id, b ) => uiDrumrows.toggleDrumrow( id, b ),
-					reorderDrumrow: ( id, order ) => uiDrumrows.reorderDrumrow( id, order ),
+					changeDrumrow: ( id, prop, val ) => uiDrumrows.changeDrumrow( id, prop, val ),
 				},
 			} ),
 			dataDrums = new GSDataDrums( {
@@ -30,7 +28,7 @@ class GSDrums {
 		Object.seal( this );
 
 		uiDrums.onchange = ( act, ...args ) => this._dawcore.callAction( act, this._patternId, ...args );
-		uiDrums.drumrows.onchange = ( ...args ) => this._dawcore.callAction( ...args );
+		uiDrumrows.onchange = ( ...args ) => this._dawcore.callAction( ...args );
 		this._uiDrums.toggleShadow( true );
 	}
 
@@ -58,7 +56,7 @@ class GSDrums {
 
 		this._dataDrumrows.change( obj );
 		if ( obj.drumrows ) {
-			this._uiDrums.drumrows.reorderDrumrows();
+			this._uiDrums.drumrows.reorderDrumrows( obj.drumrows );
 		}
 		if ( drmObj ) {
 			this._dataDrums.change( drmObj );
