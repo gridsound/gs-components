@@ -86,8 +86,7 @@ class GSDrums {
 		this._uiDrums.timeSignature( a, b );
 	}
 	clear() {
-		this._uiDrums.toggleShadow( true );
-		this._dataDrums.clear();
+		this.selectPattern( null );
 		this._dataDrumrows.clear();
 	}
 }
