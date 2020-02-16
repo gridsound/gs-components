@@ -29,6 +29,11 @@ class GSDrums {
 
 		uiDrums.onchange = ( act, ...args ) => this._dawcore.callAction( act, this._patternId, ...args );
 		uiDrumrows.onchange = ( ...args ) => this._dawcore.callAction( ...args );
+		uiDrums.onchangeLoop = ( looping, a, b ) => {
+			looping
+				? this._dawcore.drums.setLoop( a, b )
+				: this._dawcore.drums.clearLoop();
+		};
 		this._uiDrums.toggleShadow( true );
 	}
 
@@ -62,6 +67,10 @@ class GSDrums {
 			this._dataDrums.change( drmObj );
 		}
 	}
+	clear() {
+		this.selectPattern( null );
+		this._dataDrumrows.clear();
+	}
 
 	// .........................................................................
 	attached() {
@@ -84,10 +93,6 @@ class GSDrums {
 	}
 	timeSignature( a, b ) {
 		this._uiDrums.timeSignature( a, b );
-	}
-	clear() {
-		this.selectPattern( null );
-		this._dataDrumrows.clear();
 	}
 }
 
