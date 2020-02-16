@@ -64,6 +64,9 @@ class GSDrums {
 		if ( obj.drumrows ) {
 			this._uiDrums.drumrows.reorderDrumrows( obj.drumrows );
 		}
+		if ( "beatsPerMeasure" in obj || "stepsPerBeat" in obj ) {
+			this._uiDrums.timeSignature( obj.beatsPerMeasure, obj.stepsPerBeat );
+		}
 		if ( drmObj ) {
 			this._dataDrums.change( drmObj );
 		}
@@ -91,9 +94,6 @@ class GSDrums {
 	}
 	loop( a, b ) {
 		this._uiDrums.loop( a, b );
-	}
-	timeSignature( a, b ) {
-		this._uiDrums.timeSignature( a, b );
 	}
 }
 
