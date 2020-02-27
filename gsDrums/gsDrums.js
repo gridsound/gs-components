@@ -6,9 +6,9 @@ class GSDrums {
 			uiDrumrows = uiDrums.drumrows,
 			dataDrumrows = new GSDataDrumrows( {
 				dataCallbacks: {
-					addDrumrow: id => uiDrumrows.addDrumrow( id, uiDrums.createDrumrow( id ) ),
-					removeDrumrow: id => uiDrumrows.removeDrumrow( id ),
-					changeDrumrow: ( id, prop, val ) => uiDrumrows.changeDrumrow( id, prop, val ),
+					addDrumrow: id => uiDrumrows.add( id, uiDrums.createDrumrow( id ) ),
+					removeDrumrow: id => uiDrumrows.remove( id ),
+					changeDrumrow: ( id, prop, val ) => uiDrumrows.change( id, prop, val ),
 				},
 			} ),
 			dataDrums = new GSDataDrums( {
