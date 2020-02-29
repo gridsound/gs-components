@@ -8,7 +8,11 @@ class GSDrums {
 				dataCallbacks: {
 					addDrumrow: id => uiDrumrows.add( id, uiDrums.createDrumrow( id ) ),
 					removeDrumrow: id => uiDrumrows.remove( id ),
-					changeDrumrow: ( id, prop, val ) => uiDrumrows.change( id, prop, val ),
+					changeDrumrow: ( id, prop, val ) => {
+						uiDrumrows.change( id, prop, prop !== "pattern"
+							? val
+							: this._svgManager.createSVG( this._dawcore.get.pattern( val ).buffer ) );
+					},
 				},
 			} ),
 			dataDrums = new GSDataDrums( {
@@ -24,7 +28,8 @@ class GSDrums {
 		this._dataDrumrows = dataDrumrows;
 		this._dawcore =
 		this._drumsId =
-		this._patternId = null;
+		this._patternId =
+		this._svgManager = null;
 		Object.seal( this );
 
 		uiDrums.onchange = ( act, ...args ) => this._dawcore.callAction( act, this._patternId, ...args );
@@ -56,6 +61,9 @@ class GSDrums {
 				this._dataDrums.change( drums );
 			}
 		}
+	}
+	setWaveforms( svgManager ) {
+		this._svgManager = svgManager;
 	}
 	change( obj ) {
 		const drmObj = obj.drums && obj.drums[ this._drumsId ];
