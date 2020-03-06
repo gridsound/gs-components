@@ -4,26 +4,40 @@ class GSDrums {
 	constructor() {
 		const uiDrums = new gsuiDrums(),
 			uiDrumrows = uiDrums.drumrows,
-			dataDrumrows = new GSDataDrumrows( {
-				dataCallbacks: {
-					addDrumrow: id => uiDrumrows.add( id, uiDrums.createDrumrow( id ) ),
-					removeDrumrow: id => uiDrumrows.remove( id ),
-					changeDrumrow: ( id, prop, val ) => {
-						uiDrumrows.change( id, prop, prop !== "pattern"
-							? val
-							: this._svgManager.createSVG( this._dawcore.get.pattern( val ).buffer ) );
-					},
-				},
-			} ),
 			dataDrums = new GSDataDrums( {
 				dataCallbacks: {
 					addDrum: ( id, drum ) => uiDrums.addDrum( id, drum ),
 					removeDrum: id => uiDrums.removeDrum( id ),
 				},
+			} ),
+			dataDrumrows = new GSDataDrumrows( {
+				dataCallbacks: {
+					addDrumrow: id => uiDrumrows.add( id, uiDrums.createDrumrow( id ) ),
+					removeDrumrow: id => uiDrumrows.remove( id ),
+					changeDrumrow: ( id, prop, val ) => {
+						switch ( prop ) {
+							default:
+								uiDrumrows.change( id, prop, val );
+								break;
+							case "pattern": {
+								const bufId = this._dawcore.get.pattern( val ).buffer;
+
+								uiDrumrows.change( id, prop, this._svgManager.createSVG( bufId ) );
+							} break;
+							case "duration": {
+								const patId = this._dawcore.get.drumrow( id ).pattern,
+									bufId = this._dawcore.get.pattern( patId ).buffer;
+
+								uiDrumrows.change( id, prop, this._dawcore.get.buffer( bufId ).duration );
+							} break;
+						}
+					},
+				},
 			} );
 
 		this.rootElement = uiDrums.rootElement;
 		this._uiDrums = uiDrums;
+		this._uiDrumrows = uiDrumrows;
 		this._dataDrums = dataDrums;
 		this._dataDrumrows = dataDrumrows;
 		this._dawcore =
@@ -34,6 +48,8 @@ class GSDrums {
 
 		uiDrums.onchange = ( act, ...args ) => this._dawcore.callAction( act, this._patternId, ...args );
 		uiDrumrows.onchange = ( ...args ) => this._dawcore.callAction( ...args );
+		uiDrumrows.onlivestart = rowId => this._dawcore.drums.startLiveDrum( rowId );
+		uiDrumrows.onlivestop = rowId => this._dawcore.drums.stopLiveDrum( rowId );
 		uiDrums.onchangeCurrentTime = t => this._dawcore.drums.setCurrentTime( t );
 		uiDrums.onchangeLoop = ( looping, a, b ) => {
 			looping
@@ -64,6 +80,12 @@ class GSDrums {
 	}
 	setWaveforms( svgManager ) {
 		this._svgManager = svgManager;
+	}
+	onstartdrum( rowId ) {
+		this._uiDrumrows.playRow( rowId );
+	}
+	onstopdrumrow( rowId ) {
+		this._uiDrumrows.stopRow( rowId );
 	}
 	change( obj ) {
 		const drmObj = obj.drums && obj.drums[ this._drumsId ];
