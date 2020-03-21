@@ -95,7 +95,10 @@ class GSDrums {
 			this._uiDrums.drumrows.reorderDrumrows( obj.drumrows );
 		}
 		if ( "beatsPerMeasure" in obj || "stepsPerBeat" in obj ) {
-			this._uiDrums.timeSignature( obj.beatsPerMeasure, obj.stepsPerBeat );
+			const bPM = obj.beatsPerMeasure || this._dawcore.get.beatsPerMeasure(),
+				sPB = obj.stepsPerBeat || this._dawcore.get.stepsPerBeat();
+
+			this._uiDrums.timeSignature( bPM, sPB );
 		}
 		if ( drmObj ) {
 			this._dataDrums.change( drmObj );
