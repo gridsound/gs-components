@@ -19,11 +19,9 @@ class GSDrums {
 							default:
 								uiDrumrows.change( id, prop, val );
 								break;
-							case "pattern": {
-								const bufId = this._dawcore.get.pattern( val ).buffer;
-
-								uiDrumrows.change( id, prop, this._svgManager.createSVG( bufId ) );
-							} break;
+							case "pattern":
+								uiDrumrows.change( id, prop, this._svgManager.createSVG( val ) );
+							break;
 							case "duration": {
 								const patId = this._dawcore.get.drumrow( id ).pattern,
 									bufId = this._dawcore.get.pattern( patId ).buffer;
