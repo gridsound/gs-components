@@ -104,6 +104,9 @@ class GSDrums {
 		if ( drmObj ) {
 			this._dataDrums.change( drmObj );
 		}
+		if ( "patternDrumsOpened" in obj ) {
+			this.selectPattern( obj.patternDrumsOpened );
+		}
 	}
 	clear() {
 		this.selectPattern( null );
