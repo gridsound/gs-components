@@ -58,6 +58,9 @@ class GSSynth {
 				this._uiSynth.reorderOscillators( obj.oscillators );
 			}
 		}
+		if ( "synthOpened" in obj ) {
+			this.selectSynth( obj.synthOpened );
+		}
 	}
 	resize() {
 		this._uiLFO.resize();
