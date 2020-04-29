@@ -36,6 +36,7 @@ class GSDrums {
 			} );
 
 		this.rootElement = uiDrums.rootElement;
+		this.timeline = uiDrums._timeline;
 		this._uiDrums = uiDrums;
 		this._uiDrumrows = uiDrumrows;
 		this._dataDrums = dataDrums;
