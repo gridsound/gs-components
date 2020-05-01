@@ -26,6 +26,7 @@ class GSPatterns {
 		this.data = Object.freeze( {
 			synths: {},
 			patterns: {},
+			channels: {},
 		} );
 		this.rootElement = uiPatterns.rootElement;
 		this.svgForms = svgForms;
@@ -40,6 +41,10 @@ class GSPatterns {
 			this._createPattern.bind( this ),
 			this._updatePattern.bind( this ),
 			this._deletePattern.bind( this ) );
+		this._channelsCrud = GSUtils.createUpdateDelete.bind( null, this.data.channels,
+			this._createChannel.bind( this ),
+			this._updateChannel.bind( this ),
+			this._deleteChannel.bind( this ) );
 		Object.seal( this );
 
 		svgForms.bufferHD.hdMode( true );
@@ -78,7 +83,7 @@ class GSPatterns {
 	change( obj ) {
 		this._synthsCrud( obj.synths );
 		this._patternsCrud( obj.patterns );
-		this._updateChannels( obj.channels );
+		this._channelsCrud( obj.channels );
 		if ( obj.keys || obj.drums || obj.drumrows ) {
 			Object.entries( this._dawcore.get.patterns() )
 				.filter( ( [ id, pat ] ) => (
@@ -127,28 +132,6 @@ class GSPatterns {
 			}
 		}
 	}
-	_updateChannels( chans ) {
-		if ( chans ) {
-			const chanMap = Object.freeze( Object.entries( chans )
-					.reduce( ( map, [ id, syn ] ) => {
-						if ( syn && "name" in syn ) {
-							map[ id ] = true;
-						}
-						return map;
-					}, {} ) );
-
-			Object.entries( this._dawcore.get.synths() ).forEach( ( [ id, syn ] ) => {
-				if ( syn.dest in chanMap ) {
-					this._uiPatterns.changeSynth( id, "dest", syn.dest );
-				}
-			} );
-			Object.entries( this._dawcore.get.patterns() ).forEach( ( [ id, pat ] ) => {
-				if ( pat.dest in chanMap ) {
-					this._uiPatterns.changePattern( id, "dest", pat.dest );
-				}
-			} );
-		}
-	}
 
 	// .........................................................................
 	_createSynth( id, obj ) {
@@ -157,13 +140,14 @@ class GSPatterns {
 		this._updateSynth( id, obj );
 	}
 	_updateSynth( id, obj ) {
-		if ( "name" in obj ) {
-			this.data.synths[ id ].name = obj.name;
-			this._uiPatterns.changeSynth( id, "name", obj.name );
-		}
+		const dat = this.data.synths[ id ];
+
+		Object.entries( obj ).forEach( ( [ prop, val ] ) => {
+			dat[ prop ] = val;
+			this._uiPatterns.changeSynth( id, prop, val );
+		} );
 		if ( "dest" in obj ) {
-			this.data.synths[ id ].dest = obj.dest;
-			this._uiPatterns.changeSynth( id, "dest", this._dawcore.get.channel( obj.dest ).name );
+			this._uiPatterns.changeSynth( id, "destName", this._dawcore.get.channel( obj.dest ).name );
 		}
 	}
 	_deleteSynth( id ) {
@@ -198,6 +182,9 @@ class GSPatterns {
 			dat[ prop ] = val;
 			this._uiPatterns.changePattern( id, prop, val );
 		} );
+		if ( "dest" in obj ) {
+			this._uiPatterns.changePattern( id, "destName", this._dawcore.get.channel( obj.dest ).name );
+		}
 	}
 	_deletePattern( id ) {
 		const pat = this.data.patterns[ id ];
@@ -208,6 +195,21 @@ class GSPatterns {
 			this.svgForms.bufferHD.delete( id );
 		}
 		this._uiPatterns.deletePattern( id );
+	}
+
+	// .........................................................................
+	_createChannel( id, obj ) {
+		this.data.channels[ id ] = obj.name;
+		this._uiPatterns.addChannel( id, obj.name );
+	}
+	_updateChannel( id, obj ) {
+		if ( "name" in obj ) {
+			this._uiPatterns.updateChannel( id, obj.name );
+		}
+	}
+	_deleteChannel( id ) {
+		delete this.data.channels[ id ];
+		this._uiPatterns.deleteChannel( id );
 	}
 }
 
