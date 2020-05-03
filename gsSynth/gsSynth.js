@@ -47,10 +47,11 @@ class GSSynth {
 		}
 	}
 	change( obj ) {
-		const synObj = obj.synths && obj.synths[ this._synthId ];
+		const synObj = obj.synths && obj.synths[ this._synthId ],
+			get = this._dawcore.get;
 
 		if ( "beatsPerMeasure" in obj || "stepsPerBeat" in obj ) {
-			this._uiLFO.timeSignature( obj.beatsPerMeasure, obj.stepsPerBeat );
+			this._uiLFO.timeSignature( get.beatsPerMeasure(), get.stepsPerBeat() );
 		}
 		if ( synObj ) {
 			this._dataSynth.change( synObj );
