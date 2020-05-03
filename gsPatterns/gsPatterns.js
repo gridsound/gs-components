@@ -84,11 +84,11 @@ class GSPatterns {
 		this._synthsCrud( obj.synths );
 		this._patternsCrud( obj.patterns );
 		this._channelsCrud( obj.channels );
-		if ( obj.keys || obj.drums || obj.drumrows ) {
+		if ( obj.keys || obj.drums || obj.drumrows || obj.patterns ) {
 			Object.entries( this._dawcore.get.patterns() )
 				.filter( ( [ id, pat ] ) => (
-					( pat.type === "drums" && ( obj.drumrows || obj.drums?.[ pat.drums ] ) ) ||
-					( pat.type === "keys" && obj.keys?.[ pat.keys ] )
+					( pat.type === "drums" && ( obj.drumrows || obj.drums?.[ pat.drums ] || obj.patterns?.[ id ]?.duration ) ) ||
+					( pat.type === "keys" && ( obj.keys?.[ pat.keys ] || obj.patterns?.[ id ]?.duration ) )
 				) )
 				.forEach( kv => this._updatePatternContent( kv[ 0 ] ) );
 		}
