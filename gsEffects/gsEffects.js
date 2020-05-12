@@ -3,7 +3,7 @@
 class GSEffects {
 	constructor() {
 		const uiEffects = new gsuiEffects(),
-			dataEffects = new GSDataEffects( {
+			ctrlEffects = new DAWCore.controllers.effects( {
 				dataCallbacks: {
 					addEffect: ( id, obj ) => uiEffects.addEffect( id, obj ),
 					removeEffect: id => uiEffects.removeEffect( id ),
@@ -14,7 +14,7 @@ class GSEffects {
 
 		this.rootElement = uiEffects.rootElement;
 		this._uiEffects = uiEffects;
-		this._dataEffects = dataEffects;
+		this._ctrlEffects = ctrlEffects;
 		this._dawcore = null;
 		this._destFilter = "main";
 		Object.seal( this );
@@ -29,10 +29,10 @@ class GSEffects {
 	}
 	setDestFilter( dest ) {
 		this._destFilter = dest;
-		this._dataEffects.setDestFilter( dest );
+		this._ctrlEffects.setDestFilter( dest );
 	}
 	change( obj ) {
-		this._dataEffects.change( obj );
+		this._ctrlEffects.change( obj );
 		if ( obj.effects ) {
 			this._uiEffects.reorderEffects( obj.effects );
 		}
@@ -47,7 +47,7 @@ class GSEffects {
 		this._uiEffects.attached();
 	}
 	clear() {
-		this._dataEffects.clear();
+		this._ctrlEffects.clear();
 	}
 
 	// .........................................................................
