@@ -4,7 +4,7 @@ class GSSynth {
 	constructor() {
 		const uiSynth = new gsuiSynthesizer(),
 			uiLFO = new gsuiLFO(),
-			dataSynth = new GSDataSynth( {
+			dataSynth = new DAWCore.controllers.synth( {
 				dataCallbacks: {
 					addOsc: ( id, osc ) => uiSynth.addOscillator( id, osc ),
 					removeOsc: id => uiSynth.removeOscillator( id ),

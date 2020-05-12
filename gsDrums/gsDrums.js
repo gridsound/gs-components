@@ -4,13 +4,13 @@ class GSDrums {
 	constructor() {
 		const uiDrums = new gsuiDrums(),
 			uiDrumrows = uiDrums.drumrows,
-			dataDrums = new GSDataDrums( {
+			dataDrums = new DAWCore.controllers.drums( {
 				dataCallbacks: {
 					addDrum: ( id, drum ) => uiDrums.addDrum( id, drum ),
 					removeDrum: id => uiDrums.removeDrum( id ),
 				},
 			} ),
-			dataDrumrows = new GSDataDrumrows( {
+			dataDrumrows = new DAWCore.controllers.drumrows( {
 				dataCallbacks: {
 					addDrumrow: id => uiDrumrows.add( id, uiDrums.createDrumrow( id ) ),
 					removeDrumrow: id => uiDrumrows.remove( id ),
