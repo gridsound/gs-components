@@ -56,7 +56,7 @@ class GSSynth {
 		if ( synObj ) {
 			this._dataSynth.change( synObj );
 			if ( synObj.oscillators ) {
-				this._uiSynth.reorderOscillators( obj.oscillators );
+				this._uiSynth.reorderOscillators( synObj.oscillators );
 			}
 		}
 		if ( "synthOpened" in obj ) {
