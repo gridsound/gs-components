@@ -27,6 +27,9 @@ class GSEffects {
 	setDAWCore( core ) {
 		this._dawcore = core;
 	}
+	getDestFilter() {
+		return this._destFilter;
+	}
 	setDestFilter( dest ) {
 		this._destFilter = dest;
 		this._ctrlEffects.setDestFilter( dest );
