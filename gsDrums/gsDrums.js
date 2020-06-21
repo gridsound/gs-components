@@ -7,7 +7,9 @@ class GSDrums {
 			dataDrums = new DAWCore.controllers.drums( {
 				dataCallbacks: {
 					addDrum: ( id, drum ) => uiDrums.addDrum( id, drum ),
+					addDrumcut: ( id, drumcut ) => uiDrums.addDrumcut( id, drumcut ),
 					removeDrum: id => uiDrums.removeDrum( id ),
+					removeDrumcut: id => uiDrums.removeDrumcut( id ),
 				},
 			} ),
 			dataDrumrows = new DAWCore.controllers.drumrows( {
