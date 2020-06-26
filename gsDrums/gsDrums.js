@@ -49,6 +49,7 @@ class GSDrums {
 
 		uiDrums.onchange = ( act, ...args ) => this._dawcore.callAction( act, this._patternId, ...args );
 		uiDrumrows.onchange = ( ...args ) => this._dawcore.callAction( ...args );
+		uiDrumrows.onlivechange = ( rowId, prop, val ) => this._dawcore.drums.changeLiveDrumrow( rowId, prop, val );
 		uiDrumrows.onlivestart = rowId => this._dawcore.drums.startLiveDrum( rowId );
 		uiDrumrows.onlivestop = rowId => this._dawcore.drums.stopLiveDrum( rowId );
 		uiDrums.onchangeCurrentTime = t => this._dawcore.drums.setCurrentTime( t );
