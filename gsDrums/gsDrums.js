@@ -8,13 +8,17 @@ class GSDrums {
 				dataCallbacks: {
 					addDrum: ( id, drum ) => uiDrums.addDrum( id, drum ),
 					addDrumcut: ( id, drumcut ) => uiDrums.addDrumcut( id, drumcut ),
+					changeDrum: ( id, prop, val ) => uiDrums.changeDrum( id, prop, val ),
 					removeDrum: id => uiDrums.removeDrum( id ),
 					removeDrumcut: id => uiDrums.removeDrumcut( id ),
 				},
 			} ),
 			dataDrumrows = new DAWCore.controllers.drumrows( {
 				dataCallbacks: {
-					addDrumrow: id => uiDrumrows.add( id, uiDrums.createDrumrow( id ) ),
+					addDrumrow: id => {
+						uiDrumrows.add( id, uiDrums.createDrumrow( id ) );
+						this._setPropFilter( id, "detune" );
+					},
 					removeDrumrow: id => uiDrumrows.remove( id ),
 					changeDrumrow: ( id, prop, val ) => {
 						switch ( prop ) {
@@ -47,17 +51,41 @@ class GSDrums {
 		this._svgManager = null;
 		Object.seal( this );
 
-		uiDrums.onchange = ( act, ...args ) => this._dawcore.callAction( act, this._patternId, ...args );
-		uiDrumrows.onchange = ( ...args ) => this._dawcore.callAction( ...args );
-		uiDrumrows.onlivechange = ( rowId, prop, val ) => this._dawcore.drums.changeLiveDrumrow( rowId, prop, val );
-		uiDrumrows.onlivestart = rowId => this._dawcore.drums.startLiveDrum( rowId );
-		uiDrumrows.onlivestop = rowId => this._dawcore.drums.stopLiveDrum( rowId );
-		uiDrums.onchangeCurrentTime = t => this._dawcore.drums.setCurrentTime( t );
-		uiDrums.onchangeLoop = ( looping, a, b ) => {
-			looping
-				? this._dawcore.drums.setLoop( a, b )
-				: this._dawcore.drums.clearLoop();
-		};
+		uiDrumrows.rootElement.addEventListener( "gsuiEvents", e => {
+			const d = e.detail;
+
+			switch ( d.eventName ) {
+				case "change": this._dawcore.callAction( ...d.args ); break;
+				case "propFilter": this._setPropFilter( ...d.args ); break;
+				case "propFilters": this._setAllPropFilters( ...d.args ); break;
+				case "liveStopDrum": this._dawcore.drums.stopLiveDrum( ...d.args ); break;
+				case "liveStartDrum": this._dawcore.drums.startLiveDrum( ...d.args ); break;
+				case "liveChangeDrumrow": this._dawcore.drums.changeLiveDrumrow( ...d.args ); break;
+				default: return;
+			}
+			e.stopPropagation();
+		} );
+		uiDrums.rootElement.addEventListener( "gsuiEvents", e => {
+			const d = e.detail;
+
+			switch ( d.eventName ) {
+				case "change": {
+					const [ act, ...args ] = d.args;
+
+					this._dawcore.callAction( act, this._patternId, ...args );
+				} break;
+				case "changeLoop": {
+					const [ looping, a, b ] = d.args;
+
+					looping
+						? this._dawcore.drums.setLoop( a, b )
+						: this._dawcore.drums.clearLoop();
+				} break;
+				case "changeCurrentTime": this._dawcore.drums.setCurrentTime( d.args[ 0 ] ); break;
+				default: return;
+			}
+			e.stopPropagation();
+		} );
 		this._uiDrums.toggleShadow( true );
 	}
 
@@ -132,6 +160,20 @@ class GSDrums {
 	}
 	loop( a, b ) {
 		this._uiDrums.loop( a, b );
+	}
+
+	// .........................................................................
+	_setPropFilter( rowId, prop ) {
+		const propValues = Object.entries( this._dawcore.get.drums( this._drumsId ) )
+				.filter( ( [, drm ] ) => drm.row === rowId && "gain" in drm )
+				.map( ( [ id, drm ] ) => [ id, drm[ prop ] ] );
+
+		this._uiDrumrows.setPropFilter( rowId, prop );
+		this._uiDrums.setPropValues( rowId, prop, propValues );
+	}
+	_setAllPropFilters( prop ) {
+		Object.keys( this._dawcore.get.drumrows() )
+			.forEach( id => this._setPropFilter( id, prop ) );
 	}
 }
 
