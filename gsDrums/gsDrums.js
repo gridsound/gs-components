@@ -74,6 +74,12 @@ class GSDrums {
 
 					this._dawcore.callAction( act, this._patternId, ...args );
 				} break;
+				case "input":
+					this._uiDrumrows.setDrumPropValue( d.args[ 0 ], d.args[ 2 ], d.args[ 3 ] );
+					break;
+				case "inputEnd":
+					this._uiDrumrows.removeDrumPropValue( ...d.args );
+					break;
 				case "changeLoop": {
 					const [ looping, a, b ] = d.args;
 
