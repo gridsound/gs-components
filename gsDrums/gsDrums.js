@@ -17,7 +17,7 @@ class GSDrums {
 				dataCallbacks: {
 					addDrumrow: id => {
 						uiDrumrows.add( id, uiDrums.createDrumrow( id ) );
-						this._setPropFilter( id, "detune" );
+						this._setPropFilter( id, "gain" );
 					},
 					removeDrumrow: id => uiDrumrows.remove( id ),
 					changeDrumrow: ( id, prop, val ) => {
