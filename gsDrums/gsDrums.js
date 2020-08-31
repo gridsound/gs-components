@@ -2,7 +2,7 @@
 
 class GSDrums {
 	constructor() {
-		const uiDrums = new gsuiDrums(),
+		const uiDrums = document.createElement( "gsui-drums" ),
 			uiDrumrows = uiDrums.drumrows,
 			dataDrums = new DAWCore.controllers.drums( {
 				dataCallbacks: {
@@ -39,7 +39,7 @@ class GSDrums {
 				},
 			} );
 
-		this.rootElement = uiDrums.rootElement;
+		this.rootElement = uiDrums;
 		this.timeline = uiDrums._timeline;
 		this._uiDrums = uiDrums;
 		this._uiDrumrows = uiDrumrows;
@@ -65,7 +65,7 @@ class GSDrums {
 			}
 			e.stopPropagation();
 		} );
-		uiDrums.rootElement.addEventListener( "gsuiEvents", e => {
+		uiDrums.addEventListener( "gsuiEvents", e => {
 			const d = e.detail;
 
 			switch ( d.eventName ) {
@@ -149,9 +149,6 @@ class GSDrums {
 	}
 
 	// .........................................................................
-	attached() {
-		this._uiDrums.attached();
-	}
 	resize( w, h ) {
 		this._uiDrums.resize( w, h );
 	}
