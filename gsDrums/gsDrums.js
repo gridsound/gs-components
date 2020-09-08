@@ -40,7 +40,7 @@ class GSDrums {
 			} );
 
 		this.rootElement = uiDrums;
-		this.timeline = uiDrums._timeline;
+		this.timeline = uiDrums._win._elTimeline;
 		this._uiDrums = uiDrums;
 		this._uiDrumrows = uiDrumrows;
 		this._dataDrums = dataDrums;
@@ -81,13 +81,15 @@ class GSDrums {
 					this._uiDrumrows.removeDrumPropValue( ...d.args );
 					break;
 				case "changeLoop": {
-					const [ looping, a, b ] = d.args;
+					const [ a, b ] = d.args;
 
-					looping
+					a !== false
 						? this._dawcore.drums.setLoop( a, b )
 						: this._dawcore.drums.clearLoop();
 				} break;
-				case "changeCurrentTime": this._dawcore.drums.setCurrentTime( d.args[ 0 ] ); break;
+				case "changeCurrentTime":
+					this._dawcore.drums.setCurrentTime( d.args[ 0 ] );
+					break;
 				default: return;
 			}
 			e.stopPropagation();
@@ -149,11 +151,8 @@ class GSDrums {
 	}
 
 	// .........................................................................
-	resize( w, h ) {
-		this._uiDrums.resize( w, h );
-	}
 	setFontSize( fs ) {
-		this._uiDrums.drumrows.setFontSize( fs );
+		this._uiDrums.setFontSize( fs );
 	}
 	setPxPerBeat( ppb ) {
 		this._uiDrums.setPxPerBeat( ppb );
