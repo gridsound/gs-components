@@ -78,6 +78,15 @@ class GSPatternroll {
 	setPxPerBeat( ppb ) {
 		this._uiRoll.setPxPerBeat( ppb );
 	}
+	currentTime( t ) {
+		this._uiRoll.currentTime( t );
+	}
+	loop( a, b ) {
+		this._uiRoll.loop( a, b );
+	}
+	empty() {
+		this._uiRoll.empty();
+	}
 	getBlocks() {
 		return this._uiRoll.getBlocks();
 	}
@@ -85,6 +94,7 @@ class GSPatternroll {
 	// .........................................................................
 	_onchange( obj, ...args ) {
 		switch ( obj ) { // tmp
+			case "add": this._dawcore.callAction( "addBlock", ...args ); break;
 			case "move": this._dawcore.callAction( "moveBlocks", ...args ); break;
 			case "cropEnd": this._dawcore.callAction( "cropEndBlocks", ...args ); break;
 			case "cropStart": this._dawcore.callAction( "cropStartBlocks", ...args ); break;
