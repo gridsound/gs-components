@@ -9,6 +9,15 @@ class GSPatternroll {
 				onchangeLoop: this._onchangeLoop.bind( this ),
 				onchangeCurrentTime: t => this._dawcore.composition.setCurrentTime( t ),
 			} ),
+			dataTracks = new DAWCore.controllers.tracks( {
+				dataCallbacks: {
+					addTrack: id => uiPatternroll.addTrack( id ),
+					removeTrack: id => uiPatternroll.removeTrack( id ),
+					toggleTrack: ( id, b ) => uiPatternroll.toggleTrack( id, b ),
+					renameTrack: ( id, s ) => uiPatternroll.renameTrack( id, s ),
+					reorderTrack: ( id, n ) => uiPatternroll.reorderTrack( id, n ),
+				}
+			} ),
 			dataBlocks = null;
 			// dataBlocks = new DAWCore.controllers.blocks( {
 			// 	dataCallbacks: {
@@ -18,6 +27,7 @@ class GSPatternroll {
 
 		this.rootElement = uiPatternroll.rootElement;
 		this._uiRoll = uiPatternroll;
+		this._dataTracks = dataTracks;
 		this._dataBlocks = dataBlocks;
 		this._dawcore =
 		this._svgForms = null;
@@ -48,7 +58,8 @@ class GSPatternroll {
 	}
 	change( obj ) {
 		// this._dataBlocks.change( obj );
-		GSUtils.diffAssign( this._uiRoll.data.tracks, obj.tracks );
+		this._dataTracks.change( obj );
+		// GSUtils.diffAssign( this._uiRoll.data.tracks, obj.tracks );
 		GSUtils.diffAssign( this._uiRoll.data.blocks, obj.blocks );
 		if ( "loopA" in obj || "loopB" in obj ) {
 			this._uiRoll.loop(
@@ -62,7 +73,8 @@ class GSPatternroll {
 		}
 	}
 	clear() {
-		this._dataBlocks.clear();
+		// this._dataBlocks.clear();
+		this._dataTracks.clear();
 	}
 
 	// .........................................................................
@@ -96,11 +108,14 @@ class GSPatternroll {
 		switch ( obj ) { // tmp
 			case "add": this._dawcore.callAction( "addBlock", ...args ); break;
 			case "move": this._dawcore.callAction( "moveBlocks", ...args ); break;
+			case "rename": this._dawcore.callAction( "renameTrack", ...args ); break;
+			case "toggle": this._dawcore.callAction( "toggleTrack", ...args ); break;
 			case "cropEnd": this._dawcore.callAction( "cropEndBlocks", ...args ); break;
 			case "cropStart": this._dawcore.callAction( "cropStartBlocks", ...args ); break;
 			case "duplicate": this._dawcore.callAction( "duplicateSelectedBlocks", ...args ); break;
 			case "deletion": this._dawcore.callAction( "removeBlocks", ...args ); break;
 			case "selection": this._dawcore.callAction( "selectBlocks", ...args ); break;
+			case "toggleSolo": this._dawcore.callAction( "toggleSoloTrack", ...args ); break;
 			case "unselection": this._dawcore.callAction( "unselectBlocks", ...args ); break;
 			default: {
 				const dur = this.getBlocks().size && this._uiRoll.getDuration();
