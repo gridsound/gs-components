@@ -3,6 +3,7 @@
 class GSPatternroll {
 	constructor() {
 		const uiPatternroll = new gsuiPatternroll( {
+				getData: () => dataBlocks.data,
 				onchange: this._onchange.bind( this ),
 				onaddBlock: this._onaddBlock.bind( this ),
 				oneditBlock: this._oneditBlock.bind( this ),
@@ -18,12 +19,14 @@ class GSPatternroll {
 					reorderTrack: ( id, n ) => uiPatternroll.reorderTrack( id, n ),
 				}
 			} ),
-			dataBlocks = null;
-			// dataBlocks = new DAWCore.controllers.blocks( {
-			// 	dataCallbacks: {
-			// 		xxxxxx: () => {},
-			// 	},
-			// } );
+			dataBlocks = new DAWCore.controllers.blocks( {
+				dataCallbacks: {
+					addBlock: ( id, blc ) => uiPatternroll.addBlock( id, blc ),
+					removeBlock: id => uiPatternroll.removeBlock( id ),
+					changeBlockProp: ( id, prop, val ) => uiPatternroll.changeBlockProp( id, prop, val ),
+					updateBlockViewBox: ( id, blc ) => uiPatternroll.updateBlockViewBox( id, blc ),
+				},
+			} );
 
 		this.rootElement = uiPatternroll.rootElement;
 		this._uiRoll = uiPatternroll;
@@ -34,18 +37,14 @@ class GSPatternroll {
 		Object.seal( this );
 
 		this.rootElement.addEventListener( "gsuiEvents", e => {
-			const d = e.detail,
-				a = d.args,
-				dc = this._dawcore;
+			const d = e.detail;
 
 			switch ( d.component ) {
-				case "gsuiXxxxxxx":
-					switch ( d.eventName ) {
-						case "xxxxxx": dc.callAction( "xxxxx" ); break;
-					}
+				case "gsuiTracklist":
+					this._dawcore.callAction( d.eventName, ...d.args );
+					e.stopPropagation();
 					break;
 			}
-			e.stopPropagation();
 		} );
 	}
 
@@ -57,10 +56,8 @@ class GSPatternroll {
 		this._svgForms = svgForms;
 	}
 	change( obj ) {
-		// this._dataBlocks.change( obj );
 		this._dataTracks.change( obj );
-		// GSUtils.diffAssign( this._uiRoll.data.tracks, obj.tracks );
-		GSUtils.diffAssign( this._uiRoll.data.blocks, obj.blocks );
+		this._dataBlocks.change( obj );
 		if ( "loopA" in obj || "loopB" in obj ) {
 			this._uiRoll.loop(
 				this._dawcore.get.loopA(),
@@ -73,7 +70,7 @@ class GSPatternroll {
 		}
 	}
 	clear() {
-		// this._dataBlocks.clear();
+		this._dataBlocks.clear();
 		this._dataTracks.clear();
 	}
 
@@ -96,9 +93,6 @@ class GSPatternroll {
 	loop( a, b ) {
 		this._uiRoll.loop( a, b );
 	}
-	empty() {
-		this._uiRoll.empty();
-	}
 	getBlocks() {
 		return this._uiRoll.getBlocks();
 	}
@@ -108,14 +102,11 @@ class GSPatternroll {
 		switch ( obj ) { // tmp
 			case "add": this._dawcore.callAction( "addBlock", ...args ); break;
 			case "move": this._dawcore.callAction( "moveBlocks", ...args ); break;
-			case "rename": this._dawcore.callAction( "renameTrack", ...args ); break;
-			case "toggle": this._dawcore.callAction( "toggleTrack", ...args ); break;
 			case "cropEnd": this._dawcore.callAction( "cropEndBlocks", ...args ); break;
 			case "cropStart": this._dawcore.callAction( "cropStartBlocks", ...args ); break;
 			case "duplicate": this._dawcore.callAction( "duplicateSelectedBlocks", ...args ); break;
 			case "deletion": this._dawcore.callAction( "removeBlocks", ...args ); break;
 			case "selection": this._dawcore.callAction( "selectBlocks", ...args ); break;
-			case "toggleSolo": this._dawcore.callAction( "toggleSoloTrack", ...args ); break;
 			case "unselection": this._dawcore.callAction( "unselectBlocks", ...args ); break;
 			default: {
 				const dur = this.getBlocks().size && this._uiRoll.getDuration();
