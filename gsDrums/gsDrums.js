@@ -51,7 +51,7 @@ class GSDrums {
 		this._svgManager = null;
 		Object.seal( this );
 
-		uiDrumrows.rootElement.addEventListener( "gsuiEvents", e => {
+		uiDrumrows.addEventListener( "gsuiEvents", e => {
 			const d = e.detail;
 
 			switch ( d.eventName ) {
