@@ -107,7 +107,8 @@ class GSPatternroll {
 			case "duplicate": this._dawcore.callAction( "duplicateSelectedBlocks", ...args ); break;
 			case "deletion": this._dawcore.callAction( "removeBlocks", ...args ); break;
 			case "selection": this._dawcore.callAction( "selectBlocks", ...args ); break;
-			case "unselection": this._dawcore.callAction( "unselectBlocks", ...args ); break;
+			case "unselection": this._dawcore.callAction( "unselectAllBlocks", ...args ); break;
+			case "unselectionOne": this._dawcore.callAction( "unselectBlock", ...args ); break;
 			default: {
 				const dur = this.getBlocks().size && this._uiRoll.getDuration();
 
