@@ -33,8 +33,10 @@ class GSPianoroll {
 		this.rootElement.addEventListener( "gsuiEvents", e => {
 			const d = e.detail;
 
-			switch ( d.component ) {
-				case "xxxxxx":
+			switch ( d.eventName ) {
+				case "changeKeysProps":
+					this._dawcore.callAction( "changeKeysProps", this._patternId, ...d.args );
+					e.stopPropagation();
 					break;
 			}
 		} );
@@ -59,7 +61,6 @@ class GSPianoroll {
 				this._keysId = pat.keys;
 				GSUtils.diffAssign( this._uiRoll.data, keys );
 				// this._dataKeys.change( keys );
-				this._uiRoll.resetKey();
 				this._uiRoll.scrollToKeys();
 			}
 		}
@@ -112,10 +113,16 @@ class GSPianoroll {
 	// .........................................................................
 	_onchange( obj, ...args ) {
 		switch ( obj ) { // tmp
-			case "xxxxxxxx": this._dawcore.callAction( "xxxxxxxxxxx", ...args ); break;
-			default:
-				this._dawcore.callAction( "changePatternKeys", this._patternId, obj, this._uiRoll.getDuration() );
-				break;
+			case "add": this._dawcore.callAction( "addKey", this._patternId, ...args ); break;
+			case "move": this._dawcore.callAction( "moveKeys", this._patternId, ...args ); break;
+			case "clone": this._dawcore.callAction( "cloneSelectedKeys", this._patternId, ...args ); break;
+			case "remove": this._dawcore.callAction( "removeKeys", this._patternId, ...args ); break;
+			case "cropEnd": this._dawcore.callAction( "cropEndKeys", this._patternId, ...args ); break;
+			case "redirect": this._dawcore.callAction( "redirectKey", this._patternId, ...args ); break;
+			case "changeEnv": this._dawcore.callAction( "changeKeysEnv", this._patternId, ...args ); break;
+			case "selection": this._dawcore.callAction( "selectKeys", this._patternId, ...args ); break;
+			case "unselection": this._dawcore.callAction( "unselectAllKeys", this._patternId, ...args ); break;
+			case "unselectionOne": this._dawcore.callAction( "unselectKey", this._patternId, ...args ); break;
 		}
 	}
 	_onchangeLoop( looping, a, b ) {
