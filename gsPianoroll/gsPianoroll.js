@@ -3,19 +3,18 @@
 class GSPianoroll {
 	constructor() {
 		const uiPianoroll = new gsuiPianoroll( {
+				getData: () => this._dataKeys.data,
 				onchange: this._onchange.bind( this ),
 				onchangeLoop: this._onchangeLoop.bind( this ),
 				onchangeCurrentTime: this._onchangeCurrentTime.bind( this ),
 			} ),
-			dataKeys = null;
-			// dataKeys = new DAWCore.controllers.keys( {
-			// 	dataCallbacks: {
-			// 		addBlock: ( id, blc ) => uiPianoroll.addBlock( id, blc ),
-			// 		removeBlock: id => uiPianoroll.removeBlock( id ),
-			// 		changeBlockProp: ( id, prop, val ) => uiPianoroll.changeBlockProp( id, prop, val ),
-			// 		updateBlockViewBox: ( id, blc ) => uiPianoroll.updateBlockViewBox( id, blc ),
-			// 	},
-			// } );
+			dataKeys = new DAWCore.controllers.keys( {
+				dataCallbacks: {
+					addKey: ( id, blc ) => uiPianoroll.addKey( id, blc ),
+					removeKey: id => uiPianoroll.removeKey( id ),
+					changeKeyProp: ( id, prop, val ) => uiPianoroll.changeKeyProp( id, prop, val ),
+				},
+			} );
 
 		this.rootElement = uiPianoroll.rootElement;
 		this._uiRoll = uiPianoroll;
@@ -50,8 +49,8 @@ class GSPianoroll {
 		if ( id !== this._patternId ) {
 			this._patternId = id;
 			this._keysId = null;
-			this._uiRoll.empty();
-			// this._dataKeys.clear();
+			this._dataKeys.clear();
+			this._uiRoll.reset();
 			// this._uiRoll.toggleShadow( !id );
 			this._uiRoll.setPxPerBeat( 90 );
 			if ( id ) {
@@ -59,8 +58,7 @@ class GSPianoroll {
 					keys = this._dawcore.get.keys( pat.keys );
 
 				this._keysId = pat.keys;
-				GSUtils.diffAssign( this._uiRoll.data, keys );
-				// this._dataKeys.change( keys );
+				this._dataKeys.change( keys );
 				this._uiRoll.scrollToKeys();
 			}
 		}
@@ -77,16 +75,15 @@ class GSPianoroll {
 			const keys = obj.keys && obj.keys[ this._keysId ];
 
 			if ( keys ) {
-				GSUtils.diffAssign( this._uiRoll.data, keys );
-				// this._dataKeys.change( keys );
+				this._dataKeys.change( keys );
 			}
 		}
 	}
 	clear() {
 		this._keysId =
 		this._patternId = null;
-		this._uiRoll.empty();
-		// this._dataKeys.clear();
+		this._dataKeys.clear();
+		this._uiRoll.reset();
 	}
 	getUIKeys() {
 		return this._uiRoll.uiKeys;
