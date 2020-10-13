@@ -29,6 +29,7 @@ class GSPatternroll {
 			} );
 
 		this.rootElement = uiPatternroll.rootElement;
+		this.timeline = uiPatternroll.timeline;
 		this._uiRoll = uiPatternroll;
 		this._dataTracks = dataTracks;
 		this._dataBlocks = dataBlocks;
@@ -44,8 +45,21 @@ class GSPatternroll {
 					this._dawcore.callAction( d.eventName, ...d.args );
 					e.stopPropagation();
 					break;
+				case "gsuiTimeline":
+					switch ( d.eventName ) {
+						case "changeLoop":
+							this._dawcore.callAction( "changeLoop", ...d.args );
+							e.stopPropagation();
+							break;
+						case "changeCurrentTime":
+							this._dawcore.composition.setCurrentTime( d.args[ 0 ] );
+							e.stopPropagation();
+							break;
+					}
+					break;
 			}
 		} );
+
 	}
 
 	// .........................................................................
@@ -81,12 +95,6 @@ class GSPatternroll {
 	resized() {
 		this._uiRoll.resized();
 	}
-	setFontSize( fs ) {
-		this._uiRoll.setFontSize( fs );
-	}
-	setPxPerBeat( ppb ) {
-		this._uiRoll.setPxPerBeat( ppb );
-	}
 	currentTime( t ) {
 		this._uiRoll.currentTime( t );
 	}
@@ -109,14 +117,6 @@ class GSPatternroll {
 			case "selection": this._dawcore.callAction( "selectBlocks", ...args ); break;
 			case "unselection": this._dawcore.callAction( "unselectAllBlocks", ...args ); break;
 			case "unselectionOne": this._dawcore.callAction( "unselectBlock", ...args ); break;
-			default: {
-				const dur = this.getBlocks().size && this._uiRoll.getDuration();
-
-				if ( dur !== this._dawcore.get.duration() ) {
-					obj.duration = dur;
-				}
-				this._dawcore.callAction( "changeTracksAndBlocks", obj );
-			} break;
 		}
 	}
 	_onchangeLoop( looping, a, b ) {
