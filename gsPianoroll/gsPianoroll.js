@@ -17,6 +17,7 @@ class GSPianoroll {
 			} );
 
 		this.rootElement = uiPianoroll.rootElement;
+		this.timeline = uiPianoroll.timeline;
 		this._uiRoll = uiPianoroll;
 		this._dataKeys = dataKeys;
 		this._dawcore =
@@ -24,9 +25,6 @@ class GSPianoroll {
 		this._patternId = null;
 		Object.seal( this );
 
-		uiPianoroll.octaves( 1, 7 );
-		uiPianoroll.setPxPerBeat( 90 );
-		uiPianoroll.setFontSize( 20 );
 		uiPianoroll.uiKeys.onkeydown = midi => this._dawcore.pianoroll.liveKeydown( midi );
 		uiPianoroll.uiKeys.onkeyup = midi => this._dawcore.pianoroll.liveKeyup( midi );
 		this.rootElement.addEventListener( "gsuiEvents", e => {
@@ -52,7 +50,6 @@ class GSPianoroll {
 			this._dataKeys.clear();
 			this._uiRoll.reset();
 			// this._uiRoll.toggleShadow( !id );
-			this._uiRoll.setPxPerBeat( 90 );
 			if ( id ) {
 				const pat = this._dawcore.get.pattern( id ),
 					keys = this._dawcore.get.keys( pat.keys );
@@ -92,15 +89,7 @@ class GSPianoroll {
 	// .........................................................................
 	attached() {
 		this._uiRoll.attached();
-	}
-	resized() {
-		this._uiRoll.resized();
-	}
-	setFontSize( fs ) {
-		this._uiRoll.setFontSize( fs );
-	}
-	setPxPerBeat( ppb ) {
-		this._uiRoll.setPxPerBeat( ppb );
+		this._uiRoll.octaves( 1, 7 );
 	}
 	currentTime( t ) {
 		this._uiRoll.currentTime( t );
