@@ -5,8 +5,6 @@ class GSPianoroll {
 		const uiPianoroll = new gsuiPianoroll( {
 				getData: () => this._dataKeys.data,
 				onchange: this._onchange.bind( this ),
-				onchangeLoop: this._onchangeLoop.bind( this ),
-				onchangeCurrentTime: this._onchangeCurrentTime.bind( this ),
 			} ),
 			dataKeys = new DAWCore.controllers.keys( {
 				dataCallbacks: {
@@ -27,16 +25,7 @@ class GSPianoroll {
 
 		uiPianoroll.uiKeys.onkeydown = midi => this._dawcore.pianoroll.liveKeydown( midi );
 		uiPianoroll.uiKeys.onkeyup = midi => this._dawcore.pianoroll.liveKeyup( midi );
-		this.rootElement.addEventListener( "gsuiEvents", e => {
-			const d = e.detail;
-
-			switch ( d.eventName ) {
-				case "changeKeysProps":
-					this._dawcore.callAction( "changeKeysProps", this._patternId, ...d.args );
-					e.stopPropagation();
-					break;
-			}
-		} );
+		this.rootElement.addEventListener( "gsuiEvents", this._ongsuiEvents.bind( this ) );
 	}
 
 	// .........................................................................
@@ -99,6 +88,34 @@ class GSPianoroll {
 	}
 
 	// .........................................................................
+	_ongsuiEvents( e ) {
+		const d = e.detail;
+
+		switch ( d.component ) {
+			case "gsuiPianoroll":
+				switch ( d.eventName ) {
+					case "changeKeysProps":
+						this._dawcore.callAction( "changeKeysProps", this._patternId, ...d.args );
+						break;
+				}
+				break;
+			case "gsuiTimeline":
+				switch ( d.eventName ) {
+					case "changeLoop":
+						d.args[ 0 ] !== false
+							? this._dawcore.pianoroll.setLoop( ...d.args )
+							: this._dawcore.pianoroll.clearLoop();
+						break;
+					case "changeCurrentTime":
+						this._dawcore.pianoroll.setCurrentTime( d.args[ 0 ] );
+						break;
+				}
+				break;
+		}
+		e.stopPropagation();
+	}
+
+	// .........................................................................
 	_onchange( obj, ...args ) {
 		switch ( obj ) { // tmp
 			case "add": this._dawcore.callAction( "addKey", this._patternId, ...args ); break;
@@ -112,14 +129,6 @@ class GSPianoroll {
 			case "unselection": this._dawcore.callAction( "unselectAllKeys", this._patternId, ...args ); break;
 			case "unselectionOne": this._dawcore.callAction( "unselectKey", this._patternId, ...args ); break;
 		}
-	}
-	_onchangeLoop( looping, a, b ) {
-		looping
-			? this._dawcore.pianoroll.setLoop( a, b )
-			: this._dawcore.pianoroll.clearLoop();
-	}
-	_onchangeCurrentTime( t ) {
-		this._dawcore.pianoroll.setCurrentTime( t );
 	}
 }
 
