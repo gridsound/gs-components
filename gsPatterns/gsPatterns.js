@@ -2,20 +2,7 @@
 
 class GSPatterns {
 	constructor() {
-		const uiPatterns = new gsuiPatterns( {
-				patternDataTransfer: elPat => {
-					const id = elPat.dataset.id;
-
-					return `${ id }:${ this._dawcore.get.pattern( id ).duration }`;
-				},
-				onchange: ( act, ...args ) => {
-					if ( act in DAWCore.actions ) {
-						this._dawcore.callAction( act, ...args );
-					} else {
-						lg( "GSPatterns.onchange", act, ...args );
-					}
-				},
-			} ),
+		const uiPatterns = GSUI.createElement( "gsui-patterns" ),
 			svgForms = Object.freeze( {
 				keys: new gsuiKeysforms(),
 				drums: new gsuiDrumsforms(),
@@ -23,12 +10,24 @@ class GSPatterns {
 				bufferHD: new gsuiWaveforms(),
 			} );
 
+		uiPatterns.onpatternDataTransfer = elPat => {
+			const id = elPat.dataset.id;
+
+			return `${ id }:${ this._dawcore.get.pattern( id ).duration }`;
+		};
+		uiPatterns.onchange = ( act, ...args ) => {
+			if ( act in DAWCore.actions ) {
+				this._dawcore.callAction( act, ...args );
+			} else {
+				lg( "GSPatterns.onchange", act, ...args );
+			}
+		};
 		this.data = Object.freeze( {
 			synths: {},
 			patterns: {},
 			channels: {},
 		} );
-		this.rootElement = uiPatterns.rootElement;
+		this.rootElement = uiPatterns;
 		this.svgForms = svgForms;
 		this._buffers = {};
 		this._dawcore = null;
@@ -54,9 +53,6 @@ class GSPatterns {
 	// .........................................................................
 	setDAWCore( core ) {
 		this._dawcore = core;
-	}
-	attached() {
-		this._uiPatterns.attached();
 	}
 	clear() {
 		Object.keys( this.data.patterns ).forEach( this._deletePattern, this );
