@@ -7,8 +7,6 @@ class GSPatternroll {
 				onchange: this._onchange.bind( this ),
 				onaddBlock: this._onaddBlock.bind( this ),
 				oneditBlock: this._oneditBlock.bind( this ),
-				onchangeLoop: this._onchangeLoop.bind( this ),
-				onchangeCurrentTime: t => this._dawcore.composition.setCurrentTime( t ),
 			} ),
 			dataTracks = new DAWCore.controllers.tracks( {
 				dataCallbacks: {
@@ -118,9 +116,6 @@ class GSPatternroll {
 			case "unselection": this._dawcore.callAction( "unselectAllBlocks", ...args ); break;
 			case "unselectionOne": this._dawcore.callAction( "unselectBlock", ...args ); break;
 		}
-	}
-	_onchangeLoop( looping, a, b ) {
-		this._dawcore.callAction( "changeLoop", looping && a, looping && b );
 	}
 	_oneditBlock( _id, obj, blc ) {
 		if ( blc._gsuiSVGform ) {
