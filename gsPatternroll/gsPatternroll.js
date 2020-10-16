@@ -35,29 +35,7 @@ class GSPatternroll {
 		this._svgForms = null;
 		Object.seal( this );
 
-		this.rootElement.addEventListener( "gsuiEvents", e => {
-			const d = e.detail;
-
-			switch ( d.component ) {
-				case "gsuiTracklist":
-					this._dawcore.callAction( d.eventName, ...d.args );
-					e.stopPropagation();
-					break;
-				case "gsuiTimeline":
-					switch ( d.eventName ) {
-						case "changeLoop":
-							this._dawcore.callAction( "changeLoop", ...d.args );
-							e.stopPropagation();
-							break;
-						case "changeCurrentTime":
-							this._dawcore.composition.setCurrentTime( d.args[ 0 ] );
-							e.stopPropagation();
-							break;
-					}
-					break;
-			}
-		} );
-
+		this.rootElement.addEventListener( "gsuiEvents", this._ongsuiEvents.bind( this ) );
 	}
 
 	// .........................................................................
@@ -101,6 +79,28 @@ class GSPatternroll {
 	}
 	getBlocks() {
 		return this._uiRoll.getBlocks();
+	}
+
+	// .........................................................................
+	_ongsuiEvents( e ) {
+		const d = e.detail;
+
+		switch ( d.component ) {
+			case "gsuiTracklist":
+				this._dawcore.callAction( d.eventName, ...d.args );
+				break;
+			case "gsuiTimeline":
+				switch ( d.eventName ) {
+					case "changeLoop":
+						this._dawcore.callAction( "changeLoop", ...d.args );
+						break;
+					case "changeCurrentTime":
+						this._dawcore.composition.setCurrentTime( d.args[ 0 ] );
+						break;
+				}
+				break;
+		}
+		e.stopPropagation();
 	}
 
 	// .........................................................................
