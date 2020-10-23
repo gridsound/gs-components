@@ -40,15 +40,6 @@ class GSEffects {
 			this._uiEffects.reorderEffects( obj.effects );
 		}
 	}
-	resize() {
-		this._uiEffects.resized();
-	}
-	resizing() {
-		this._uiEffects.resized();
-	}
-	attached() {
-		this._uiEffects.attached();
-	}
 	clear() {
 		this._ctrlEffects.clear();
 	}
@@ -57,7 +48,7 @@ class GSEffects {
 	_changeEffectData( id, obj ) {
 		const uiFx = this._uiEffects._fxsHtml.get( id ).uiFx;
 
-		Object.entries( obj ).forEach( kv => uiFx.change( ...kv ) );
+		Object.entries( obj ).forEach( kv => GSUI.setAttribute( uiFx, ...kv ) );
 		if ( uiFx.updateWave ) {
 			uiFx.updateWave();
 		}
