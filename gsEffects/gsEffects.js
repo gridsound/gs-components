@@ -12,15 +12,38 @@ class GSEffects {
 				},
 			} );
 
-		this.rootElement = uiEffects.rootElement;
-		this._uiEffects = uiEffects;
+		this.rootElement = uiEffects;
 		this._ctrlEffects = ctrlEffects;
 		this._dawcore = null;
 		this._destFilter = "main";
 		Object.seal( this );
 
-		uiEffects.oninput = this._oninput.bind( this );
-		uiEffects.onchange = this._onchange.bind( this );
+		uiEffects.askData = ( fxId, fxType, dataType, ...args ) => {
+			if ( fxType === "filter" && dataType === "curve" ) {
+				const wafx = this._dawcore.get.audioEffect( fxId );
+
+				return wafx && wafx.updateResponse( args[ 0 ] );
+			}
+		};
+		uiEffects.addEventListener( "gsuiEvents", e => {
+			const d = e.detail;
+
+			switch ( d.component ) {
+				case "gsuiEffects":
+					switch ( d.eventName ) {
+						case "fxInput":
+							this._dawcore.liveChangeEffect( ...d.args );
+							break;
+						case "addEffect":
+							d.args.unshift( this._destFilter );
+						default:
+							this._dawcore.callAction( d.eventName, ...d.args );
+							break;
+					}
+					break;
+			}
+			e.stopPropagation();
+		} );
 	}
 
 	// .........................................................................
@@ -37,7 +60,7 @@ class GSEffects {
 	change( obj ) {
 		this._ctrlEffects.change( obj );
 		if ( obj.effects ) {
-			this._uiEffects.reorderEffects( obj.effects );
+			this.rootElement.reorderEffects( obj.effects );
 		}
 	}
 	clear() {
@@ -46,24 +69,12 @@ class GSEffects {
 
 	// .........................................................................
 	_changeEffectData( id, obj ) {
-		const uiFx = this._uiEffects._fxsHtml.get( id ).uiFx;
+		const uiFx = this.rootElement._fxsHtml.get( id ).uiFx;
 
 		Object.entries( obj ).forEach( kv => GSUI.setAttribute( uiFx, ...kv ) );
 		if ( uiFx.updateWave ) {
 			uiFx.updateWave();
 		}
-	}
-
-	// events:
-	// .........................................................................
-	_onchange( act, ...args ) {
-		if ( act === "addEffect" ) {
-			args.unshift( this._destFilter );
-		}
-		this._dawcore.callAction( act, ...args );
-	}
-	_oninput( id, prop, val ) {
-		this._dawcore.liveChangeEffect( id, prop, val );
 	}
 }
 
