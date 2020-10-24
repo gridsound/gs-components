@@ -25,24 +25,19 @@ class GSEffects {
 				return wafx && wafx.updateResponse( args[ 0 ] );
 			}
 		};
-		uiEffects.addEventListener( "gsuiEvents", e => {
-			const d = e.detail;
-
-			switch ( d.component ) {
-				case "gsuiEffects":
-					switch ( d.eventName ) {
-						case "fxInput":
-							this._dawcore.liveChangeEffect( ...d.args );
-							break;
-						case "addEffect":
-							d.args.unshift( this._destFilter );
-						default:
-							this._dawcore.callAction( d.eventName, ...d.args );
-							break;
-					}
-					break;
-			}
-			e.stopPropagation();
+		GSUI.listenEvent( uiEffects, {
+			gsuiEffects: {
+				liveChangeEffect: d => {
+					this._dawcore.liveChangeEffect( ...d.args );
+				},
+				addEffect: d => {
+					d.args.unshift( this._destFilter );
+					this._dawcore.callAction( "addEffect", ...d.args );
+				},
+				default: d => {
+					this._dawcore.callAction( d.eventName, ...d.args );
+				},
+			},
 		} );
 	}
 
