@@ -9,8 +9,8 @@ class GSSynth {
 				dataCallbacks: {
 					addOsc: ( id, osc ) => uiSynth.addOscillator( id, osc ),
 					removeOsc: id => uiSynth.removeOscillator( id ),
-					changeEnvProp: ( k, v ) => uiEnv.setAttribute( k, v ),
-					changeLFOProp: ( k, v ) => uiLFO.setAttribute( k, v ),
+					changeEnvProp: ( k, v ) => GSUI.setAttribute( uiEnv, k, v ),
+					changeLFOProp: ( k, v ) => GSUI.setAttribute( uiLFO, k, v ),
 					changeOscProp: ( id, k, v ) => uiSynth.getOscillator( id ).setAttribute( k, v ),
 					updateEnvWave: () => uiEnv.updateWave(),
 					updateLFOWave: () => uiLFO.updateWave(),
@@ -91,7 +91,7 @@ class GSSynth {
 
 		if ( "beatsPerMeasure" in obj || "stepsPerBeat" in obj ) {
 			this._uiEnv.timeSignature( get.beatsPerMeasure(), get.stepsPerBeat() );
-			this._uiLFO.timeSignature( get.beatsPerMeasure(), get.stepsPerBeat() );
+			this._uiLFO.setAttribute( "timesignature", `${ get.beatsPerMeasure() },${ get.stepsPerBeat() }` );
 		}
 		if ( synObj ) {
 			this._dataSynth.change( synObj );
