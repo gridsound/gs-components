@@ -90,8 +90,8 @@ class GSSynth {
 			get = this._dawcore.get;
 
 		if ( "beatsPerMeasure" in obj || "stepsPerBeat" in obj ) {
-			this._uiEnv.timeSignature( get.beatsPerMeasure(), get.stepsPerBeat() );
-			this._uiLFO.setAttribute( "timesignature", `${ get.beatsPerMeasure() },${ get.stepsPerBeat() }` );
+			this._uiEnv.timeDivision( get.beatsPerMeasure(), get.stepsPerBeat() );
+			this._uiLFO.setAttribute( "timedivision", `${ get.beatsPerMeasure() }/${ get.stepsPerBeat() }` );
 		}
 		if ( synObj ) {
 			this._dataSynth.change( synObj );

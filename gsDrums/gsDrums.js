@@ -136,7 +136,7 @@ class GSDrums {
 			const bPM = obj.beatsPerMeasure || this._dawcore.get.beatsPerMeasure(),
 				sPB = obj.stepsPerBeat || this._dawcore.get.stepsPerBeat();
 
-			this._uiDrums.timeSignature( bPM, sPB );
+			this._uiDrums.timeDivision( bPM, sPB );
 		}
 		if ( drmObj ) {
 			this._dataDrums.change( drmObj );

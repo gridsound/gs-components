@@ -51,7 +51,7 @@ class GSPianoroll {
 	}
 	change( obj ) {
 		if ( "beatsPerMeasure" in obj || "stepsPerBeat" in obj ) {
-			this._uiRoll.timeSignature(
+			this._uiRoll.timeDivision(
 				this._dawcore.get.beatsPerMeasure(),
 				this._dawcore.get.stepsPerBeat() );
 		}
