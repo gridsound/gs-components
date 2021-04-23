@@ -11,9 +11,8 @@ class GSPianoroll {
 				},
 			} );
 
-		this.rootElement = uiPianoroll.rootElement;
+		this.rootElement = uiPianoroll;
 		this.timeline = uiPianoroll.timeline;
-		this._uiRoll = uiPianoroll;
 		this._dataKeys = dataKeys;
 		this._dawcore =
 		this._keysId =
@@ -38,21 +37,21 @@ class GSPianoroll {
 			this._patternId = id;
 			this._keysId = null;
 			this._dataKeys.clear();
-			this._uiRoll.reset();
-			// this._uiRoll.toggleShadow( !id );
+			this.rootElement.reset();
+			// this.rootElement.toggleShadow( !id );
 			if ( id ) {
 				const pat = this._dawcore.get.pattern( id ),
 					keys = this._dawcore.get.keys( pat.keys );
 
 				this._keysId = pat.keys;
 				this._dataKeys.change( keys );
-				this._uiRoll.scrollToKeys();
+				this.rootElement.scrollToKeys();
 			}
 		}
 	}
 	change( obj ) {
 		if ( "beatsPerMeasure" in obj || "stepsPerBeat" in obj ) {
-			this._uiRoll.timeDivision(
+			this.rootElement.timeDivision(
 				this._dawcore.get.beatsPerMeasure(),
 				this._dawcore.get.stepsPerBeat() );
 		}
@@ -70,22 +69,10 @@ class GSPianoroll {
 		this._keysId =
 		this._patternId = null;
 		this._dataKeys.clear();
-		this._uiRoll.reset();
+		this.rootElement.reset();
 	}
 	getUIKeys() {
-		return this._uiRoll.uiKeys;
-	}
-
-	// .........................................................................
-	attached() {
-		this._uiRoll.attached();
-		this._uiRoll.octaves( 1, 7 );
-	}
-	currentTime( t ) {
-		this._uiRoll.currentTime( t );
-	}
-	loop( a, b ) {
-		this._uiRoll.loop( a, b );
+		return this.rootElement.uiKeys;
 	}
 
 	// .........................................................................
