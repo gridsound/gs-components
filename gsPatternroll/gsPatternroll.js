@@ -2,11 +2,7 @@
 
 class GSPatternroll {
 	constructor() {
-		const uiPatternroll = new gsuiPatternroll( {
-				onchange: this._onchange.bind( this ),
-				onaddBlock: this._onaddBlock.bind( this ),
-				oneditBlock: this._oneditBlock.bind( this ),
-			} ),
+		const uiPatternroll = new gsuiPatternroll(),
 			dataTracks = new DAWCore.controllers.tracks( {
 				dataCallbacks: {
 					addTrack: id => uiPatternroll.addTrack( id ),
@@ -35,6 +31,11 @@ class GSPatternroll {
 		Object.seal( this );
 
 		uiPatternroll.setData( dataBlocks.data );
+		uiPatternroll.setCallbacks( {
+			onchange: this._onchange.bind( this ),
+			onaddBlock: this._onaddBlock.bind( this ),
+			oneditBlock: this._oneditBlock.bind( this ),
+		} );
 		this.rootElement.addEventListener( "gsuiEvents", this._ongsuiEvents.bind( this ) );
 	}
 
