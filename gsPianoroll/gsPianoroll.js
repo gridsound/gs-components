@@ -124,7 +124,6 @@ class GSPianoroll {
 			case "remove": this._dawcore.callAction( "removeKeys", this._patternId, ...args ); break;
 			case "cropEnd": this._dawcore.callAction( "cropEndKeys", this._patternId, ...args ); break;
 			case "redirect": this._dawcore.callAction( "redirectKey", this._patternId, ...args ); break;
-			case "changeEnv": this._dawcore.callAction( "changeKeysEnv", this._patternId, ...args ); break;
 			case "selection": this._dawcore.callAction( "selectKeys", this._patternId, ...args ); break;
 			case "unselection": this._dawcore.callAction( "unselectAllKeys", this._patternId, ...args ); break;
 			case "unselectionOne": this._dawcore.callAction( "unselectKey", this._patternId, ...args ); break;
