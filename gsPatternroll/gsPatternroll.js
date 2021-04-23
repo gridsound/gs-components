@@ -65,11 +65,6 @@ class GSPatternroll {
 	}
 
 	// .........................................................................
-	currentTime( t ) { // to rm
-		this.rootElement.currentTime( t );
-	}
-
-	// .........................................................................
 	_ongsuiEvents( e ) {
 		const d = e.detail;
 
