@@ -41,7 +41,6 @@ class GSDrums {
 
 		this.rootElement = uiDrums;
 		this.timeline = uiDrums._win._elTimeline;
-		this._uiDrums = uiDrums;
 		this._uiDrumrows = uiDrumrows;
 		this._dataDrums = dataDrums;
 		this._dataDrumrows = dataDrumrows;
@@ -94,7 +93,7 @@ class GSDrums {
 			}
 			e.stopPropagation();
 		} );
-		this._uiDrums.toggleShadow( true );
+		this.rootElement.toggleShadow( true );
 	}
 
 	// .........................................................................
@@ -106,7 +105,7 @@ class GSDrums {
 			this._patternId = id;
 			this._drumsId = null;
 			this._dataDrums.clear();
-			this._uiDrums.toggleShadow( !id );
+			this.rootElement.toggleShadow( !id );
 			if ( id ) {
 				const pat = this._dawcore.get.pattern( id ),
 					drums = this._dawcore.get.drums( pat.drums );
@@ -130,13 +129,13 @@ class GSDrums {
 
 		this._dataDrumrows.change( obj );
 		if ( obj.drumrows ) {
-			this._uiDrums.drumrows.reorderDrumrows( obj.drumrows );
+			this.rootElement.drumrows.reorderDrumrows( obj.drumrows );
 		}
 		if ( "beatsPerMeasure" in obj || "stepsPerBeat" in obj ) {
 			const bPM = obj.beatsPerMeasure || this._dawcore.get.beatsPerMeasure(),
 				sPB = obj.stepsPerBeat || this._dawcore.get.stepsPerBeat();
 
-			this._uiDrums.timeDivision( bPM, sPB );
+			this.rootElement.timeDivision( bPM, sPB );
 		}
 		if ( drmObj ) {
 			this._dataDrums.change( drmObj );
@@ -151,27 +150,13 @@ class GSDrums {
 	}
 
 	// .........................................................................
-	setFontSize( fs ) {
-		this._uiDrums.setFontSize( fs );
-	}
-	setPxPerBeat( ppb ) {
-		this._uiDrums.setPxPerBeat( ppb );
-	}
-	currentTime( beat ) {
-		this._uiDrums.currentTime( beat );
-	}
-	loop( a, b ) {
-		this._uiDrums.loop( a, b );
-	}
-
-	// .........................................................................
 	_setPropFilter( rowId, prop ) {
 		const propValues = Object.entries( this._dawcore.get.drums( this._drumsId ) )
 				.filter( ( [, drm ] ) => drm.row === rowId && "gain" in drm )
 				.map( ( [ id, drm ] ) => [ id, drm[ prop ] ] );
 
 		this._uiDrumrows.setPropFilter( rowId, prop );
-		this._uiDrums.setPropValues( rowId, prop, propValues );
+		this.rootElement.setPropValues( rowId, prop, propValues );
 	}
 	_setAllPropFilters( prop ) {
 		Object.keys( this._dawcore.get.drumrows() )
