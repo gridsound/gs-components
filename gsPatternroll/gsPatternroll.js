@@ -2,7 +2,7 @@
 
 class GSPatternroll {
 	constructor() {
-		const uiPatternroll = new gsuiPatternroll(),
+		const uiPatternroll = GSUI.createElement( "gsui-patternroll" ),
 			dataTracks = new DAWCore.controllers.tracks( {
 				dataCallbacks: {
 					addTrack: id => uiPatternroll.addTrack( id ),
@@ -21,9 +21,8 @@ class GSPatternroll {
 				},
 			} );
 
-		this.rootElement = uiPatternroll.rootElement;
+		this.rootElement = uiPatternroll;
 		this.timeline = uiPatternroll.timeline;
-		this._uiRoll = uiPatternroll;
 		this._dataTracks = dataTracks;
 		this._dataBlocks = dataBlocks;
 		this._dawcore =
@@ -50,12 +49,12 @@ class GSPatternroll {
 		this._dataTracks.change( obj );
 		this._dataBlocks.change( obj );
 		if ( "loopA" in obj || "loopB" in obj ) {
-			this._uiRoll.loop(
+			this.rootElement.loop(
 				this._dawcore.get.loopA(),
 				this._dawcore.get.loopB() );
 		}
 		if ( "beatsPerMeasure" in obj || "stepsPerBeat" in obj ) {
-			this._uiRoll.timeDivision(
+			this.rootElement.timeDivision(
 				this._dawcore.get.beatsPerMeasure(),
 				this._dawcore.get.stepsPerBeat() );
 		}
@@ -66,20 +65,8 @@ class GSPatternroll {
 	}
 
 	// .........................................................................
-	attached() {
-		this._uiRoll.attached();
-	}
-	resized() {
-		this._uiRoll.resized();
-	}
-	currentTime( t ) {
-		this._uiRoll.currentTime( t );
-	}
-	loop( a, b ) {
-		this._uiRoll.loop( a, b );
-	}
-	getBlocks() {
-		return this._uiRoll.getBlocks();
+	currentTime( t ) { // to rm
+		this.rootElement.currentTime( t );
 	}
 
 	// .........................................................................
