@@ -3,7 +3,6 @@
 class GSPatternroll {
 	constructor() {
 		const uiPatternroll = new gsuiPatternroll( {
-				getData: () => dataBlocks.data,
 				onchange: this._onchange.bind( this ),
 				onaddBlock: this._onaddBlock.bind( this ),
 				oneditBlock: this._oneditBlock.bind( this ),
@@ -35,6 +34,7 @@ class GSPatternroll {
 		this._svgForms = null;
 		Object.seal( this );
 
+		uiPatternroll.setData( dataBlocks.data );
 		this.rootElement.addEventListener( "gsuiEvents", this._ongsuiEvents.bind( this ) );
 	}
 

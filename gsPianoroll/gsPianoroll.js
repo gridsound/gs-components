@@ -3,7 +3,6 @@
 class GSPianoroll {
 	constructor() {
 		const uiPianoroll = new gsuiPianoroll( {
-				getData: () => this._dataKeys.data,
 				onchange: this._onchange.bind( this ),
 			} ),
 			dataKeys = new DAWCore.controllers.keys( {
@@ -23,6 +22,7 @@ class GSPianoroll {
 		this._patternId = null;
 		Object.seal( this );
 
+		uiPianoroll.setData( dataKeys.data );
 		uiPianoroll.uiKeys.onkeydown = midi => this._dawcore.pianoroll.liveKeydown( midi );
 		uiPianoroll.uiKeys.onkeyup = midi => this._dawcore.pianoroll.liveKeyup( midi );
 		this.rootElement.addEventListener( "gsuiEvents", this._ongsuiEvents.bind( this ) );
