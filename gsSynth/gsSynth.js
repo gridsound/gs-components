@@ -39,7 +39,7 @@ class GSSynth {
 					switch ( d.eventName ) {
 						case "toggle": dc.callAction( "toggleEnv", id ); break;
 						case "change": dc.callAction( "changeEnv", id, ...a ); break;
-						case "liveChange": dc.liveChangeSynth( id, { env: { [ a[ 0 ] ]: a[ 1 ] } } ); break;
+						// case "liveChange": dc.liveChangeSynth( id, { env: { [ a[ 0 ] ]: a[ 1 ] } } ); break;
 					}
 					break;
 				case "gsuiLFO":
