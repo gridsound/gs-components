@@ -40,7 +40,7 @@ class GSDrums {
 			} );
 
 		this.rootElement = uiDrums;
-		this.timeline = uiDrums._win._elTimeline;
+		this.timeline = uiDrums.timeline;
 		this._uiDrumrows = uiDrumrows;
 		this._dataDrums = dataDrums;
 		this._dataDrumrows = dataDrumrows;
