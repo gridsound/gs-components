@@ -32,15 +32,15 @@ class GSPatterns {
 		this._buffers = {};
 		this._dawcore = null;
 		this._uiPatterns = uiPatterns;
-		this._synthsCrud = GSUtils.createUpdateDelete.bind( null, this.data.synths,
+		this._synthsCrud = DAWCore.utils.createUpdateDelete.bind( null, this.data.synths,
 			this._createSynth.bind( this ),
 			this._updateSynth.bind( this ),
 			this._deleteSynth.bind( this ) );
-		this._patternsCrud = GSUtils.createUpdateDelete.bind( null, this.data.patterns,
+		this._patternsCrud = DAWCore.utils.createUpdateDelete.bind( null, this.data.patterns,
 			this._createPattern.bind( this ),
 			this._updatePattern.bind( this ),
 			this._deletePattern.bind( this ) );
-		this._channelsCrud = GSUtils.createUpdateDelete.bind( null, this.data.channels,
+		this._channelsCrud = DAWCore.utils.createUpdateDelete.bind( null, this.data.channels,
 			this._createChannel.bind( this ),
 			this._updateChannel.bind( this ),
 			this._deleteChannel.bind( this ) );
@@ -133,7 +133,7 @@ class GSPatterns {
 
 	// .........................................................................
 	_createSynth( id, obj ) {
-		this.data.synths[ id ] = GSUtils.jsonCopy( obj );
+		this.data.synths[ id ] = DAWCore.utils.jsonCopy( obj );
 		this._uiPatterns.addSynth( id );
 		this._updateSynth( id, obj );
 	}
@@ -158,7 +158,7 @@ class GSPatterns {
 		const isBuf = obj.type === "buffer",
 			SVG = this.svgForms[ isBuf ? "bufferHD" : obj.type ];
 
-		this.data.patterns[ id ] = GSUtils.jsonCopy( obj );
+		this.data.patterns[ id ] = DAWCore.utils.jsonCopy( obj );
 		SVG.add( id );
 		if ( isBuf ) {
 			const buf = this._buffers[ obj.buffer ];
