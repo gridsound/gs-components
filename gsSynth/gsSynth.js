@@ -3,31 +3,25 @@
 class GSSynth {
 	constructor() {
 		const uiSynth = document.createElement( "gsui-synthesizer" ),
-			uiEnv = document.createElement( "gsui-envelope" ),
-			uiLFO = document.createElement( "gsui-lfo" ),
 			dataSynth = new DAWCore.controllers.synth( {
 				dataCallbacks: {
 					addOsc: ( id, osc ) => uiSynth.addOscillator( id, osc ),
 					removeOsc: id => uiSynth.removeOscillator( id ),
-					changeEnvProp: ( k, v ) => GSUI.setAttribute( uiEnv, k, v ),
-					changeLFOProp: ( k, v ) => GSUI.setAttribute( uiLFO, k, v ),
-					changeOscProp: ( id, k, v ) => uiSynth.getOscillator( id ).setAttribute( k, v ),
-					updateEnvWave: () => uiEnv.updateWave(),
-					updateLFOWave: () => uiLFO.updateWave(),
+					changeEnvProp: ( k, v ) => GSUI.setAttribute( uiSynth.env, k, v ),
+					changeLFOProp: ( k, v ) => GSUI.setAttribute( uiSynth.lfo, k, v ),
+					changeOscProp: ( id, k, v ) => GSUI.setAttribute( uiSynth.getOscillator( id ), k, v ),
+					updateEnvWave: () => uiSynth.env.updateWave(),
+					updateLFOWave: () => uiSynth.lfo.updateWave(),
 					updateOscWave: id => uiSynth.getOscillator( id ).updateWave(),
 				},
 			} );
 
 		this.rootElement = uiSynth;
-		this._uiEnv = uiEnv;
-		this._uiLFO = uiLFO;
 		this._dataSynth = dataSynth;
 		this._dawcore =
 		this._synthId = null;
 		Object.seal( this );
 
-		uiSynth.setEnvelope( uiEnv );
-		uiSynth.setLFO( uiLFO );
 		uiSynth.addEventListener( "gsuiEvents", e => {
 			const d = e.detail,
 				a = d.args,
@@ -90,8 +84,8 @@ class GSSynth {
 			get = this._dawcore.get;
 
 		if ( "beatsPerMeasure" in obj || "stepsPerBeat" in obj ) {
-			this._uiEnv.timeDivision( get.beatsPerMeasure(), get.stepsPerBeat() );
-			this._uiLFO.setAttribute( "timedivision", `${ get.beatsPerMeasure() }/${ get.stepsPerBeat() }` );
+			GSUI.setAttribute( this.rootElement.env, "timedivision", `${ get.beatsPerMeasure() }/${ get.stepsPerBeat() }` );
+			GSUI.setAttribute( this.rootElement.lfo, "timedivision", `${ get.beatsPerMeasure() }/${ get.stepsPerBeat() }` );
 		}
 		if ( synObj ) {
 			this._dataSynth.change( synObj );
