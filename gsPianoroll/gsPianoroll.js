@@ -23,7 +23,27 @@ class GSPianoroll {
 		uiPianoroll.setCallbacks( {
 			onchange: this._onchange.bind( this ),
 		} );
-		this.rootElement.addEventListener( "gsuiEvents", this._ongsuiEvents.bind( this ) );
+		GSUI.listenEvent( this.rootElement, {
+			gsuiPianoroll: {
+				changeKeysProps: d => {
+					this._dawcore.callAction( "changeKeysProps", this._patternId, ...d.args );
+				},
+			},
+			gsuiTimeline: {
+				changeCurrentTime: d => {
+					this._dawcore.pianoroll.setCurrentTime( d.args[ 0 ] );
+				},
+				changeLoop: d => {
+					d.args[ 0 ] !== false
+						? this._dawcore.pianoroll.setLoop( ...d.args )
+						: this._dawcore.pianoroll.clearLoop();
+				},
+			},
+			gsuiKeys: {
+				keyUp: d => { this._dawcore.pianoroll.liveKeyup( d.args[ 0 ] ); },
+				keyDown: d => { this._dawcore.pianoroll.liveKeydown( d.args[ 0 ] ); },
+			},
+		} );
 	}
 
 	// .........................................................................
@@ -71,40 +91,6 @@ class GSPianoroll {
 	}
 	getUIKeys() {
 		return this.rootElement.uiKeys;
-	}
-
-	// .........................................................................
-	_ongsuiEvents( e ) {
-		const d = e.detail;
-
-		switch ( d.component ) {
-			case "gsuiPianoroll":
-				switch ( d.eventName ) {
-					case "changeKeysProps":
-						this._dawcore.callAction( "changeKeysProps", this._patternId, ...d.args );
-						break;
-				}
-				break;
-			case "gsuiTimeline":
-				switch ( d.eventName ) {
-					case "changeLoop":
-						d.args[ 0 ] !== false
-							? this._dawcore.pianoroll.setLoop( ...d.args )
-							: this._dawcore.pianoroll.clearLoop();
-						break;
-					case "changeCurrentTime":
-						this._dawcore.pianoroll.setCurrentTime( d.args[ 0 ] );
-						break;
-				}
-				break;
-			case "gsuiKeys":
-				switch ( d.eventName ) {
-					case "keyDown": this._dawcore.pianoroll.liveKeydown( d.args[ 0 ] ); break;
-					case "keyUp": this._dawcore.pianoroll.liveKeyup( d.args[ 0 ] ); break;
-				}
-				break;
-		}
-		e.stopPropagation();
 	}
 
 	// .........................................................................
