@@ -50,48 +50,43 @@ class GSDrums {
 		this._svgManager = null;
 		Object.seal( this );
 
-		uiDrumrows.addEventListener( "gsuiEvents", e => {
-			const d = e.detail;
-
-			switch ( d.eventName ) {
-				case "change": this._dawcore.callAction( ...d.args ); break;
-				case "propFilter": this._setPropFilter( ...d.args ); break;
-				case "propFilters": this._setAllPropFilters( ...d.args ); break;
-				case "liveStopDrum": this._dawcore.drums.stopLiveDrum( ...d.args ); break;
-				case "liveStartDrum": this._dawcore.drums.startLiveDrum( ...d.args ); break;
-				case "liveChangeDrumrow": this._dawcore.drums.changeLiveDrumrow( ...d.args ); break;
-				default: return;
-			}
-			e.stopPropagation();
-		} );
-		uiDrums.addEventListener( "gsuiEvents", e => {
-			const d = e.detail;
-
-			switch ( d.eventName ) {
-				case "change": {
+		GSUI.listenEvents( this.rootElement, {
+			gsuiDrumrows: {
+				change: d => { this._dawcore.callAction( ...d.args ); },
+				propFilter: d => { this._setPropFilter( ...d.args ); },
+				propFilters: d => { this._setAllPropFilters( ...d.args ); },
+				liveStopDrum: d => { this._dawcore.drums.stopLiveDrum( ...d.args ); },
+				liveStartDrum: d => { this._dawcore.drums.startLiveDrum( ...d.args ); },
+				liveChangeDrumrow: d => { this._dawcore.drums.changeLiveDrumrow( ...d.args ); },
+			},
+			gsuiDrums: {
+				change: d => {
 					const [ act, ...args ] = d.args;
 
 					this._dawcore.callAction( act, this._patternId, ...args );
-				} break;
-				case "input":
-					this._uiDrumrows.setDrumPropValue( d.args[ 0 ], d.args[ 2 ], d.args[ 3 ] );
-					break;
-				case "inputEnd":
-					this._uiDrumrows.removeDrumPropValue( ...d.args );
-					break;
-				case "changeLoop": {
+				},
+				changeLoop: d => {
 					const [ a, b ] = d.args;
 
 					a !== false
 						? this._dawcore.drums.setLoop( a, b )
 						: this._dawcore.drums.clearLoop();
-				} break;
-				case "changeCurrentTime":
+				},
+				changeCurrentTime: d => {
 					this._dawcore.drums.setCurrentTime( d.args[ 0 ] );
-					break;
-				default: return;
-			}
-			e.stopPropagation();
+				},
+			},
+			gsuiSliderGroup: {
+				change: d => {
+					this._dawcore.callAction( "changeDrumsProps", this._patternId, ...d.args );
+				},
+				input: d => {
+					this._uiDrumrows.setDrumPropValue( d.args[ 0 ], d.args[ 2 ], d.args[ 3 ] );
+				},
+				inputEnd: d => {
+					this._uiDrumrows.removeDrumPropValue( ...d.args );
+				},
+			},
 		} );
 		this.rootElement.toggleShadow( true );
 	}
