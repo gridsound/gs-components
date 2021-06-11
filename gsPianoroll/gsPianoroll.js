@@ -23,8 +23,6 @@ class GSPianoroll {
 		uiPianoroll.setCallbacks( {
 			onchange: this._onchange.bind( this ),
 		} );
-		uiPianoroll.uiKeys.onkeydown = midi => this._dawcore.pianoroll.liveKeydown( midi );
-		uiPianoroll.uiKeys.onkeyup = midi => this._dawcore.pianoroll.liveKeyup( midi );
 		this.rootElement.addEventListener( "gsuiEvents", this._ongsuiEvents.bind( this ) );
 	}
 
@@ -97,6 +95,12 @@ class GSPianoroll {
 					case "changeCurrentTime":
 						this._dawcore.pianoroll.setCurrentTime( d.args[ 0 ] );
 						break;
+				}
+				break;
+			case "gsuiKeys":
+				switch ( d.eventName ) {
+					case "keyDown": this._dawcore.pianoroll.liveKeydown( d.args[ 0 ] ); break;
+					case "keyUp": this._dawcore.pianoroll.liveKeyup( d.args[ 0 ] ); break;
 				}
 				break;
 		}
