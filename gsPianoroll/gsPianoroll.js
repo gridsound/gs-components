@@ -23,7 +23,7 @@ class GSPianoroll {
 		uiPianoroll.setCallbacks( {
 			onchange: this._onchange.bind( this ),
 		} );
-		GSUI.listenEvent( this.rootElement, {
+		GSUI.listenEvents( this.rootElement, {
 			gsuiPianoroll: {
 				changeKeysProps: d => {
 					this._dawcore.callAction( "changeKeysProps", this._patternId, ...d.args );

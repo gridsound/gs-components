@@ -25,7 +25,7 @@ class GSEffects {
 				return wafx && wafx.updateResponse( args[ 0 ] );
 			}
 		};
-		GSUI.listenEvent( uiEffects, {
+		GSUI.listenEvents( uiEffects, {
 			gsuiEffects: {
 				liveChangeEffect: d => {
 					this._dawcore.liveChangeEffect( ...d.args );
