@@ -65,15 +65,17 @@ class GSDrums {
 
 					this._dawcore.callAction( act, this._patternId, ...args );
 				},
+			},
+			gsuiTimeline: {
+				changeCurrentTime: d => {
+					this._dawcore.drums.setCurrentTime( d.args[ 0 ] );
+				},
 				changeLoop: d => {
 					const [ a, b ] = d.args;
 
 					a !== false
 						? this._dawcore.drums.setLoop( a, b )
 						: this._dawcore.drums.clearLoop();
-				},
-				changeCurrentTime: d => {
-					this._dawcore.drums.setCurrentTime( d.args[ 0 ] );
 				},
 			},
 			gsuiSliderGroup: {
