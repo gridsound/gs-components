@@ -108,7 +108,7 @@ class GSPatterns {
 	_updatePatternContent( id ) {
 		const get = this._dawcore.get,
 			pat = get.pattern( id ),
-			elPat = this._uiPatterns._getPattern( id );
+			elPat = this._uiPatterns.getPattern( id );
 
 		if ( elPat ) {
 			const type = pat.type;
