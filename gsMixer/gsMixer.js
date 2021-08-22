@@ -2,11 +2,7 @@
 
 class GSMixer {
 	constructor() {
-		const uiMixer = new gsuiMixer( {
-				oninput: this._oninput.bind( this ),
-				onchange: this._onchange.bind( this ),
-				onselectChan: this._onselectChan.bind( this ),
-			} ),
+		const uiMixer = GSUI.createElement( "gsui-mixer" ),
 			ctrlMixer = new DAWCore.controllers.mixer( {
 				dataCallbacks: {
 					addChannel: ( id, chan ) => uiMixer.addChannel( id, chan ),
@@ -20,12 +16,16 @@ class GSMixer {
 				},
 			} );
 
-		this.rootElement = uiMixer.rootElement;
+		this.rootElement = uiMixer;
 		this.onselectChan = null;
 		this._uiMixer = uiMixer;
 		this._ctrlMixer = ctrlMixer;
 		this._dawcore = null;
 		Object.seal( this );
+
+		uiMixer.oninput = this._oninput.bind( this );
+		uiMixer.onchange = this._onchange.bind( this );
+		uiMixer.onselectChan = this._onselectChan.bind( this );
 	}
 
 	// .........................................................................
@@ -46,9 +46,6 @@ class GSMixer {
 	}
 	resizing() {
 		this._uiMixer.resized();
-	}
-	attached() {
-		this._uiMixer.attached();
 	}
 	updateAudioData( chanId, ldata, rdata ) {
 		this._uiMixer.updateAudioData( chanId, ldata, rdata );
