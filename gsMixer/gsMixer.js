@@ -41,12 +41,6 @@ class GSMixer {
 			this._uiMixer.reorderChannels( obj.channels );
 		}
 	}
-	resize() {
-		this._uiMixer.resized();
-	}
-	resizing() {
-		this._uiMixer.resized();
-	}
 	updateAudioData( chanId, ldata, rdata ) {
 		this._uiMixer.updateAudioData( chanId, ldata, rdata );
 	}
