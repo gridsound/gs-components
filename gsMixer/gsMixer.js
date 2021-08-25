@@ -1,64 +1,61 @@
 "use strict";
 
 class GSMixer {
-	constructor() {
-		const uiMixer = GSUI.createElement( "gsui-mixer" ),
-			ctrlMixer = new DAWCore.controllers.mixer( {
-				dataCallbacks: {
-					addChannel: ( id, chan ) => uiMixer.addChannel( id, chan ),
-					removeChannel: id => uiMixer.removeChannel( id ),
-					renameChannel: ( id, name ) => uiMixer.renameChannel( id, name ),
-					redirectChannel: ( id, dest ) => uiMixer.redirectChannel( id, dest ),
-					toggleChannel: ( id, b ) => uiMixer.toggleChannel( id, b ),
-					reorderChannel: ( id, n ) => uiMixer.reorderChannel( id, n ),
-					changePanChannel: ( id, val ) => uiMixer.changePanChannel( id, val ),
-					changeGainChannel: ( id, val ) => uiMixer.changeGainChannel( id, val ),
-				},
-			} );
+	#dawcore = null
+	onselectChan = null
+	rootElement = GSUI.createElement( "gsui-mixer" )
+	#ctrlMixer = new DAWCore.controllers.mixer( {
+		dataCallbacks: {
+			addChannel: ( id, chan ) => this.rootElement.addChannel( id, chan ),
+			removeChannel: id => this.rootElement.removeChannel( id ),
+			renameChannel: ( id, name ) => this.rootElement.renameChannel( id, name ),
+			redirectChannel: ( id, dest ) => this.rootElement.redirectChannel( id, dest ),
+			toggleChannel: ( id, b ) => this.rootElement.toggleChannel( id, b ),
+			reorderChannel: ( id, n ) => this.rootElement.reorderChannel( id, n ),
+			changePanChannel: ( id, val ) => this.rootElement.changePanChannel( id, val ),
+			changeGainChannel: ( id, val ) => this.rootElement.changeGainChannel( id, val ),
+		},
+	} )
 
-		this.rootElement = uiMixer;
-		this.onselectChan = null;
-		this._uiMixer = uiMixer;
-		this._ctrlMixer = ctrlMixer;
-		this._dawcore = null;
+	constructor() {
 		Object.seal( this );
 
-		uiMixer.oninput = this._oninput.bind( this );
-		uiMixer.onchange = this._onchange.bind( this );
-		uiMixer.onselectChan = this._onselectChan.bind( this );
+		this.rootElement.oninput = this.#oninput.bind( this );
+		this.rootElement.onchange = this.#onchange.bind( this );
+		this.rootElement.onselectChan = this.#onselectChan.bind( this );
 	}
 
 	// .........................................................................
 	setDAWCore( core ) {
-		this._dawcore = core;
+		this.#dawcore = core;
 	}
 	clear() {
-		this._ctrlMixer.clear();
+		this.#ctrlMixer.clear();
 	}
 	change( obj ) {
-		this._ctrlMixer.change( obj );
+		this.#ctrlMixer.change( obj );
 		if ( obj.channels ) {
-			this._uiMixer.reorderChannels( obj.channels );
+			this.rootElement.reorderChannels( obj.channels );
 		}
 	}
 	updateAudioData( chanId, ldata, rdata ) {
-		this._uiMixer.updateAudioData( chanId, ldata, rdata );
+		this.rootElement.updateAudioData( chanId, ldata, rdata );
 	}
 	selectChannel( id ) {
-		this._uiMixer.selectChannel( id );
+		this.rootElement.selectChannel( id );
 	}
 	getSelectedChannelId() {
-		return this._uiMixer.getSelectedChannelId();
+		return this.rootElement.getSelectedChannelId();
 	}
 
 	// .........................................................................
-	_oninput( id, prop, val ) {
-		this._dawcore.liveChangeChannel( id, prop, val );
+	#oninput( id, prop, val ) {
+		this.#dawcore.liveChangeChannel( id, prop, val );
 	}
-	_onchange( act, ...args ) {
-		this._dawcore.callAction( act, ...args );
+	#onchange( act, ...args ) {
+		this.#dawcore.callAction( act, ...args );
 	}
-	_onselectChan( id ) {
+	#onselectChan( id ) {
 		if ( this.onselectChan ) {
 			this.onselectChan( id );
 		}
