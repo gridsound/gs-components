@@ -1,41 +1,39 @@
 "use strict";
 
 class GSEffects {
-	constructor() {
-		const uiEffects = new gsuiEffects(),
-			ctrlEffects = new DAWCore.controllers.effects( {
-				dataCallbacks: {
-					addEffect: ( id, obj ) => uiEffects.addEffect( id, obj ),
-					removeEffect: id => uiEffects.removeEffect( id ),
-					changeEffect: ( id, prop, val ) => uiEffects.changeEffect( id, prop, val ),
-					changeEffectData: ( id, obj ) => this._changeEffectData( id, obj ),
-				},
-			} );
+	#dawcore = null
+	#destFilter = "main"
+	rootElement = new gsuiEffects()
+	#ctrlEffects = new DAWCore.controllers.effects( {
+		dataCallbacks: {
+			addEffect: ( id, obj ) => this.rootElement.addEffect( id, obj ),
+			removeEffect: id => this.rootElement.removeEffect( id ),
+			changeEffect: ( id, prop, val ) => this.rootElement.changeEffect( id, prop, val ),
+			changeEffectData: ( id, obj ) => this.#changeEffectData( id, obj ),
+		},
+	} )
 
-		this.rootElement = uiEffects;
-		this._ctrlEffects = ctrlEffects;
-		this._dawcore = null;
-		this._destFilter = "main";
+	constructor() {
 		Object.seal( this );
 
-		uiEffects.askData = ( fxId, fxType, dataType, ...args ) => {
+		this.rootElement.askData = ( fxId, fxType, dataType, ...args ) => {
 			if ( fxType === "filter" && dataType === "curve" ) {
-				const wafx = this._dawcore.get.audioEffect( fxId );
+				const wafx = this.#dawcore.get.audioEffect( fxId );
 
 				return wafx && wafx.updateResponse( args[ 0 ] );
 			}
 		};
-		GSUI.listenEvents( uiEffects, {
+		GSUI.listenEvents( this.rootElement, {
 			gsuiEffects: {
 				liveChangeEffect: d => {
-					this._dawcore.liveChangeEffect( ...d.args );
+					this.#dawcore.liveChangeEffect( ...d.args );
 				},
 				addEffect: d => {
-					d.args.unshift( this._destFilter );
-					this._dawcore.callAction( "addEffect", ...d.args );
+					d.args.unshift( this.#destFilter );
+					this.#dawcore.callAction( "addEffect", ...d.args );
 				},
 				default: d => {
-					this._dawcore.callAction( d.eventName, ...d.args );
+					this.#dawcore.callAction( d.eventName, ...d.args );
 				},
 			},
 		} );
@@ -43,27 +41,27 @@ class GSEffects {
 
 	// .........................................................................
 	setDAWCore( core ) {
-		this._dawcore = core;
+		this.#dawcore = core;
 	}
 	getDestFilter() {
-		return this._destFilter;
+		return this.#destFilter;
 	}
 	setDestFilter( dest ) {
-		this._destFilter = dest;
-		this._ctrlEffects.setDestFilter( dest );
+		this.#destFilter = dest;
+		this.#ctrlEffects.setDestFilter( dest );
 	}
 	change( obj ) {
-		this._ctrlEffects.change( obj );
+		this.#ctrlEffects.change( obj );
 		if ( obj.effects ) {
 			this.rootElement.reorderEffects( obj.effects );
 		}
 	}
 	clear() {
-		this._ctrlEffects.clear();
+		this.#ctrlEffects.clear();
 	}
 
 	// .........................................................................
-	_changeEffectData( id, obj ) {
+	#changeEffectData( id, obj ) {
 		const uiFx = this.rootElement.getFxHTML( id ).uiFx;
 
 		Object.entries( obj ).forEach( kv => GSUI.setAttribute( uiFx, ...kv ) );
