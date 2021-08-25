@@ -1,68 +1,66 @@
 "use strict";
 
 class GSPianoroll {
-	constructor() {
-		const uiPianoroll = new gsuiPianoroll(),
-			dataKeys = new DAWCore.controllers.keys( {
-				dataCallbacks: {
-					addKey: ( id, blc ) => uiPianoroll.addKey( id, blc ),
-					removeKey: id => uiPianoroll.removeKey( id ),
-					changeKeyProp: ( id, prop, val ) => uiPianoroll.changeKeyProp( id, prop, val ),
-				},
-			} );
+	#dawcore = null
+	#keysId = null
+	#patternId = null
+	rootElement = new gsuiPianoroll()
+	timeline = this.rootElement.timeline
+	#dataKeys = new DAWCore.controllers.keys( {
+		dataCallbacks: {
+			addKey: ( id, blc ) => this.rootElement.addKey( id, blc ),
+			removeKey: id => this.rootElement.removeKey( id ),
+			changeKeyProp: ( id, prop, val ) => this.rootElement.changeKeyProp( id, prop, val ),
+		},
+	} )
 
-		this.rootElement = uiPianoroll;
-		this.timeline = uiPianoroll.timeline;
-		this._dataKeys = dataKeys;
-		this._dawcore =
-		this._keysId =
-		this._patternId = null;
+	constructor() {
 		Object.seal( this );
 
-		uiPianoroll.setData( dataKeys.data );
-		uiPianoroll.setCallbacks( {
-			onchange: this._onchange.bind( this ),
+		this.rootElement.setData( this.#dataKeys.data );
+		this.rootElement.setCallbacks( {
+			onchange: this.#onchange.bind( this ),
 		} );
 		GSUI.listenEvents( this.rootElement, {
 			gsuiPianoroll: {
 				changeKeysProps: d => {
-					this._dawcore.callAction( "changeKeysProps", this._patternId, ...d.args );
+					this.#dawcore.callAction( "changeKeysProps", this.#patternId, ...d.args );
 				},
 			},
 			gsuiTimeline: {
 				changeCurrentTime: d => {
-					this._dawcore.pianoroll.setCurrentTime( d.args[ 0 ] );
+					this.#dawcore.pianoroll.setCurrentTime( d.args[ 0 ] );
 				},
 				changeLoop: d => {
 					d.args[ 0 ] !== false
-						? this._dawcore.pianoroll.setLoop( ...d.args )
-						: this._dawcore.pianoroll.clearLoop();
+						? this.#dawcore.pianoroll.setLoop( ...d.args )
+						: this.#dawcore.pianoroll.clearLoop();
 				},
 			},
 			gsuiKeys: {
-				keyUp: d => { this._dawcore.pianoroll.liveKeyup( d.args[ 0 ] ); },
-				keyDown: d => { this._dawcore.pianoroll.liveKeydown( d.args[ 0 ] ); },
+				keyUp: d => { this.#dawcore.pianoroll.liveKeyup( d.args[ 0 ] ); },
+				keyDown: d => { this.#dawcore.pianoroll.liveKeydown( d.args[ 0 ] ); },
 			},
 		} );
 	}
 
 	// .........................................................................
 	setDAWCore( core ) {
-		this._dawcore = core;
+		this.#dawcore = core;
 	}
 	selectPattern( id ) {
-		if ( id !== this._patternId ) {
-			this._patternId = id;
-			this._keysId = null;
-			this._dataKeys.clear();
+		if ( id !== this.#patternId ) {
+			this.#patternId = id;
+			this.#keysId = null;
+			this.#dataKeys.clear();
 			this.rootElement.reset();
 			// this.rootElement.toggleShadow( !id );
 			if ( id ) {
-				const pat = this._dawcore.get.pattern( id ),
-					keys = this._dawcore.get.keys( pat.keys );
+				const pat = this.#dawcore.get.pattern( id ),
+					keys = this.#dawcore.get.keys( pat.keys );
 
-				this._keysId = pat.keys;
-				this._dataKeys.change( keys );
+				this.#keysId = pat.keys;
+				this.#dataKeys.change( keys );
 				this.rootElement.scrollToKeys();
 			}
 		}
@@ -70,23 +68,23 @@ class GSPianoroll {
 	change( obj ) {
 		if ( "beatsPerMeasure" in obj || "stepsPerBeat" in obj ) {
 			this.rootElement.timeDivision(
-				this._dawcore.get.beatsPerMeasure(),
-				this._dawcore.get.stepsPerBeat() );
+				this.#dawcore.get.beatsPerMeasure(),
+				this.#dawcore.get.stepsPerBeat() );
 		}
 		if ( "patternKeysOpened" in obj ) {
 			this.selectPattern( obj.patternKeysOpened );
 		} else {
-			const keys = obj.keys && obj.keys[ this._keysId ];
+			const keys = obj.keys && obj.keys[ this.#keysId ];
 
 			if ( keys ) {
-				this._dataKeys.change( keys );
+				this.#dataKeys.change( keys );
 			}
 		}
 	}
 	clear() {
-		this._keysId =
-		this._patternId = null;
-		this._dataKeys.clear();
+		this.#keysId =
+		this.#patternId = null;
+		this.#dataKeys.clear();
 		this.rootElement.reset();
 	}
 	getUIKeys() {
@@ -94,17 +92,17 @@ class GSPianoroll {
 	}
 
 	// .........................................................................
-	_onchange( obj, ...args ) {
+	#onchange( obj, ...args ) {
 		switch ( obj ) { // tmp
-			case "add": this._dawcore.callAction( "addKey", this._patternId, ...args ); break;
-			case "move": this._dawcore.callAction( "moveKeys", this._patternId, ...args ); break;
-			case "clone": this._dawcore.callAction( "cloneSelectedKeys", this._patternId, ...args ); break;
-			case "remove": this._dawcore.callAction( "removeKeys", this._patternId, ...args ); break;
-			case "cropEnd": this._dawcore.callAction( "cropEndKeys", this._patternId, ...args ); break;
-			case "redirect": this._dawcore.callAction( "redirectKey", this._patternId, ...args ); break;
-			case "selection": this._dawcore.callAction( "selectKeys", this._patternId, ...args ); break;
-			case "unselection": this._dawcore.callAction( "unselectAllKeys", this._patternId, ...args ); break;
-			case "unselectionOne": this._dawcore.callAction( "unselectKey", this._patternId, ...args ); break;
+			case "add": this.#dawcore.callAction( "addKey", this.#patternId, ...args ); break;
+			case "move": this.#dawcore.callAction( "moveKeys", this.#patternId, ...args ); break;
+			case "clone": this.#dawcore.callAction( "cloneSelectedKeys", this.#patternId, ...args ); break;
+			case "remove": this.#dawcore.callAction( "removeKeys", this.#patternId, ...args ); break;
+			case "cropEnd": this.#dawcore.callAction( "cropEndKeys", this.#patternId, ...args ); break;
+			case "redirect": this.#dawcore.callAction( "redirectKey", this.#patternId, ...args ); break;
+			case "selection": this.#dawcore.callAction( "selectKeys", this.#patternId, ...args ); break;
+			case "unselection": this.#dawcore.callAction( "unselectAllKeys", this.#patternId, ...args ); break;
+			case "unselectionOne": this.#dawcore.callAction( "unselectKey", this.#patternId, ...args ); break;
 		}
 	}
 }
