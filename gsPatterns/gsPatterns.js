@@ -1,6 +1,13 @@
 "use strict";
 
 class GSPatterns {
+	#buffers = {}
+	#dawcore = null
+	#uiPatterns = null
+	#synthsCrud = null
+	#patternsCrud = null
+	#channelsCrud = null
+
 	constructor() {
 		const uiPatterns = GSUI.createElement( "gsui-patterns" ),
 			svgForms = Object.freeze( {
@@ -13,11 +20,11 @@ class GSPatterns {
 		uiPatterns.onpatternDataTransfer = elPat => {
 			const id = elPat.dataset.id;
 
-			return `${ id }:${ this._dawcore.get.pattern( id ).duration }`;
+			return `${ id }:${ this.#dawcore.get.pattern( id ).duration }`;
 		};
 		uiPatterns.onchange = ( act, ...args ) => {
 			if ( act in DAWCore.actions ) {
-				this._dawcore.callAction( act, ...args );
+				this.#dawcore.callAction( act, ...args );
 			} else {
 				lg( "GSPatterns.onchange", act, ...args );
 			}
@@ -29,21 +36,19 @@ class GSPatterns {
 		} );
 		this.rootElement = uiPatterns;
 		this.svgForms = svgForms;
-		this._buffers = {};
-		this._dawcore = null;
-		this._uiPatterns = uiPatterns;
-		this._synthsCrud = DAWCore.utils.createUpdateDelete.bind( null, this.data.synths,
-			this._createSynth.bind( this ),
-			this._updateSynth.bind( this ),
-			this._deleteSynth.bind( this ) );
-		this._patternsCrud = DAWCore.utils.createUpdateDelete.bind( null, this.data.patterns,
-			this._createPattern.bind( this ),
-			this._updatePattern.bind( this ),
-			this._deletePattern.bind( this ) );
-		this._channelsCrud = DAWCore.utils.createUpdateDelete.bind( null, this.data.channels,
-			this._createChannel.bind( this ),
-			this._updateChannel.bind( this ),
-			this._deleteChannel.bind( this ) );
+		this.#uiPatterns = uiPatterns;
+		this.#synthsCrud = DAWCore.utils.createUpdateDelete.bind( null, this.data.synths,
+			this.#createSynth.bind( this ),
+			this.#updateSynth.bind( this ),
+			this.#deleteSynth.bind( this ) );
+		this.#patternsCrud = DAWCore.utils.createUpdateDelete.bind( null, this.data.patterns,
+			this.#createPattern.bind( this ),
+			this.#updatePattern.bind( this ),
+			this.#deletePattern.bind( this ) );
+		this.#channelsCrud = DAWCore.utils.createUpdateDelete.bind( null, this.data.channels,
+			this.#createChannel.bind( this ),
+			this.#updateChannel.bind( this ),
+			this.#deleteChannel.bind( this ) );
 		Object.seal( this );
 
 		svgForms.bufferHD.hdMode( true );
@@ -52,63 +57,63 @@ class GSPatterns {
 
 	// .........................................................................
 	setDAWCore( core ) {
-		this._dawcore = core;
+		this.#dawcore = core;
 	}
 	clear() {
-		Object.keys( this.data.patterns ).forEach( this._deletePattern, this );
-		Object.keys( this.data.synths ).forEach( this._deleteSynth, this );
-		Object.keys( this._buffers ).forEach( id => delete this._buffers[ id ] );
+		Object.keys( this.data.patterns ).forEach( this.#deletePattern, this );
+		Object.keys( this.data.synths ).forEach( this.#deleteSynth, this );
+		Object.keys( this.#buffers ).forEach( id => delete this.#buffers[ id ] );
 		this.svgForms.keys.empty();
 		this.svgForms.drums.empty();
 		this.svgForms.buffer.empty();
 		this.svgForms.bufferHD.empty();
 	}
 	bufferLoaded( buffers ) {
-		const pats = Object.entries( this._dawcore.get.patterns() ),
+		const pats = Object.entries( this.#dawcore.get.patterns() ),
 			bufToPat = pats.reduce( ( map, [ id, pat ] ) => {
 				map[ pat.buffer ] = id;
 				return map;
 			}, {} );
 
 		Object.entries( buffers ).forEach( ( [ idBuf, buf ] ) => {
-			this._buffers[ idBuf ] = buf;
+			this.#buffers[ idBuf ] = buf;
 			this.svgForms.buffer.update( bufToPat[ idBuf ], buf.buffer );
 			this.svgForms.bufferHD.update( bufToPat[ idBuf ], buf.buffer );
 		} );
 	}
 	change( obj ) {
-		this._synthsCrud( obj.synths );
-		this._patternsCrud( obj.patterns );
-		this._channelsCrud( obj.channels );
+		this.#synthsCrud( obj.synths );
+		this.#patternsCrud( obj.patterns );
+		this.#channelsCrud( obj.channels );
 		if ( obj.keys || obj.drums || obj.drumrows || obj.patterns ) {
-			Object.entries( this._dawcore.get.patterns() ).forEach( ( [ id, pat ] ) => {
+			Object.entries( this.#dawcore.get.patterns() ).forEach( ( [ id, pat ] ) => {
 				if (
-					( pat.type === "drums" && ( obj.drumrows || obj.drums?.[ pat.drums ] || obj.patterns?.[ id ]?.duration ) ) ||
-					( pat.type === "keys" && ( obj.keys?.[ pat.keys ] || obj.patterns?.[ id ]?.duration ) )
+					( pat.type === "drums" && ( obj.patterns?.[ id ]?.duration || obj.drums?.[ pat.drums ] || obj.drumrows ) ) ||
+					( pat.type === "keys" && ( obj.patterns?.[ id ]?.duration || obj.keys?.[ pat.keys ] ) )
 				) {
-					this._updatePatternContent( id );
+					this.#updatePatternContent( id );
 				}
 			} );
 		}
 		if ( obj.patterns ) {
-			this._uiPatterns.reorderPatterns( obj.patterns );
+			this.#uiPatterns.reorderPatterns( obj.patterns );
 		}
 		if ( "synthOpened" in obj ) {
-			this._uiPatterns.selectSynth( obj.synthOpened );
+			this.#uiPatterns.selectSynth( obj.synthOpened );
 		}
 		if ( "patternDrumsOpened" in obj ) {
-			this._uiPatterns.selectPattern( "drums", obj.patternDrumsOpened );
+			this.#uiPatterns.selectPattern( "drums", obj.patternDrumsOpened );
 		}
 		if ( "patternKeysOpened" in obj ) {
-			this._uiPatterns.selectPattern( "keys", obj.patternKeysOpened );
+			this.#uiPatterns.selectPattern( "keys", obj.patternKeysOpened );
 		}
 	}
 
 	// .........................................................................
-	_updatePatternContent( id ) {
-		const get = this._dawcore.get,
+	#updatePatternContent( id ) {
+		const get = this.#dawcore.get,
 			pat = get.pattern( id ),
-			elPat = this._uiPatterns.getPattern( id );
+			elPat = this.#uiPatterns.getPattern( id );
 
 		if ( elPat ) {
 			const type = pat.type;
@@ -118,7 +123,7 @@ class GSPatterns {
 			} else if ( type === "drums" ) {
 				this.svgForms.drums.update( id, get.drums( pat.drums ), get.drumrows(), pat.duration, get.stepsPerBeat() );
 			} else if ( type === "buffer" ) {
-				const buf = this._buffers[ pat.buffer ];
+				const buf = this.#buffers[ pat.buffer ];
 
 				if ( buf ) {
 					this.svgForms.buffer.update( id, buf.buffer );
@@ -132,36 +137,36 @@ class GSPatterns {
 	}
 
 	// .........................................................................
-	_createSynth( id, obj ) {
+	#createSynth( id, obj ) {
 		this.data.synths[ id ] = DAWCore.utils.jsonCopy( obj );
-		this._uiPatterns.addSynth( id );
-		this._updateSynth( id, obj );
+		this.#uiPatterns.addSynth( id );
+		this.#updateSynth( id, obj );
 	}
-	_updateSynth( id, obj ) {
+	#updateSynth( id, obj ) {
 		const dat = this.data.synths[ id ];
 
 		Object.entries( obj ).forEach( ( [ prop, val ] ) => {
 			dat[ prop ] = val;
-			this._uiPatterns.changeSynth( id, prop, val );
+			this.#uiPatterns.changeSynth( id, prop, val );
 		} );
 		if ( "dest" in obj ) {
-			this._uiPatterns.changeSynth( id, "destName", this._dawcore.get.channel( obj.dest ).name );
+			this.#uiPatterns.changeSynth( id, "destName", this.#dawcore.get.channel( obj.dest ).name );
 		}
 	}
-	_deleteSynth( id ) {
+	#deleteSynth( id ) {
 		delete this.data.synths[ id ];
-		this._uiPatterns.deleteSynth( id );
+		this.#uiPatterns.deleteSynth( id );
 	}
 
 	// .........................................................................
-	_createPattern( id, obj ) {
+	#createPattern( id, obj ) {
 		const isBuf = obj.type === "buffer",
 			SVG = this.svgForms[ isBuf ? "bufferHD" : obj.type ];
 
 		this.data.patterns[ id ] = DAWCore.utils.jsonCopy( obj );
 		SVG.add( id );
 		if ( isBuf ) {
-			const buf = this._buffers[ obj.buffer ];
+			const buf = this.#buffers[ obj.buffer ];
 
 			this.svgForms.buffer.add( id );
 			if ( buf ) {
@@ -169,22 +174,22 @@ class GSPatterns {
 				SVG.update( id, buf.buffer );
 			}
 		}
-		this._uiPatterns.addPattern( id, obj );
-		this._updatePattern( id, obj );
-		this._uiPatterns.appendPatternSVG( id, SVG.createSVG( id ) );
+		this.#uiPatterns.addPattern( id, obj );
+		this.#updatePattern( id, obj );
+		this.#uiPatterns.appendPatternSVG( id, SVG.createSVG( id ) );
 	}
-	_updatePattern( id, obj ) {
+	#updatePattern( id, obj ) {
 		const dat = this.data.patterns[ id ];
 
 		Object.entries( obj ).forEach( ( [ prop, val ] ) => {
 			dat[ prop ] = val;
-			this._uiPatterns.changePattern( id, prop, val );
+			this.#uiPatterns.changePattern( id, prop, val );
 		} );
 		if ( "dest" in obj ) {
-			this._uiPatterns.changePattern( id, "destName", this._dawcore.get.channel( obj.dest ).name );
+			this.#uiPatterns.changePattern( id, "destName", this.#dawcore.get.channel( obj.dest ).name );
 		}
 	}
-	_deletePattern( id ) {
+	#deletePattern( id ) {
 		const pat = this.data.patterns[ id ];
 
 		delete this.data.patterns[ id ];
@@ -192,22 +197,22 @@ class GSPatterns {
 		if ( pat.type === "buffer" ) {
 			this.svgForms.bufferHD.delete( id );
 		}
-		this._uiPatterns.deletePattern( id );
+		this.#uiPatterns.deletePattern( id );
 	}
 
 	// .........................................................................
-	_createChannel( id, obj ) {
+	#createChannel( id, obj ) {
 		this.data.channels[ id ] = obj.name;
-		this._uiPatterns.addChannel( id, obj.name );
+		this.#uiPatterns.addChannel( id, obj.name );
 	}
-	_updateChannel( id, obj ) {
+	#updateChannel( id, obj ) {
 		if ( "name" in obj ) {
-			this._uiPatterns.updateChannel( id, obj.name );
+			this.#uiPatterns.updateChannel( id, obj.name );
 		}
 	}
-	_deleteChannel( id ) {
+	#deleteChannel( id ) {
 		delete this.data.channels[ id ];
-		this._uiPatterns.deleteChannel( id );
+		this.#uiPatterns.deleteChannel( id );
 	}
 }
 
