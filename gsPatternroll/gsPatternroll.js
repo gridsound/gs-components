@@ -1,84 +1,81 @@
 "use strict";
 
 class GSPatternroll {
-	constructor() {
-		const uiPatternroll = GSUI.createElement( "gsui-patternroll" ),
-			dataTracks = new DAWCore.controllers.tracks( {
-				dataCallbacks: {
-					addTrack: id => uiPatternroll.addTrack( id ),
-					removeTrack: id => uiPatternroll.removeTrack( id ),
-					toggleTrack: ( id, b ) => uiPatternroll.toggleTrack( id, b ),
-					renameTrack: ( id, s ) => uiPatternroll.renameTrack( id, s ),
-					reorderTrack: ( id, n ) => uiPatternroll.reorderTrack( id, n ),
-				}
-			} ),
-			dataBlocks = new DAWCore.controllers.blocks( {
-				dataCallbacks: {
-					addBlock: ( id, blc ) => uiPatternroll.addBlock( id, blc ),
-					removeBlock: id => uiPatternroll.removeBlock( id ),
-					changeBlockProp: ( id, prop, val ) => uiPatternroll.changeBlockProp( id, prop, val ),
-					updateBlockViewBox: ( id, blc ) => uiPatternroll.updateBlockViewBox( id, blc ),
-				},
-			} );
+	#dawcore = null
+	#svgForms = null
+	rootElement = GSUI.createElement( "gsui-patternroll" )
+	timeline = this.rootElement.timeline
+	#dataTracks = new DAWCore.controllers.tracks( {
+		dataCallbacks: {
+			addTrack: id => this.rootElement.addTrack( id ),
+			removeTrack: id => this.rootElement.removeTrack( id ),
+			toggleTrack: ( id, b ) => this.rootElement.toggleTrack( id, b ),
+			renameTrack: ( id, s ) => this.rootElement.renameTrack( id, s ),
+			reorderTrack: ( id, n ) => this.rootElement.reorderTrack( id, n ),
+		}
+	} )
+	#dataBlocks = new DAWCore.controllers.blocks( {
+		dataCallbacks: {
+			addBlock: ( id, blc ) => this.rootElement.addBlock( id, blc ),
+			removeBlock: id => this.rootElement.removeBlock( id ),
+			changeBlockProp: ( id, prop, val ) => this.rootElement.changeBlockProp( id, prop, val ),
+			updateBlockViewBox: ( id, blc ) => this.rootElement.updateBlockViewBox( id, blc ),
+		},
+	} )
 
-		this.rootElement = uiPatternroll;
-		this.timeline = uiPatternroll.timeline;
-		this._dataTracks = dataTracks;
-		this._dataBlocks = dataBlocks;
-		this._dawcore =
-		this._svgForms = null;
+	constructor() {
 		Object.seal( this );
 
-		uiPatternroll.setData( dataBlocks.data );
-		uiPatternroll.setCallbacks( {
-			onchange: this._onchange.bind( this ),
-			onaddBlock: this._onaddBlock.bind( this ),
-			oneditBlock: this._oneditBlock.bind( this ),
+		this.rootElement.setData( this.#dataBlocks.data );
+		this.rootElement.setCallbacks( {
+			onchange: this.#onchange.bind( this ),
+			onaddBlock: this.#onaddBlock.bind( this ),
+			oneditBlock: this.#oneditBlock.bind( this ),
 		} );
-		this.rootElement.addEventListener( "gsuiEvents", this._ongsuiEvents.bind( this ) );
+		this.rootElement.addEventListener( "gsuiEvents", this.#ongsuiEvents.bind( this ) );
 	}
 
 	// .........................................................................
 	setDAWCore( core ) {
-		this._dawcore = core;
+		this.#dawcore = core;
 	}
 	setSVGForms( svgForms ) {
-		this._svgForms = svgForms;
+		this.#svgForms = svgForms;
 	}
 	change( obj ) {
-		this._dataTracks.change( obj );
-		this._dataBlocks.change( obj );
+		this.#dataTracks.change( obj );
+		this.#dataBlocks.change( obj );
 		if ( "loopA" in obj || "loopB" in obj ) {
 			this.rootElement.loop(
-				this._dawcore.get.loopA(),
-				this._dawcore.get.loopB() );
+				this.#dawcore.get.loopA(),
+				this.#dawcore.get.loopB() );
 		}
 		if ( "beatsPerMeasure" in obj || "stepsPerBeat" in obj ) {
 			this.rootElement.timeDivision(
-				this._dawcore.get.beatsPerMeasure(),
-				this._dawcore.get.stepsPerBeat() );
+				this.#dawcore.get.beatsPerMeasure(),
+				this.#dawcore.get.stepsPerBeat() );
 		}
 	}
 	clear() {
-		this._dataBlocks.clear();
-		this._dataTracks.clear();
+		this.#dataBlocks.clear();
+		this.#dataTracks.clear();
 	}
 
 	// .........................................................................
-	_ongsuiEvents( e ) {
+	#ongsuiEvents( e ) {
 		const d = e.detail;
 
 		switch ( d.component ) {
 			case "gsuiTracklist":
-				this._dawcore.callAction( d.eventName, ...d.args );
+				this.#dawcore.callAction( d.eventName, ...d.args );
 				break;
 			case "gsuiTimeline":
 				switch ( d.eventName ) {
 					case "changeLoop":
-						this._dawcore.callAction( "changeLoop", ...d.args );
+						this.#dawcore.callAction( "changeLoop", ...d.args );
 						break;
 					case "changeCurrentTime":
-						this._dawcore.composition.setCurrentTime( d.args[ 0 ] );
+						this.#dawcore.composition.setCurrentTime( d.args[ 0 ] );
 						break;
 				}
 				break;
@@ -87,35 +84,35 @@ class GSPatternroll {
 	}
 
 	// .........................................................................
-	_onchange( obj, ...args ) {
+	#onchange( obj, ...args ) {
 		switch ( obj ) { // tmp
-			case "add": this._dawcore.callAction( "addBlock", ...args ); break;
-			case "move": this._dawcore.callAction( "moveBlocks", ...args ); break;
-			case "cropEnd": this._dawcore.callAction( "cropEndBlocks", ...args ); break;
-			case "cropStart": this._dawcore.callAction( "cropStartBlocks", ...args ); break;
-			case "duplicate": this._dawcore.callAction( "duplicateSelectedBlocks", ...args ); break;
-			case "deletion": this._dawcore.callAction( "removeBlocks", ...args ); break;
-			case "selection": this._dawcore.callAction( "selectBlocks", ...args ); break;
-			case "unselection": this._dawcore.callAction( "unselectAllBlocks", ...args ); break;
-			case "unselectionOne": this._dawcore.callAction( "unselectBlock", ...args ); break;
+			case "add": this.#dawcore.callAction( "addBlock", ...args ); break;
+			case "move": this.#dawcore.callAction( "moveBlocks", ...args ); break;
+			case "cropEnd": this.#dawcore.callAction( "cropEndBlocks", ...args ); break;
+			case "cropStart": this.#dawcore.callAction( "cropStartBlocks", ...args ); break;
+			case "duplicate": this.#dawcore.callAction( "duplicateSelectedBlocks", ...args ); break;
+			case "deletion": this.#dawcore.callAction( "removeBlocks", ...args ); break;
+			case "selection": this.#dawcore.callAction( "selectBlocks", ...args ); break;
+			case "unselection": this.#dawcore.callAction( "unselectAllBlocks", ...args ); break;
+			case "unselectionOne": this.#dawcore.callAction( "unselectBlock", ...args ); break;
 		}
 	}
-	_oneditBlock( _id, obj, blc ) {
+	#oneditBlock( id, obj, blc ) {
 		if ( blc._gsuiSVGform ) {
-			const pat = this._dawcore.get.pattern( obj.pattern );
+			const pat = this.#dawcore.get.pattern( obj.pattern );
 
-			this._svgForms[ pat.type ].setSVGViewbox( blc._gsuiSVGform, obj.offset, obj.duration, this._dawcore.get.bpm() / 60 );
+			this.#svgForms[ pat.type ].setSVGViewbox( blc._gsuiSVGform, obj.offset, obj.duration, this.#dawcore.get.bpm() / 60 );
 		}
 	}
-	_onaddBlock( id, obj, blc ) {
-		const pat = this._dawcore.get.pattern( obj.pattern ),
-			SVGs = this._svgForms[ pat.type ],
+	#onaddBlock( id, obj, blc ) {
+		const pat = this.#dawcore.get.pattern( obj.pattern ),
+			SVGs = this.#svgForms[ pat.type ],
 			svg = SVGs.createSVG( obj.pattern );
 
 		blc._gsuiSVGform = svg;
 		blc.children[ 3 ].append( svg );
-		SVGs.setSVGViewbox( svg, obj.offset, obj.duration, this._dawcore.get.bpm() / 60 );
-		blc.ondblclick = () => this._dawcore.callAction( "openPattern", obj.pattern );
+		SVGs.setSVGViewbox( svg, obj.offset, obj.duration, this.#dawcore.get.bpm() / 60 );
+		blc.ondblclick = () => this.#dawcore.callAction( "openPattern", obj.pattern );
 		blc.querySelector( ".gsuiPatternroll-block-name" ).textContent = pat.name;
 	}
 }
