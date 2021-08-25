@@ -1,32 +1,30 @@
 "use strict";
 
 class GSSynth {
-	constructor() {
-		const uiSynth = document.createElement( "gsui-synthesizer" ),
-			dataSynth = new DAWCore.controllers.synth( {
-				dataCallbacks: {
-					addOsc: ( id, osc ) => uiSynth.addOscillator( id, osc ),
-					removeOsc: id => uiSynth.removeOscillator( id ),
-					changeEnvProp: ( k, v ) => GSUI.setAttribute( uiSynth.env, k, v ),
-					changeLFOProp: ( k, v ) => GSUI.setAttribute( uiSynth.lfo, k, v ),
-					changeOscProp: ( id, k, v ) => GSUI.setAttribute( uiSynth.getOscillator( id ), k, v ),
-					updateEnvWave: () => uiSynth.env.updateWave(),
-					updateLFOWave: () => uiSynth.lfo.updateWave(),
-					updateOscWave: id => uiSynth.getOscillator( id ).updateWave(),
-				},
-			} );
+	#dawcore = null
+	#synthId = null
+	rootElement = GSUI.createElement( "gsui-synthesizer" )
+	#dataSynth = new DAWCore.controllers.synth( {
+		dataCallbacks: {
+			addOsc: ( id, osc ) => this.rootElement.addOscillator( id, osc ),
+			removeOsc: id => this.rootElement.removeOscillator( id ),
+			changeEnvProp: ( k, v ) => GSUI.setAttribute( this.rootElement.env, k, v ),
+			changeLFOProp: ( k, v ) => GSUI.setAttribute( this.rootElement.lfo, k, v ),
+			changeOscProp: ( id, k, v ) => GSUI.setAttribute( this.rootElement.getOscillator( id ), k, v ),
+			updateEnvWave: () => this.rootElement.env.updateWave(),
+			updateLFOWave: () => this.rootElement.lfo.updateWave(),
+			updateOscWave: id => this.rootElement.getOscillator( id ).updateWave(),
+		},
+	} )
 
-		this.rootElement = uiSynth;
-		this._dataSynth = dataSynth;
-		this._dawcore =
-		this._synthId = null;
+	constructor() {
 		Object.seal( this );
 
-		uiSynth.addEventListener( "gsuiEvents", e => {
+		this.rootElement.addEventListener( "gsuiEvents", e => {
 			const d = e.detail,
 				a = d.args,
-				id = this._synthId,
-				dc = this._dawcore;
+				id = this.#synthId,
+				dc = this.#dawcore;
 
 			switch ( d.component ) {
 				case "gsuiEnvelope":
@@ -65,30 +63,30 @@ class GSSynth {
 
 	// .........................................................................
 	setDAWCore( core ) {
-		this._dawcore = core;
+		this.#dawcore = core;
 	}
 	setWaveList( arr ) {
 		this.rootElement.setWaveList( arr );
 	}
 	selectSynth( id ) {
-		if ( id !== this._synthId ) {
-			this._synthId = id;
-			this._dataSynth.clear();
+		if ( id !== this.#synthId ) {
+			this.#synthId = id;
+			this.#dataSynth.clear();
 			if ( id ) {
-				this._dataSynth.change( this._dawcore.get.synth( id ) );
+				this.#dataSynth.change( this.#dawcore.get.synth( id ) );
 			}
 		}
 	}
 	change( obj ) {
-		const synObj = obj.synths && obj.synths[ this._synthId ],
-			get = this._dawcore.get;
+		const synObj = obj.synths && obj.synths[ this.#synthId ],
+			get = this.#dawcore.get;
 
 		if ( "beatsPerMeasure" in obj || "stepsPerBeat" in obj ) {
 			GSUI.setAttribute( this.rootElement.env, "timedivision", `${ get.beatsPerMeasure() }/${ get.stepsPerBeat() }` );
 			GSUI.setAttribute( this.rootElement.lfo, "timedivision", `${ get.beatsPerMeasure() }/${ get.stepsPerBeat() }` );
 		}
 		if ( synObj ) {
-			this._dataSynth.change( synObj );
+			this.#dataSynth.change( synObj );
 			if ( synObj.oscillators ) {
 				this.rootElement.reorderOscillators( synObj.oscillators );
 			}
@@ -98,7 +96,7 @@ class GSSynth {
 		}
 	}
 	clear() {
-		this._dataSynth.clear();
+		this.#dataSynth.clear();
 	}
 }
 
