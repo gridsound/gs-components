@@ -15,6 +15,7 @@ class GSPatterns {
 				drums: new gsuiDrumsforms(),
 				buffer: new gsuiWaveforms(),
 				bufferHD: new gsuiWaveforms(),
+				slices: new gsuiSlicesforms(),
 			} );
 
 		uiPatterns.onpatternDataTransfer = elPat => {
@@ -65,6 +66,7 @@ class GSPatterns {
 		Object.keys( this.#buffers ).forEach( id => delete this.#buffers[ id ] );
 		this.svgForms.keys.empty();
 		this.svgForms.drums.empty();
+		this.svgForms.slices.empty();
 		this.svgForms.buffer.empty();
 		this.svgForms.bufferHD.empty();
 	}
@@ -85,11 +87,12 @@ class GSPatterns {
 		this.#synthsCrud( obj.synths );
 		this.#patternsCrud( obj.patterns );
 		this.#channelsCrud( obj.channels );
-		if ( obj.keys || obj.drums || obj.drumrows || obj.patterns ) {
+		if ( obj.keys || obj.drums || obj.slices || obj.drumrows || obj.patterns ) {
 			Object.entries( this.#dawcore.get.patterns() ).forEach( ( [ id, pat ] ) => {
 				if (
 					( pat.type === "drums" && ( obj.patterns?.[ id ]?.duration || obj.drums?.[ pat.drums ] || obj.drumrows ) ) ||
-					( pat.type === "keys" && ( obj.patterns?.[ id ]?.duration || obj.keys?.[ pat.keys ] ) )
+					( pat.type === "keys" && ( obj.patterns?.[ id ]?.duration || obj.keys?.[ pat.keys ] ) ) ||
+					( pat.type === "slices" && ( obj.slices?.[ pat.slices ] ) )
 				) {
 					this.#updatePatternContent( id );
 				}
@@ -118,17 +121,24 @@ class GSPatterns {
 		if ( elPat ) {
 			const type = pat.type;
 
-			if ( type === "keys" ) {
-				this.svgForms.keys.update( id, get.keys( pat.keys ), pat.duration );
-			} else if ( type === "drums" ) {
-				this.svgForms.drums.update( id, get.drums( pat.drums ), get.drumrows(), pat.duration, get.stepsPerBeat() );
-			} else if ( type === "buffer" ) {
-				const buf = this.#buffers[ pat.buffer ];
+			switch ( type ) {
+				case "keys":
+					this.svgForms.keys.update( id, get.keys( pat.keys ), pat.duration );
+					break;
+				case "slices":
+					this.svgForms.slices.update( id, get.slices( pat.slices ), pat.duration );
+					break;
+				case "drums":
+					this.svgForms.drums.update( id, get.drums( pat.drums ), get.drumrows(), pat.duration, get.stepsPerBeat() );
+					break;
+				case "buffer": {
+					const buf = this.#buffers[ pat.buffer ];
 
-				if ( buf ) {
-					this.svgForms.buffer.update( id, buf.buffer );
-					this.svgForms.bufferHD.update( id, buf.buffer );
-				}
+					if ( buf ) {
+						this.svgForms.buffer.update( id, buf.buffer );
+						this.svgForms.bufferHD.update( id, buf.buffer );
+					}
+				} break;
 			}
 			if ( type !== "buffer" ) {
 				this.svgForms[ type ].setSVGViewbox( elPat.querySelector( "svg" ), 0, pat.duration );
