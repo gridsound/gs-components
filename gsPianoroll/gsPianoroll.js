@@ -42,7 +42,7 @@ class GSPianoroll {
 		this.rootElement.setCallbacks( {
 			onchange: this.#onchange.bind( this ),
 		} );
-		this.rootElement.toggleShadow( true );
+		GSUI.setAttribute( this.rootElement, "disabled", true );
 	}
 
 	// .........................................................................
@@ -55,7 +55,7 @@ class GSPianoroll {
 			this.#keysId = null;
 			this.#dataKeys.clear();
 			this.rootElement.reset();
-			this.rootElement.toggleShadow( !id );
+			GSUI.setAttribute( this.rootElement, "disabled", !id );
 			if ( id ) {
 				const pat = this.#dawcore.get.pattern( id ),
 					keys = this.#dawcore.get.keys( pat.keys );
