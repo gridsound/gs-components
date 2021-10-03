@@ -101,14 +101,17 @@ class GSPatterns {
 		if ( obj.patterns ) {
 			this.#uiPatterns.reorderPatterns( obj.patterns );
 		}
-		if ( "synthOpened" in obj ) {
-			this.#uiPatterns.selectSynth( obj.synthOpened );
+		if ( "patternSlicesOpened" in obj ) {
+			this.#uiPatterns.selectPattern( "slices", obj.patternSlicesOpened );
 		}
 		if ( "patternDrumsOpened" in obj ) {
 			this.#uiPatterns.selectPattern( "drums", obj.patternDrumsOpened );
 		}
 		if ( "patternKeysOpened" in obj ) {
 			this.#uiPatterns.selectPattern( "keys", obj.patternKeysOpened );
+		}
+		if ( "synthOpened" in obj ) {
+			this.#uiPatterns.selectSynth( obj.synthOpened );
 		}
 	}
 
