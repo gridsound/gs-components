@@ -17,10 +17,6 @@ class GSPianoroll {
 	constructor() {
 		Object.seal( this );
 
-		this.rootElement.setData( this.#dataKeys.data );
-		this.rootElement.setCallbacks( {
-			onchange: this.#onchange.bind( this ),
-		} );
 		GSUI.listenEvents( this.rootElement, {
 			gsuiPianoroll: {
 				changeKeysProps: d => {
@@ -42,6 +38,11 @@ class GSPianoroll {
 				keyDown: d => { this.#dawcore.pianoroll.liveKeydown( d.args[ 0 ] ); },
 			},
 		} );
+		this.rootElement.setData( this.#dataKeys.data );
+		this.rootElement.setCallbacks( {
+			onchange: this.#onchange.bind( this ),
+		} );
+		this.rootElement.toggleShadow( true );
 	}
 
 	// .........................................................................
@@ -54,7 +55,7 @@ class GSPianoroll {
 			this.#keysId = null;
 			this.#dataKeys.clear();
 			this.rootElement.reset();
-			// this.rootElement.toggleShadow( !id );
+			this.rootElement.toggleShadow( !id );
 			if ( id ) {
 				const pat = this.#dawcore.get.pattern( id ),
 					keys = this.#dawcore.get.keys( pat.keys );
