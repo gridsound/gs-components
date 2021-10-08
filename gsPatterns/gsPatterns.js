@@ -92,7 +92,7 @@ class GSPatterns {
 				if (
 					( pat.type === "drums" && ( obj.patterns?.[ id ]?.duration || obj.drums?.[ pat.drums ] || obj.drumrows ) ) ||
 					( pat.type === "keys" && ( obj.patterns?.[ id ]?.duration || obj.keys?.[ pat.keys ] ) ) ||
-					( pat.type === "slices" && ( obj.slices?.[ pat.slices ] ) )
+					( pat.type === "slices" && ( obj.patterns?.[ id ]?.duration || obj.slices?.[ pat.slices ] ) )
 				) {
 					this.#updatePatternContent( id );
 				}
