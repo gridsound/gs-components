@@ -83,10 +83,8 @@ class GSPianoroll {
 		}
 	}
 	clear() {
-		this.#keysId =
-		this.#patternId = null;
+		this.selectPattern( null );
 		this.#dataKeys.clear();
-		this.rootElement.reset();
 	}
 	getUIKeys() {
 		return this.rootElement.uiKeys;
