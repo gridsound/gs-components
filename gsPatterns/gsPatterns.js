@@ -102,7 +102,7 @@ class GSPatterns {
 			this.#uiPatterns.reorderPatterns( obj.patterns );
 		}
 		if ( "patternSlicesOpened" in obj ) {
-			this.#uiPatterns.selectPattern( "slices", obj.patternSlicesOpened );
+			// this.#uiPatterns.selectPattern( "slices", obj.patternSlicesOpened );
 		}
 		if ( "patternDrumsOpened" in obj ) {
 			this.#uiPatterns.selectPattern( "drums", obj.patternDrumsOpened );
@@ -173,6 +173,10 @@ class GSPatterns {
 
 	// .........................................................................
 	#createPattern( id, obj ) {
+		if ( obj.type === "slices" ) {
+			return;
+		}
+
 		const isBuf = obj.type === "buffer",
 			SVG = this.svgForms[ isBuf ? "bufferHD" : obj.type ];
 

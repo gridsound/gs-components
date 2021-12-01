@@ -120,6 +120,10 @@ class GSPatternroll {
 		}
 	}
 	#onaddBlock( id, obj, blc ) {
+		if ( this.#dawcore.get.pattern( obj.pattern ).type === "slices" ) {
+			return;
+		}
+
 		const pat = this.#dawcore.get.pattern( obj.pattern ),
 			SVGs = this.#svgForms[ pat.type ],
 			svg = SVGs.createSVG( obj.pattern );
