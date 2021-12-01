@@ -55,6 +55,13 @@ class GSPatternroll {
 				this.#dawcore.get.beatsPerMeasure(),
 				this.#dawcore.get.stepsPerBeat() );
 		}
+		if ( "patterns" in obj ) {
+			Object.entries( obj.patterns ).forEach( ( [ id, pat ] ) => {
+				if ( "bufferBpm" in pat ) {
+					this.#updatePattern( id );
+				}
+			} );
+		}
 	}
 	clear() {
 		this.#dataBlocks.clear();
@@ -84,6 +91,13 @@ class GSPatternroll {
 	}
 
 	// .........................................................................
+	#updatePattern( id ) {
+		this.rootElement.getBlocks().forEach( blc => {
+			if ( blc.dataset.pattern === id ) {
+				this.rootElement.updateBlockViewBox( blc.dataset.id, this.#dataBlocks.data[ blc.dataset.id ] );
+			}
+		} );
+	}
 	#onchange( obj, ...args ) {
 		switch ( obj ) { // tmp
 			case "add": this.#dawcore.callAction( "addBlock", ...args ); break;
@@ -99,9 +113,10 @@ class GSPatternroll {
 	}
 	#oneditBlock( id, obj, blc ) {
 		if ( blc._gsuiSVGform ) {
-			const pat = this.#dawcore.get.pattern( obj.pattern );
+			const pat = this.#dawcore.get.pattern( obj.pattern ),
+				bpm = pat.bufferBpm || this.#dawcore.get.bpm();
 
-			this.#svgForms[ pat.type ].setSVGViewbox( blc._gsuiSVGform, obj.offset, obj.duration, this.#dawcore.get.bpm() / 60 );
+			this.#svgForms[ pat.type ].setSVGViewbox( blc._gsuiSVGform, obj.offset, obj.duration, bpm / 60 );
 		}
 	}
 	#onaddBlock( id, obj, blc ) {
