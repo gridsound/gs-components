@@ -213,6 +213,7 @@ class GSPatterns {
 		this.svgForms[ pat.type ].delete( id );
 		if ( pat.type === "buffer" ) {
 			this.svgForms.bufferHD.delete( id );
+			delete this.#buffers[ pat.buffer ];
 		}
 		this.#uiPatterns.deletePattern( id );
 	}
