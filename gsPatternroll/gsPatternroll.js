@@ -57,7 +57,7 @@ class GSPatternroll {
 		}
 		if ( "patterns" in obj ) {
 			Object.entries( obj.patterns ).forEach( ( [ id, pat ] ) => {
-				if ( "bufferBpm" in pat ) {
+				if ( pat && "bufferBpm" in pat ) {
 					this.#updatePattern( id );
 				}
 			} );
