@@ -16,7 +16,14 @@ class GSPatternroll {
 	} )
 	#dataBlocks = new DAWCore.controllers.blocks( {
 		dataCallbacks: {
-			addBlock: ( id, blc ) => this.rootElement.addBlock( id, blc ),
+			addBlock: ( id, blc ) => {
+				const pat = this.#dawcore.get.pattern( blc.pattern ),
+					dataReady = pat.type === "buffer"
+						? !!this.#dawcore.get.audioBuffer( pat.buffer )
+						: true;
+
+				this.rootElement.addBlock( id, blc, { dataReady } );
+			},
 			removeBlock: id => this.rootElement.removeBlock( id ),
 			changeBlockProp: ( id, prop, val ) => this.rootElement.changeBlockProp( id, prop, val ),
 			updateBlockViewBox: ( id, blc ) => this.rootElement.updateBlockViewBox( id, blc ),
