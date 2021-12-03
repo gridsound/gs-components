@@ -27,7 +27,7 @@ class GSPatterns {
 			if ( act in DAWCore.actions ) {
 				this.#dawcore.callAction( act, ...args );
 			} else {
-				lg( "GSPatterns.onchange", act, ...args );
+				console.log( "GSPatterns.onchange", act, ...args );
 			}
 		};
 		this.data = Object.freeze( {
@@ -81,6 +81,7 @@ class GSPatterns {
 			this.#buffers[ idBuf ] = buf;
 			this.svgForms.buffer.update( bufToPat[ idBuf ], buf.buffer );
 			this.svgForms.bufferHD.update( bufToPat[ idBuf ], buf.buffer );
+			this.#uiPatterns.changePattern( bufToPat[ idBuf ], "data-missing", false );
 		} );
 	}
 	change( obj ) {
@@ -194,6 +195,9 @@ class GSPatterns {
 		this.#uiPatterns.addPattern( id, obj );
 		this.#updatePattern( id, obj );
 		this.#uiPatterns.appendPatternSVG( id, SVG.createSVG( id ) );
+		if ( obj.type === "buffer" ) {
+			this.#uiPatterns.changePattern( id, "data-missing", true );
+		}
 	}
 	#updatePattern( id, obj ) {
 		const dat = this.data.patterns[ id ];
