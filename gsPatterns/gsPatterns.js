@@ -18,11 +18,7 @@ class GSPatterns {
 				slices: new gsuiSlicesforms(),
 			} );
 
-		uiPatterns.onpatternDataTransfer = elPat => {
-			const id = elPat.dataset.id;
-
-			return `${ id }:${ this.#dawcore.get.pattern( id ).duration }`;
-		};
+		uiPatterns.onpatternDataTransfer = elPat => elPat.dataset.id;
 		uiPatterns.onchange = ( act, ...args ) => {
 			if ( act in DAWCore.actions ) {
 				this.#dawcore.callAction( act, ...args );
