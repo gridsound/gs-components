@@ -86,10 +86,12 @@ class GSPatterns {
 		this.#channelsCrud( obj.channels );
 		if ( obj.keys || obj.drums || obj.slices || obj.drumrows || obj.patterns ) {
 			Object.entries( this.#dawcore.get.patterns() ).forEach( ( [ id, pat ] ) => {
+				const objPat = obj.patterns?.[ id ];
+
 				if (
-					( pat.type === "drums" && ( obj.patterns?.[ id ]?.duration || obj.drums?.[ pat.drums ] || obj.drumrows ) ) ||
-					( pat.type === "keys" && ( obj.patterns?.[ id ]?.duration || obj.keys?.[ pat.keys ] ) ) ||
-					( pat.type === "slices" && ( obj.patterns?.[ id ]?.duration || obj.slices?.[ pat.slices ] ) )
+					( pat.type === "drums" && ( objPat?.duration || obj.drums?.[ pat.drums ] || obj.drumrows ) ) ||
+					( pat.type === "keys" && ( objPat?.duration || obj.keys?.[ pat.keys ] ) ) ||
+					( pat.type === "slices" && ( objPat?.source || obj.patterns?.[ pat.source ]?.duration || obj.slices?.[ pat.slices ] ) )
 				) {
 					this.#updatePatternContent( id );
 				}
@@ -119,17 +121,18 @@ class GSPatterns {
 			elPat = this.#uiPatterns.getPattern( id );
 
 		if ( elPat ) {
-			const type = pat.type;
+			const type = pat.type,
+				dur = get.patternDuration( id );
 
 			switch ( type ) {
 				case "keys":
-					this.svgForms.keys.update( id, get.keys( pat.keys ), pat.duration );
+					this.svgForms.keys.update( id, get.keys( pat.keys ), dur );
 					break;
 				case "slices":
-					this.svgForms.slices.update( id, get.slices( pat.slices ), pat.duration );
+					this.svgForms.slices.update( id, get.slices( pat.slices ), dur );
 					break;
 				case "drums":
-					this.svgForms.drums.update( id, get.drums( pat.drums ), get.drumrows(), pat.duration, get.stepsPerBeat() );
+					this.svgForms.drums.update( id, get.drums( pat.drums ), get.drumrows(), dur, get.stepsPerBeat() );
 					break;
 				case "buffer": {
 					const buf = this.#buffers[ pat.buffer ];
@@ -141,7 +144,7 @@ class GSPatterns {
 				} break;
 			}
 			if ( type !== "buffer" ) {
-				this.svgForms[ type ].setSVGViewbox( elPat.querySelector( "svg" ), 0, pat.duration );
+				this.svgForms[ type ].setSVGViewbox( elPat.querySelector( "svg" ), 0, dur );
 			}
 		}
 	}
