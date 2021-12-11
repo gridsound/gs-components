@@ -11,10 +11,6 @@ class GSSlicer {
 			setBuffer: buf => this.rootElement.setBuffer( buf ),
 			renameBuffer: name => this.rootElement.setBufferName( name ),
 			removeBuffer: () => this.rootElement.removeBuffer(),
-			changeCrop: ( a, b ) => {
-				GSUI.setAttribute( this.rootElement, "cropa", a );
-				GSUI.setAttribute( this.rootElement, "cropb", b );
-			},
 			changeDuration: dur => GSUI.setAttribute( this.rootElement, "duration", dur ),
 			addSlice: ( id, obj ) => this.rootElement.addSlice( id, obj ),
 			changeSlice: ( id, obj ) => this.rootElement.changeSlice( id, obj ),
