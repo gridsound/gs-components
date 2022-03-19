@@ -3,7 +3,7 @@
 class GSMixer {
 	#dawcore = null
 	onselectChan = null
-	rootElement = GSUI.createElement( "gsui-mixer" )
+	rootElement = GSUI.createElement( "gsui-channels" )
 	#ctrlMixer = new DAWCore.controllers.mixer( {
 		dataCallbacks: {
 			addChannel: ( id, chan ) => this.rootElement.addChannel( id, chan ),
