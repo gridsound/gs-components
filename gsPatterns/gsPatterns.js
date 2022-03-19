@@ -24,7 +24,10 @@ class GSPatterns {
 				const daw = this.#dawcore;
 
 				if ( act === "removePattern" && daw.isPlaying() ) {
-					if ( args[ 0 ] === daw.get.opened( daw.get.pattern( args[ 0 ] ).type ) ) {
+					const id = args[ 0 ],
+						type = daw.get.pattern( id ).type;
+
+					if ( type === DAW.getFocusedName() && id === daw.get.opened( type ) ) {
 						daw.stop();
 					}
 				}
