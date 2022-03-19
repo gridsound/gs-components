@@ -10,7 +10,10 @@ class GSSlicer {
 			timedivision: timediv => GSUI.setAttribute( this.rootElement, "timedivision", timediv ),
 			setBuffer: buf => this.rootElement.setBuffer( buf ),
 			renameBuffer: name => this.rootElement.setBufferName( name ),
-			removeBuffer: () => this.rootElement.removeBuffer(),
+			removeBuffer: () => {
+				this.rootElement.removeBuffer();
+				GSUI.setAttribute( this.rootElement, "duration", this.#dawcore.get.beatsPerMeasure() );
+			},
 			changeDuration: dur => GSUI.setAttribute( this.rootElement, "duration", dur ),
 			addSlice: ( id, obj ) => this.rootElement.addSlice( id, obj ),
 			changeSlice: ( id, obj ) => this.rootElement.changeSlice( id, obj ),
