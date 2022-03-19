@@ -230,7 +230,6 @@ class GSPatterns {
 	// .........................................................................
 	#createChannel( id, obj ) {
 		this.data.channels[ id ] = obj.name;
-		this.#uiPatterns.addChannel( id, obj.name );
 	}
 	#updateChannel( id, obj ) {
 		if ( "name" in obj ) {
@@ -239,7 +238,6 @@ class GSPatterns {
 	}
 	#deleteChannel( id ) {
 		delete this.data.channels[ id ];
-		this.#uiPatterns.deleteChannel( id );
 	}
 }
 
