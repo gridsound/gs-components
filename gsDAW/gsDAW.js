@@ -11,6 +11,7 @@ class GSDAW {
 	#pianoroll = new GSPianoroll()
 	#synth = new GSSynth()
 	#windows = GSUI.createElement( "gsui-windows" )
+	#elements = null
 	rootElement = GSUI.createElement( "gsui-daw", {
 		"oki-cookies": document.cookie.indexOf( "cookieAccepted" ) > -1,
 		version: "0.36.1",
@@ -60,11 +61,15 @@ class GSDAW {
 		GSUI.setAttribute( this.rootElement.clock, "mode", localStorage.getItem( "gsuiClock.display" ) || "second" );
 		gsuiClock.numbering( localStorage.getItem( "uiTimeNumbering" ) || "1" );
 		gsuiTimeline.numbering( localStorage.getItem( "uiTimeNumbering" ) || "1" );
-		window.DOM = Array.from( document.querySelectorAll( "[id]" ) )
-			.reduce( ( obj, el ) => {
-				obj[ el.id ] = el;
-				return obj;
-			}, {} );
+		this.#elements = GSUI.findElements( document.body, {
+			drumsName: "#drumsName",
+			synthName: "#synthName",
+			slicesName: "#slicesName",
+			channelName: "#channelName",
+			pianorollName: "#pianorollName",
+			synthChannelBtn: "#synthChannelBtn",
+			synthChannelBtnText: "#synthChannelBtnText",
+		} );
 	}
 	#initComponents() {
 		this.#drums.setDAWCore( this.#dawcore );
@@ -91,12 +96,12 @@ class GSDAW {
 		this.#windows.window( "drums" ).onfocusin = GSDAW.#onfocusin.bind( null, this.#drums );
 		this.#windows.window( "piano" ).onfocusin = GSDAW.#onfocusin.bind( null, this.#pianoroll );
 		this.#windows.window( "slicer" ).onfocusin = GSDAW.#onfocusin.bind( null, this.#slicer );
-		DOM.synthName.onclick = this.#onclickName.bind( this, "Rename synthesizer", "renameSynth", "synth" );
-		DOM.drumsName.onclick = this.#onclickName.bind( this, "Rename pattern", "renamePattern", "drums" );
-		DOM.slicesName.onclick = this.#onclickName.bind( this, "Rename pattern", "renamePattern", "slices" );
-		DOM.pianorollName.onclick = this.#onclickName.bind( this, "Rename pattern", "renamePattern", "keys" );
-		DOM.channelName.onclick = this.#onclickName.bind( this, "Rename channel", "renameChannel", "channels" );
-		DOM.synthChannelBtn.onclick = this.#onclickSynthChannel.bind( this );
+		this.#elements.synthName.onclick = this.#onclickName.bind( this, "Rename synthesizer", "renameSynth", "synth" );
+		this.#elements.drumsName.onclick = this.#onclickName.bind( this, "Rename pattern", "renamePattern", "drums" );
+		this.#elements.slicesName.onclick = this.#onclickName.bind( this, "Rename pattern", "renamePattern", "slices" );
+		this.#elements.pianorollName.onclick = this.#onclickName.bind( this, "Rename pattern", "renamePattern", "keys" );
+		this.#elements.channelName.onclick = this.#onclickName.bind( this, "Rename channel", "renameChannel", "channels" );
+		this.#elements.synthChannelBtn.onclick = this.#onclickSynthChannel.bind( this );
 		this.#mixer.onselectChan = id => this.#selectChannel( id );
 		this.#patternroll.setSVGForms( this.#patterns.svgForms );
 		this.#pianoroll.rootElement.octaves( 1, 7 );
@@ -582,7 +587,7 @@ class GSDAW {
 		document.title = this.#dawcore.compositionNeedSave() ? `*${ name }` : name;
 	}
 	#selectChannel( id ) {
-		DOM.channelName.textContent = this.#dawcore.get.channel( id ).name;
+		this.#elements.channelName.textContent = this.#dawcore.get.channel( id ).name;
 		this.#effects.setDestFilter( id );
 	}
 
@@ -603,9 +608,9 @@ class GSDAW {
 		this.#drums.rootElement.loop( false );
 		this.#pianoroll.rootElement.loop( false );
 		this.#patternroll.rootElement.loop( false );
-		DOM.drumsName.textContent =
-		DOM.synthName.textContent =
-		DOM.pianorollName.textContent = "";
+		this.#elements.drumsName.textContent =
+		this.#elements.synthName.textContent =
+		this.#elements.pianorollName.textContent = "";
 		this.#patterns.clear();
 	}
 	#oncmpChanged( obj, prevObj ) {
@@ -630,10 +635,10 @@ class GSDAW {
 				mixerSelectedChan = obj.channels[ this.#effects.getDestFilter() ];
 
 			if ( synOpenedChan && "name" in synOpenedChan ) {
-				DOM.synthChannelBtnText.textContent = synOpenedChan.name;
+				this.#elements.synthChannelBtnText.textContent = synOpenedChan.name;
 			}
 			if ( mixerSelectedChan && "name" in mixerSelectedChan ) {
-				DOM.channelName.textContent = mixerSelectedChan.name;
+				this.#elements.channelName.textContent = mixerSelectedChan.name;
 			}
 		} ],
 		[ [ "synths" ], function( obj ) {
@@ -641,10 +646,10 @@ class GSDAW {
 
 			if ( synOpened ) {
 				if ( "name" in synOpened ) {
-					DOM.synthName.textContent = synOpened.name;
+					this.#elements.synthName.textContent = synOpened.name;
 				}
 				if ( "dest" in synOpened ) {
-					DOM.synthChannelBtnText.textContent = this.#dawcore.get.channel( synOpened.dest ).name;
+					this.#elements.synthChannelBtnText.textContent = this.#dawcore.get.channel( synOpened.dest ).name;
 				}
 			}
 		} ],
@@ -673,51 +678,51 @@ class GSDAW {
 			if ( obj.patternSlicesOpened ) {
 				const pat = this.#dawcore.get.pattern( obj.patternSlicesOpened );
 
-				DOM.slicesName.textContent = pat.name;
+				this.#elements.slicesName.textContent = pat.name;
 				this.#windows.window( "slicer" ).open();
 				if ( this.#dawcore.getFocusedName() === "slices" ) {
 					GSUI.setAttribute( this.rootElement, "duration", pat.duration );
 				}
 			} else {
-				DOM.slicesName.textContent = "";
+				this.#elements.slicesName.textContent = "";
 			}
 		} ],
 		[ [ "patternDrumsOpened" ], function( obj ) {
 			if ( obj.patternDrumsOpened ) {
 				const pat = this.#dawcore.get.pattern( obj.patternDrumsOpened );
 
-				DOM.drumsName.textContent = pat.name;
+				this.#elements.drumsName.textContent = pat.name;
 				this.#windows.window( "drums" ).open();
 				if ( this.#dawcore.getFocusedName() === "drums" ) {
 					GSUI.setAttribute( this.rootElement, "duration", pat.duration );
 				}
 			} else {
-				DOM.drumsName.textContent = "";
+				this.#elements.drumsName.textContent = "";
 			}
 		} ],
 		[ [ "synthOpened" ], function( obj ) {
 			if ( obj.synthOpened ) {
 				const syn = this.#dawcore.get.synth( obj.synthOpened );
 
-				DOM.synthName.textContent = syn.name;
-				DOM.synthChannelBtnText.textContent = this.#dawcore.get.channel( this.#dawcore.get.synth( obj.synthOpened ).dest ).name;
+				this.#elements.synthName.textContent = syn.name;
+				this.#elements.synthChannelBtnText.textContent = this.#dawcore.get.channel( this.#dawcore.get.synth( obj.synthOpened ).dest ).name;
 				this.#windows.window( "synth" ).open();
 			} else {
-				DOM.synthName.textContent = "";
-				DOM.synthChannelBtnText.textContent = "";
+				this.#elements.synthName.textContent = "";
+				this.#elements.synthChannelBtnText.textContent = "";
 			}
 		} ],
 		[ [ "patternKeysOpened" ], function( { patternKeysOpened } ) {
 			if ( patternKeysOpened ) {
 				const pat = this.#dawcore.get.pattern( patternKeysOpened );
 
-				DOM.pianorollName.textContent = pat.name;
+				this.#elements.pianorollName.textContent = pat.name;
 				if ( this.#dawcore.getFocusedName() === "keys" ) {
 					GSUI.setAttribute( this.rootElement, "duration", pat.duration );
 				}
 				this.#windows.window( "piano" ).open();
 			} else {
-				DOM.pianorollName.textContent = "";
+				this.#elements.pianorollName.textContent = "";
 			}
 		} ],
 	] )
@@ -739,13 +744,13 @@ class GSDAW {
 					}
 				} );
 				if ( id === this.#dawcore.get.opened( "slices" ) ) {
-					DOM.slicesName.textContent = name;
+					this.#elements.slicesName.textContent = name;
 				}
 				if ( id === this.#dawcore.get.opened( "keys" ) ) {
-					DOM.pianorollName.textContent = name;
+					this.#elements.pianorollName.textContent = name;
 				}
 				if ( id === this.#dawcore.get.opened( "drums" ) ) {
-					DOM.drumsName.textContent = name;
+					this.#elements.drumsName.textContent = name;
 				}
 			}
 		}
