@@ -60,9 +60,8 @@ class GSDAW {
 		GSUI.setAttribute( this.rootElement.clock, "mode", localStorage.getItem( "gsuiClock.display" ) || "second" );
 		gsuiClock.numbering( localStorage.getItem( "uiTimeNumbering" ) || "1" );
 		gsuiTimeline.numbering( localStorage.getItem( "uiTimeNumbering" ) || "1" );
-
-		window.DOM = Array.prototype.reduce.call(
-			document.querySelectorAll( "[id]" ), ( obj, el ) => {
+		window.DOM = Array.from( document.querySelectorAll( "[id]" ) )
+			.reduce( ( obj, el ) => {
 				obj[ el.id ] = el;
 				return obj;
 			}, {} );
@@ -88,51 +87,25 @@ class GSDAW {
 		this.#slicer.rootElement.onfocus = () => this.#dawcore.focusOn( "slices" );
 		this.#pianoroll.rootElement.onfocus = () => this.#dawcore.focusOn( "keys" );
 		this.#patternroll.rootElement.onfocus = () => this.#dawcore.focusOn( "composition" );
-		this.#windows.window( "main" ).onfocusin = onfocusin.bind( null, this.#patternroll );
-		this.#windows.window( "drums" ).onfocusin = onfocusin.bind( null, this.#drums );
-		this.#windows.window( "piano" ).onfocusin = onfocusin.bind( null, this.#pianoroll );
-		this.#windows.window( "slicer" ).onfocusin = onfocusin.bind( null, this.#slicer );
-		function onfocusin( obj, e ) {
-			if ( !obj.rootElement.contains( e.target ) ) {
-				obj.rootElement.focus();
-			}
-		}
-
-		this.#windows.window( "main" ).open();
-		this.#windows.window( "mixer" ).open();
-		this.#windows.window( "blocks" ).open();
-
-		DOM.synthName.onclick = onclickName.bind( null, "Rename synthesizer", "renameSynth", "synth" );
-		DOM.drumsName.onclick = onclickName.bind( null, "Rename pattern", "renamePattern", "drums" );
-		DOM.slicesName.onclick = onclickName.bind( null, "Rename pattern", "renamePattern", "slices" );
-		DOM.pianorollName.onclick = onclickName.bind( null, "Rename pattern", "renamePattern", "keys" );
-		DOM.channelName.onclick = onclickName.bind( null, "Rename channel", "renameChannel", "channels" );
-		function onclickName( title, action, area, e ) {
-			const id = area === "channels"
-				? this.#mixer.getSelectedChannelId()
-				: this.#dawcore.get.opened( area );
-
-			if ( id ) {
-				GSUI.popup.prompt( title, "", e.currentTarget.textContent, "Rename" )
-					.then( name => this.#dawcore.callAction( action, id, name ) );
-			}
-		}
-
-		DOM.synthChannelBtn.onclick = () => {
-			const id = this.#dawcore.get.opened( "synth" );
-
-			if ( id ) {
-				gsuiChannels.openSelectChannelPopup( this.#dawcore.get.synth( id ).dest )
-					.then( chanId => chanId && this.#dawcore.callAction( "redirectSynth", id, chanId ) );
-			}
-		};
-
+		this.#windows.window( "main" ).onfocusin = GSDAW.#onfocusin.bind( null, this.#patternroll );
+		this.#windows.window( "drums" ).onfocusin = GSDAW.#onfocusin.bind( null, this.#drums );
+		this.#windows.window( "piano" ).onfocusin = GSDAW.#onfocusin.bind( null, this.#pianoroll );
+		this.#windows.window( "slicer" ).onfocusin = GSDAW.#onfocusin.bind( null, this.#slicer );
+		DOM.synthName.onclick = this.#onclickName.bind( this, "Rename synthesizer", "renameSynth", "synth" );
+		DOM.drumsName.onclick = this.#onclickName.bind( this, "Rename pattern", "renamePattern", "drums" );
+		DOM.slicesName.onclick = this.#onclickName.bind( this, "Rename pattern", "renamePattern", "slices" );
+		DOM.pianorollName.onclick = this.#onclickName.bind( this, "Rename pattern", "renamePattern", "keys" );
+		DOM.channelName.onclick = this.#onclickName.bind( this, "Rename channel", "renameChannel", "channels" );
+		DOM.synthChannelBtn.onclick = this.#onclickSynthChannel.bind( this );
 		this.#mixer.onselectChan = id => this.#selectChannel( id );
 		this.#patternroll.setSVGForms( this.#patterns.svgForms );
 		this.#pianoroll.rootElement.octaves( 1, 7 );
 		this.#drums.rootElement.setPxPerBeat( 120 );
 		this.#drums.setWaveforms( this.#patterns.svgForms.bufferHD );
 		this.#synth.setWaveList( Array.from( gswaPeriodicWaves.list.keys() ) );
+		this.#windows.window( "main" ).open();
+		this.#windows.window( "mixer" ).open();
+		this.#windows.window( "blocks" ).open();
 	}
 	#initEvents() {
 		window.onblur = () => this.#pianoroll.getUIKeys().midiReleaseAllKeys();
@@ -497,6 +470,29 @@ class GSDAW {
 	static #onwheel( e ) {
 		if ( e.ctrlKey ) {
 			e.preventDefault();
+		}
+	}
+	static #onfocusin( obj, e ) {
+		if ( !obj.rootElement.contains( e.target ) ) {
+			obj.rootElement.focus();
+		}
+	}
+	#onclickName( title, action, area, e ) {
+		const id = area === "channels"
+			? this.#mixer.getSelectedChannelId()
+			: this.#dawcore.get.opened( area );
+
+		if ( id ) {
+			GSUI.popup.prompt( title, "", e.currentTarget.textContent, "Rename" )
+				.then( name => this.#dawcore.callAction( action, id, name ) );
+		}
+	}
+	#onclickSynthChannel() {
+		const id = this.#dawcore.get.opened( "synth" );
+
+		if ( id ) {
+			gsuiChannels.openSelectChannelPopup( this.#dawcore.get.synth( id ).dest )
+				.then( chanId => chanId && this.#dawcore.callAction( "redirectSynth", id, chanId ) );
 		}
 	}
 	#ondrop( e ) {
