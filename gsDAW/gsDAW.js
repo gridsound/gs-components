@@ -2,16 +2,15 @@
 
 class GSDAW {
 	#dawcore = new DAWCore()
+	#synth = new GSSynth()
 	#drums = new GSDrums()
-	#effects = new GSEffects()
 	#mixer = new GSMixer()
 	#slicer = new GSSlicer()
-	#patternroll = new GSPatternroll()
+	#effects = new GSEffects()
 	#patterns = new GSPatterns()
 	#pianoroll = new GSPianoroll()
-	#synth = new GSSynth()
+	#patternroll = new GSPatternroll()
 	#windows = GSUI.createElement( "gsui-windows" )
-	#elements = null
 	rootElement = GSUI.createElement( "gsui-daw", {
 		"oki-cookies": document.cookie.indexOf( "cookieAccepted" ) > -1,
 		version: "0.36.1",
@@ -21,6 +20,7 @@ class GSDAW {
 		timelinenumbering: localStorage.getItem( "uiTimeNumbering" ) || "1",
 		windowslowgraphics: !!+( localStorage.getItem( "gsuiWindows.lowGraphics" ) || "0" ),
 	} )
+	#elements = null
 	#keyboardFns = [
 		[ true,  false, "o", () => this.rootElement.showOpenPopup() ],
 		[ true,  false, "s", () => this.#oncmpClickSave() ],
@@ -45,16 +45,15 @@ class GSDAW {
 	#initHTML() {
 		document.body.append(
 			this.rootElement,
-			GSUI.getTemplate( "window-main" ),
-			GSUI.getTemplate( "window-piano" ),
-			GSUI.getTemplate( "window-drums" ),
-			GSUI.getTemplate( "window-synth" ),
-			GSUI.getTemplate( "window-mixer" ),
-			GSUI.getTemplate( "window-blocks" ),
-			GSUI.getTemplate( "window-slicer" ),
-			GSUI.getTemplate( "window-effects" ),
+			GSUI.getTemplate( "gsui-daw-window-main" ),
+			GSUI.getTemplate( "gsui-daw-window-piano" ),
+			GSUI.getTemplate( "gsui-daw-window-drums" ),
+			GSUI.getTemplate( "gsui-daw-window-synth" ),
+			GSUI.getTemplate( "gsui-daw-window-mixer" ),
+			GSUI.getTemplate( "gsui-daw-window-blocks" ),
+			GSUI.getTemplate( "gsui-daw-window-slicer" ),
+			GSUI.getTemplate( "gsui-daw-window-effects" ),
 		);
-
 		this.rootElement.querySelector( ".gsuiDAW-body" ).append( this.#windows );
 		this.#dawcore.setLoopRate( +localStorage.getItem( "uiRefreshRate" ) || 60 );
 		this.#windows.lowGraphics( !!+( localStorage.getItem( "gsuiWindows.lowGraphics" ) || "0" ) );
@@ -62,13 +61,13 @@ class GSDAW {
 		gsuiClock.numbering( localStorage.getItem( "uiTimeNumbering" ) || "1" );
 		gsuiTimeline.numbering( localStorage.getItem( "uiTimeNumbering" ) || "1" );
 		this.#elements = GSUI.findElements( document.body, {
-			drumsName: "#drumsName",
-			synthName: "#synthName",
-			slicesName: "#slicesName",
-			channelName: "#channelName",
-			pianorollName: "#pianorollName",
-			synthChannelBtn: "#synthChannelBtn",
-			synthChannelBtnText: "#synthChannelBtnText",
+			drumsName: "[data-target=drums]",
+			synthName: "[data-target=synth]",
+			slicesName: "[data-target=slices]",
+			channelName: "[data-target=channel]",
+			pianorollName: "[data-target=pianoroll]",
+			synthChannelBtn: "[data-target=synthChannel]",
+			synthChannelBtnText: "[data-target=synthChannel] span",
 		} );
 	}
 	#initComponents() {
@@ -335,7 +334,7 @@ class GSDAW {
 			if ( children.length ) {
 				const child0 = children[ 0 ];
 
-				if ( child0.classList.contains( "windowMenu" ) ) {
+				if ( child0.classList.contains( "gsuiDAW-winMenu" ) ) {
 					children.shift();
 					win.headAppend( ...child0.children );
 				}
