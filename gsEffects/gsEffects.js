@@ -1,9 +1,9 @@
 "use strict";
 
 class GSEffects {
-	#dawcore = null
-	#destFilter = "main"
-	rootElement = new gsuiEffects()
+	#dawcore = null;
+	#destFilter = "main";
+	rootElement = new gsuiEffects();
 	#ctrlEffects = new DAWCore.controllers.effects( {
 		dataCallbacks: {
 			addEffect: ( id, obj ) => this.rootElement.addEffect( id, obj ),
@@ -11,7 +11,7 @@ class GSEffects {
 			changeEffect: ( id, prop, val ) => this.rootElement.changeEffect( id, prop, val ),
 			changeEffectData: ( id, obj ) => this.#changeEffectData( id, obj ),
 		},
-	} )
+	} );
 
 	constructor() {
 		Object.seal( this );

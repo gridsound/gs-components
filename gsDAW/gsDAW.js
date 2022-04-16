@@ -1,16 +1,16 @@
 "use strict";
 
 class GSDAW {
-	#dawcore = new DAWCore()
-	#synth = new GSSynth()
-	#drums = new GSDrums()
-	#mixer = new GSMixer()
-	#slicer = new GSSlicer()
-	#effects = new GSEffects()
-	#patterns = new GSPatterns()
-	#pianoroll = new GSPianoroll()
-	#patternroll = new GSPatternroll()
-	#windows = GSUI.createElement( "gsui-windows" )
+	#dawcore = new DAWCore();
+	#synth = new GSSynth();
+	#drums = new GSDrums();
+	#mixer = new GSMixer();
+	#slicer = new GSSlicer();
+	#effects = new GSEffects();
+	#patterns = new GSPatterns();
+	#pianoroll = new GSPianoroll();
+	#patternroll = new GSPatternroll();
+	#windows = GSUI.createElement( "gsui-windows" );
 	rootElement = GSUI.createElement( "gsui-daw", {
 		"oki-cookies": document.cookie.indexOf( "cookieAccepted" ) > -1,
 		version: "0.36.1",
@@ -19,8 +19,8 @@ class GSDAW {
 		samplerate: this.#dawcore.env.sampleRate,
 		timelinenumbering: localStorage.getItem( "uiTimeNumbering" ) || "1",
 		windowslowgraphics: !!+( localStorage.getItem( "gsuiWindows.lowGraphics" ) || "0" ),
-	} )
-	#elements = null
+	} );
+	#elements = null;
 	#keyboardFns = [
 		[ true,  false, "o", () => this.rootElement.showOpenPopup() ],
 		[ true,  false, "s", () => this.#oncmpClickSave() ],
@@ -28,7 +28,7 @@ class GSDAW {
 		[ true,  false, "z", () => this.#dawcore.history.undo() ],
 		[ true,  false, "Z", () => this.#dawcore.history.redo() ],
 		[ false, false, " ", () => this.#dawcore.isPlaying() ? this.#dawcore.stop() : this.#dawcore.play() ],
-	]
+	];
 	static #dropExtensions = { gs: true, txt: true, json: true };
 
 	constructor() {
@@ -117,7 +117,7 @@ class GSDAW {
 		window.onkeydown = this.#onkeydown.bind( this );
 		window.onbeforeunload = this.#oncmpBeforeUnload;
 		this.rootElement.ondragover = () => false;
-		this.rootElement.oncontextmenu = () => location.host === 'localhost' ? undefined : false;
+		this.rootElement.oncontextmenu = () => location.host === "localhost" ? undefined : false;
 		this.rootElement.addEventListener( "wheel", GSDAW.#onwheel, { passive: false } );
 		this.rootElement.addEventListener( "drop", this.#ondrop.bind( this ) );
 
@@ -213,7 +213,7 @@ class GSDAW {
 					GSUI.setAttribute( this.rootElement, "timelinenumbering", data.timelineNumbering );
 					GSUI.setAttribute( this.rootElement, "windowslowgraphics", data.windowsLowGraphics );
 				},
-				changeDisplayClock: d => {
+				changeDisplayClock( d ) {
 					const display = d.args[ 0 ];
 
 					localStorage.setItem( "gsuiClock.display", display );
@@ -231,7 +231,7 @@ class GSDAW {
 					} );
 				},
 				abortExport: () => this.#dawcore.abortWAVExport(),
-				save: d => this.#oncmpClickSave(),
+				save: () => this.#oncmpClickSave(),
 				open: d => this.#oncmpClickOpen( ...d.args ),
 				delete: d => this.#oncmpClickDelete( ...d.args ),
 				tempo: d => {
@@ -724,7 +724,7 @@ class GSDAW {
 				this.#elements.pianorollName.textContent = "";
 			}
 		} ],
-	] )
+	] );
 	#onupdatePattern( id, obj ) {
 		if ( obj ) {
 			if ( "duration" in obj ) {
@@ -755,8 +755,8 @@ class GSDAW {
 		}
 	}
 	#onpatternsBuffersLoaded( buffers ) {
-		const patSli = this.#dawcore.get.pattern( this.#dawcore.get.opened( "slices" ) );
-		const sliBuf = patSli?.source && this.#dawcore.get.pattern( patSli.source ).buffer;
+		const patSli = this.#dawcore.get.pattern( this.#dawcore.get.opened( "slices" ) ),
+			sliBuf = patSli?.source && this.#dawcore.get.pattern( patSli.source ).buffer;
 
 		if ( sliBuf in buffers ) {
 			this.#slicer.rootElement.setBuffer( buffers[ sliBuf ].buffer );

@@ -1,18 +1,18 @@
 "use strict";
 
 class GSPianoroll {
-	#dawcore = null
-	#keysId = null
-	#patternId = null
-	rootElement = new gsuiPianoroll()
-	timeline = this.rootElement.timeline
+	#dawcore = null;
+	#keysId = null;
+	#patternId = null;
+	rootElement = new gsuiPianoroll();
+	timeline = this.rootElement.timeline;
 	#dataKeys = new DAWCore.controllers.keys( {
 		dataCallbacks: {
 			addKey: ( id, blc ) => this.rootElement.addKey( id, blc ),
 			removeKey: id => this.rootElement.removeKey( id ),
 			changeKeyProp: ( id, prop, val ) => this.rootElement.changeKeyProp( id, prop, val ),
 		},
-	} )
+	} );
 
 	constructor() {
 		Object.seal( this );

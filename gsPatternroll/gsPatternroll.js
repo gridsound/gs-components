@@ -1,10 +1,10 @@
 "use strict";
 
 class GSPatternroll {
-	#dawcore = null
-	#svgForms = null
-	rootElement = GSUI.createElement( "gsui-patternroll" )
-	timeline = this.rootElement.timeline
+	#dawcore = null;
+	#svgForms = null;
+	rootElement = GSUI.createElement( "gsui-patternroll" );
+	timeline = this.rootElement.timeline;
 	#dataTracks = new DAWCore.controllers.tracks( {
 		dataCallbacks: {
 			addTrack: id => this.rootElement.addTrack( id ),
@@ -13,7 +13,7 @@ class GSPatternroll {
 			renameTrack: ( id, s ) => this.rootElement.renameTrack( id, s ),
 			reorderTrack: ( id, n ) => this.rootElement.reorderTrack( id, n ),
 		}
-	} )
+	} );
 	#dataBlocks = new DAWCore.controllers.blocks( {
 		dataCallbacks: {
 			addBlock: ( id, blc ) => {
@@ -28,7 +28,7 @@ class GSPatternroll {
 			changeBlockProp: ( id, prop, val ) => this.rootElement.changeBlockProp( id, prop, val ),
 			updateBlockViewBox: ( id, blc ) => this.rootElement.updateBlockViewBox( id, blc ),
 		},
-	} )
+	} );
 
 	constructor() {
 		Object.seal( this );

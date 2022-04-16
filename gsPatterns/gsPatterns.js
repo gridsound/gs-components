@@ -1,12 +1,12 @@
 "use strict";
 
 class GSPatterns {
-	#buffers = {}
-	#dawcore = null
-	#uiPatterns = null
-	#synthsCrud = null
-	#patternsCrud = null
-	#channelsCrud = null
+	#buffers = {};
+	#dawcore = null;
+	#uiPatterns = null;
+	#synthsCrud = null;
+	#patternsCrud = null;
+	#channelsCrud = null;
 
 	constructor() {
 		const uiPatterns = GSUI.createElement( "gsui-patterns" ),

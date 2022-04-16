@@ -1,9 +1,9 @@
 "use strict";
 
 class GSSynth {
-	#dawcore = null
-	#synthId = null
-	rootElement = GSUI.createElement( "gsui-synthesizer" )
+	#dawcore = null;
+	#synthId = null;
+	rootElement = GSUI.createElement( "gsui-synthesizer" );
 	#dataSynth = new DAWCore.controllers.synth( {
 		dataCallbacks: {
 			addOsc: ( id, osc ) => this.rootElement.addOscillator( id, osc ),
@@ -15,7 +15,7 @@ class GSSynth {
 			updateLFOWave: () => this.rootElement.lfo.updateWave(),
 			updateOscWave: id => this.rootElement.getOscillator( id ).updateWave(),
 		},
-	} )
+	} );
 
 	constructor() {
 		Object.seal( this );

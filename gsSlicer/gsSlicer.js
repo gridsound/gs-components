@@ -1,9 +1,9 @@
 "use strict";
 
 class GSSlicer {
-	rootElement = GSUI.createElement( "gsui-slicer" )
-	#dawcore = null
-	#patternId = null
+	rootElement = GSUI.createElement( "gsui-slicer" );
+	#dawcore = null;
+	#patternId = null;
 	#ctrlSlices = new DAWCore.controllers.slicer( {
 		dataCallbacks: {
 			disabled: b => GSUI.setAttribute( this.rootElement, "disabled", b ),
@@ -19,7 +19,7 @@ class GSSlicer {
 			changeSlice: ( id, obj ) => this.rootElement.changeSlice( id, obj ),
 			removeSlice: id => this.rootElement.removeSlice( id ),
 		},
-	} )
+	} );
 
 	constructor() {
 		Object.seal( this );

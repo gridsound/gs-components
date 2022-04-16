@@ -1,13 +1,13 @@
 "use strict";
 
 class GSDrums {
-	#dawcore = null
-	#drumsId = null
-	#patternId = null
-	#svgManager = null
-	rootElement = document.createElement( "gsui-drums" )
-	timeline = this.rootElement.timeline
-	#uiDrumrows = this.rootElement.drumrows
+	#dawcore = null;
+	#drumsId = null;
+	#patternId = null;
+	#svgManager = null;
+	rootElement = document.createElement( "gsui-drums" );
+	timeline = this.rootElement.timeline;
+	#uiDrumrows = this.rootElement.drumrows;
 	#dataDrums = new DAWCore.controllers.drums( {
 		dataCallbacks: {
 			addDrum: ( id, drum ) => this.rootElement.addDrum( id, drum ),
@@ -16,7 +16,7 @@ class GSDrums {
 			removeDrum: id => this.rootElement.removeDrum( id ),
 			removeDrumcut: id => this.rootElement.removeDrumcut( id ),
 		},
-	} )
+	} );
 	#dataDrumrows = new DAWCore.controllers.drumrows( {
 		dataCallbacks: {
 			addDrumrow: id => {
@@ -41,7 +41,7 @@ class GSDrums {
 				}
 			},
 		},
-	} )
+	} );
 
 	constructor() {
 		Object.seal( this );
@@ -145,7 +145,7 @@ class GSDrums {
 	// .........................................................................
 	#setPropFilter( rowId, prop ) {
 		const propValues = Object.entries( this.#dawcore.get.drums( this.#drumsId ) )
-				.filter( ( [, drm ] ) => drm.row === rowId && "gain" in drm )
+				.filter( ( [ , drm ] ) => drm.row === rowId && "gain" in drm )
 				.map( ( [ id, drm ] ) => [ id, drm[ prop ] ] );
 
 		this.#uiDrumrows.setPropFilter( rowId, prop );

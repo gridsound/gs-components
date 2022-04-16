@@ -1,9 +1,9 @@
 "use strict";
 
 class GSMixer {
-	#dawcore = null
-	onselectChan = null
-	rootElement = GSUI.createElement( "gsui-channels" )
+	#dawcore = null;
+	onselectChan = null;
+	rootElement = GSUI.createElement( "gsui-channels" );
 	#ctrlMixer = new DAWCore.controllers.mixer( {
 		dataCallbacks: {
 			addChannel: ( id, chan ) => this.rootElement.addChannel( id, chan ),
@@ -15,7 +15,7 @@ class GSMixer {
 			changePanChannel: ( id, val ) => this.rootElement.changePanChannel( id, val ),
 			changeGainChannel: ( id, val ) => this.rootElement.changeGainChannel( id, val ),
 		},
-	} )
+	} );
 
 	constructor() {
 		Object.seal( this );
