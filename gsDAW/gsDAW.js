@@ -194,8 +194,8 @@ class GSDAW {
 					const [ saveMode, id ] = d.args;
 
 					saveMode === "local"
-						? this.#oncmpLocalDrop( saveMode, id )
-						: this.#oncmpCloudDrop( saveMode, id );
+						? this.#oncmpCloudDrop( saveMode, id )
+						: this.#oncmpLocalDrop( saveMode, id );
 				},
 				settings: d => {
 					const data = d.args[ 0 ];
