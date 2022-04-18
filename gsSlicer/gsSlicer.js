@@ -1,7 +1,7 @@
 "use strict";
 
 class GSSlicer {
-	rootElement = GSUI.createElement( "gsui-slicer" );
+	rootElement = GSUI.createElem( "gsui-slicer" );
 	#dawcore = null;
 	#patternId = null;
 	#ctrlSlices = new DAWCore.controllers.slicer( {

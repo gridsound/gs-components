@@ -5,7 +5,7 @@ class GSDrums {
 	#drumsId = null;
 	#patternId = null;
 	#svgManager = null;
-	rootElement = GSUI.createElement( "gsui-drums" );
+	rootElement = GSUI.createElem( "gsui-drums" );
 	timeline = this.rootElement.timeline;
 	#uiDrumrows = this.rootElement.drumrows;
 	#dataDrums = new DAWCore.controllers.drums( {

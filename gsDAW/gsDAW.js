@@ -10,8 +10,8 @@ class GSDAW {
 	#patterns = new GSPatterns();
 	#pianoroll = new GSPianoroll();
 	#patternroll = new GSPatternroll();
-	#windows = GSUI.createElement( "gsui-windows" );
-	rootElement = GSUI.createElement( "gsui-daw", {
+	#windows = GSUI.createElem( "gsui-windows" );
+	rootElement = GSUI.createElem( "gsui-daw", {
 		"oki-cookies": document.cookie.indexOf( "cookieAccepted" ) > -1,
 		version: "0.36.1",
 		volume: this.#dawcore.destination.getGain(),

@@ -3,7 +3,7 @@
 class GSSynth {
 	#dawcore = null;
 	#synthId = null;
-	rootElement = GSUI.createElement( "gsui-synthesizer" );
+	rootElement = GSUI.createElem( "gsui-synthesizer" );
 	#dataSynth = new DAWCore.controllers.synth( {
 		dataCallbacks: {
 			addOsc: ( id, osc ) => this.rootElement.addOscillator( id, osc ),

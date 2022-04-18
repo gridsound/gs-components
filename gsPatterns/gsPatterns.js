@@ -9,7 +9,7 @@ class GSPatterns {
 	#channelsCrud = null;
 
 	constructor() {
-		const uiPatterns = GSUI.createElement( "gsui-patterns" );
+		const uiPatterns = GSUI.createElem( "gsui-patterns" );
 		const svgForms = Object.freeze( {
 			keys: new gsuiKeysforms(),
 			drums: new gsuiDrumsforms(),
