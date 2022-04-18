@@ -24,7 +24,7 @@ class GSSlicer {
 	constructor() {
 		Object.seal( this );
 
-		GSUI.listenEvents( this.rootElement, {
+		GSUI.listenEv( this.rootElement, {
 			gsuiSlicer: {
 				dropBuffer: obj => {
 					this.#dawcore.callAction( "redirectPatternSlices", this.#ctrlSlices.getPatternId(), obj.args[ 0 ] );

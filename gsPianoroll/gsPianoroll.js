@@ -17,7 +17,7 @@ class GSPianoroll {
 	constructor() {
 		Object.seal( this );
 
-		GSUI.listenEvents( this.rootElement, {
+		GSUI.listenEv( this.rootElement, {
 			gsuiPianoroll: {
 				changeKeysProps: d => {
 					this.#dawcore.callAction( "changeKeysProps", this.#patternId, ...d.args );

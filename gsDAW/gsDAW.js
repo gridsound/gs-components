@@ -184,7 +184,7 @@ class GSDAW {
 		};
 		this.rootElement.onExportJSON = ( saveMode, id ) => this.#dawcore.exportCompositionToJSON( saveMode, id );
 
-		GSUI.listenEvents( this.rootElement, {
+		GSUI.listenEv( this.rootElement, {
 			gsuiDAW: {
 				"oki-cookies": () => {
 					document.cookie = "cookieAccepted";

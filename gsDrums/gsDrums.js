@@ -46,7 +46,7 @@ class GSDrums {
 	constructor() {
 		Object.seal( this );
 
-		GSUI.listenEvents( this.rootElement, {
+		GSUI.listenEv( this.rootElement, {
 			gsuiDrumrows: {
 				change: d => { this.#dawcore.callAction( ...d.args ); },
 				propFilter: d => { this.#setPropFilter( ...d.args ); },
