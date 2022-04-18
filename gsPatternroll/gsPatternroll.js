@@ -17,10 +17,10 @@ class GSPatternroll {
 	#dataBlocks = new DAWCore.controllers.blocks( {
 		dataCallbacks: {
 			addBlock: ( id, blc ) => {
-				const pat = this.#dawcore.get.pattern( blc.pattern ),
-					dataReady = pat.type === "buffer"
-						? !!this.#dawcore.get.audioBuffer( pat.buffer )
-						: true;
+				const pat = this.#dawcore.get.pattern( blc.pattern );
+				const dataReady = pat.type === "buffer"
+					? !!this.#dawcore.get.audioBuffer( pat.buffer )
+					: true;
 
 				this.rootElement.addBlock( id, blc, { dataReady } );
 			},
@@ -120,16 +120,16 @@ class GSPatternroll {
 	}
 	#oneditBlock( id, obj, blc ) {
 		if ( blc._gsuiSVGform ) {
-			const pat = this.#dawcore.get.pattern( obj.pattern ),
-				bpm = pat.bufferBpm || this.#dawcore.get.bpm();
+			const pat = this.#dawcore.get.pattern( obj.pattern );
+			const bpm = pat.bufferBpm || this.#dawcore.get.bpm();
 
 			this.#svgForms[ pat.type ].setSVGViewbox( blc._gsuiSVGform, obj.offset, obj.duration, bpm / 60 );
 		}
 	}
 	#onaddBlock( id, obj, blc ) {
-		const pat = this.#dawcore.get.pattern( obj.pattern ),
-			SVGs = this.#svgForms[ pat.type ],
-			svg = SVGs.createSVG( obj.pattern );
+		const pat = this.#dawcore.get.pattern( obj.pattern );
+		const SVGs = this.#svgForms[ pat.type ];
+		const svg = SVGs.createSVG( obj.pattern );
 
 		blc._gsuiSVGform = svg;
 		blc.children[ 3 ].append( svg );

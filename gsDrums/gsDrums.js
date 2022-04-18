@@ -31,10 +31,10 @@ class GSDrums {
 						break;
 					case "pattern":
 						this.#uiDrumrows.change( id, prop, this.#svgManager.createSVG( val ) );
-					break;
+						break;
 					case "duration": {
-						const patId = this.#dawcore.get.drumrow( id ).pattern,
-							bufId = this.#dawcore.get.pattern( patId ).buffer;
+						const patId = this.#dawcore.get.drumrow( id ).pattern;
+						const bufId = this.#dawcore.get.pattern( patId ).buffer;
 
 						this.#uiDrumrows.change( id, prop, this.#dawcore.get.buffer( bufId ).duration );
 					} break;
@@ -100,8 +100,8 @@ class GSDrums {
 			this.#dataDrums.clear();
 			GSUI.setAttribute( this.rootElement, "disabled", !id );
 			if ( id ) {
-				const pat = this.#dawcore.get.pattern( id ),
-					drums = this.#dawcore.get.drums( pat.drums );
+				const pat = this.#dawcore.get.pattern( id );
+				const drums = this.#dawcore.get.drums( pat.drums );
 
 				this.#drumsId = pat.drums;
 				this.#dataDrums.change( drums );
@@ -125,8 +125,8 @@ class GSDrums {
 			this.rootElement.drumrows.reorderDrumrows( obj.drumrows );
 		}
 		if ( "beatsPerMeasure" in obj || "stepsPerBeat" in obj ) {
-			const bPM = obj.beatsPerMeasure || this.#dawcore.get.beatsPerMeasure(),
-				sPB = obj.stepsPerBeat || this.#dawcore.get.stepsPerBeat();
+			const bPM = obj.beatsPerMeasure || this.#dawcore.get.beatsPerMeasure();
+			const sPB = obj.stepsPerBeat || this.#dawcore.get.stepsPerBeat();
 
 			this.rootElement.timeDivision( bPM, sPB );
 		}
@@ -145,8 +145,8 @@ class GSDrums {
 	// .........................................................................
 	#setPropFilter( rowId, prop ) {
 		const propValues = Object.entries( this.#dawcore.get.drums( this.#drumsId ) )
-				.filter( ( [ , drm ] ) => drm.row === rowId && "gain" in drm )
-				.map( ( [ id, drm ] ) => [ id, drm[ prop ] ] );
+			.filter( ( [ , drm ] ) => drm.row === rowId && "gain" in drm )
+			.map( ( [ id, drm ] ) => [ id, drm[ prop ] ] );
 
 		this.#uiDrumrows.setPropFilter( rowId, prop );
 		this.rootElement.setPropValues( rowId, prop, propValues );

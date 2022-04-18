@@ -57,8 +57,8 @@ class GSPianoroll {
 			this.rootElement.reset();
 			GSUI.setAttribute( this.rootElement, "disabled", !id );
 			if ( id ) {
-				const pat = this.#dawcore.get.pattern( id ),
-					keys = this.#dawcore.get.keys( pat.keys );
+				const pat = this.#dawcore.get.pattern( id );
+				const keys = this.#dawcore.get.keys( pat.keys );
 
 				this.#keysId = pat.keys;
 				this.#dataKeys.change( keys );

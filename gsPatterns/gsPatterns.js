@@ -9,14 +9,14 @@ class GSPatterns {
 	#channelsCrud = null;
 
 	constructor() {
-		const uiPatterns = GSUI.createElement( "gsui-patterns" ),
-			svgForms = Object.freeze( {
-				keys: new gsuiKeysforms(),
-				drums: new gsuiDrumsforms(),
-				buffer: new gsuiWaveforms(),
-				bufferHD: new gsuiWaveforms(),
-				slices: new gsuiSlicesforms(),
-			} );
+		const uiPatterns = GSUI.createElement( "gsui-patterns" );
+		const svgForms = Object.freeze( {
+			keys: new gsuiKeysforms(),
+			drums: new gsuiDrumsforms(),
+			buffer: new gsuiWaveforms(),
+			bufferHD: new gsuiWaveforms(),
+			slices: new gsuiSlicesforms(),
+		} );
 
 		uiPatterns.onpatternDataTransfer = elPat => elPat.dataset.id;
 		uiPatterns.onchange = ( act, ...args ) => {
@@ -24,8 +24,8 @@ class GSPatterns {
 				const daw = this.#dawcore;
 
 				if ( act === "removePattern" && daw.isPlaying() ) {
-					const id = args[ 0 ],
-						type = daw.get.pattern( id ).type;
+					const id = args[ 0 ];
+					const type = daw.get.pattern( id ).type;
 
 					if ( type === daw.getFocusedName() && id === daw.get.opened( type ) ) {
 						daw.stop();
@@ -77,11 +77,11 @@ class GSPatterns {
 		this.svgForms.bufferHD.empty();
 	}
 	bufferLoaded( buffers ) {
-		const pats = Object.entries( this.#dawcore.get.patterns() ),
-			bufToPat = pats.reduce( ( map, [ id, pat ] ) => {
-				map[ pat.buffer ] = id;
-				return map;
-			}, {} );
+		const pats = Object.entries( this.#dawcore.get.patterns() );
+		const bufToPat = pats.reduce( ( map, [ id, pat ] ) => {
+			map[ pat.buffer ] = id;
+			return map;
+		}, {} );
 
 		Object.entries( buffers ).forEach( ( [ idBuf, buf ] ) => {
 			this.#buffers[ idBuf ] = buf;
@@ -126,13 +126,13 @@ class GSPatterns {
 
 	// .........................................................................
 	#updatePatternContent( id ) {
-		const get = this.#dawcore.get,
-			pat = get.pattern( id ),
-			elPat = this.#uiPatterns.getPattern( id );
+		const get = this.#dawcore.get;
+		const pat = get.pattern( id );
+		const elPat = this.#uiPatterns.getPattern( id );
 
 		if ( elPat ) {
-			const type = pat.type,
-				dur = get.patternDuration( id );
+			const type = pat.type;
+			const dur = get.patternDuration( id );
 
 			switch ( type ) {
 				case "keys":
@@ -183,8 +183,8 @@ class GSPatterns {
 
 	// .........................................................................
 	#createPattern( id, obj ) {
-		const isBuf = obj.type === "buffer",
-			SVG = this.svgForms[ isBuf ? "bufferHD" : obj.type ];
+		const isBuf = obj.type === "buffer";
+		const SVG = this.svgForms[ isBuf ? "bufferHD" : obj.type ];
 
 		this.data.patterns[ id ] = DAWCore.utils.jsonCopy( obj );
 		SVG.add( id );

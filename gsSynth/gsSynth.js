@@ -21,10 +21,10 @@ class GSSynth {
 		Object.seal( this );
 
 		this.rootElement.addEventListener( "gsuiEvents", e => {
-			const d = e.detail,
-				a = d.args,
-				id = this.#synthId,
-				dc = this.#dawcore;
+			const d = e.detail;
+			const a = d.args;
+			const id = this.#synthId;
+			const dc = this.#dawcore;
 
 			switch ( d.component ) {
 				case "gsuiEnvelope":
@@ -78,8 +78,8 @@ class GSSynth {
 		}
 	}
 	change( obj ) {
-		const synObj = obj.synths && obj.synths[ this.#synthId ],
-			get = this.#dawcore.get;
+		const synObj = obj.synths && obj.synths[ this.#synthId ];
+		const get = this.#dawcore.get;
 
 		if ( "beatsPerMeasure" in obj || "stepsPerBeat" in obj ) {
 			GSUI.setAttribute( this.rootElement.env, "timedivision", `${ get.beatsPerMeasure() }/${ get.stepsPerBeat() }` );

@@ -219,10 +219,10 @@ class GSDAW {
 					localStorage.setItem( "gsuiClock.display", display );
 				},
 				export: () => {
-					const dur = this.#dawcore.get.duration() * 60 / this.#dawcore.get.bpm(),
-						intervalId = setInterval( () => {
-							GSUI.setAttribute( this.rootElement, "exporting", this.#dawcore.ctx.currentTime / dur );
-						}, 100 );
+					const dur = this.#dawcore.get.duration() * 60 / this.#dawcore.get.bpm();
+					const intervalId = setInterval( () => {
+						GSUI.setAttribute( this.rootElement, "exporting", this.#dawcore.ctx.currentTime / dur );
+					}, 100 );
 
 					this.#dawcore.exportCompositionToWAV().then( obj => {
 						clearInterval( intervalId );
@@ -325,9 +325,9 @@ class GSDAW {
 	}
 	#initWindowsHTML() {
 		document.querySelectorAll( "div[data-window]" ).forEach( winCnt => {
-			const win = this.#windows.createWindow( winCnt.dataset.window ),
-				elWinCnt = win.querySelector( ".gsuiWindow-content" ),
-				children = Array.from( winCnt.children );
+			const win = this.#windows.createWindow( winCnt.dataset.window );
+			const elWinCnt = win.querySelector( ".gsuiWindow-content" );
+			const children = Array.from( winCnt.children );
 
 			winCnt.remove();
 			winCnt.classList.forEach( c => elWinCnt.classList.add( c ) );
@@ -349,9 +349,9 @@ class GSDAW {
 
 	// .........................................................................
 	#oncontrolsFocus( focStr ) {
-		const beat = this.#dawcore.getFocusedObject().getCurrentTime(),
-			grid = this.#controlsGetFocusedGrid( focStr ),
-			onCmp = focStr === "composition";
+		const beat = this.#dawcore.getFocusedObject().getCurrentTime();
+		const grid = this.#controlsGetFocusedGrid( focStr );
+		const onCmp = focStr === "composition";
 
 		GSUI.setAttribute( this.rootElement, "focus", onCmp ? "up" : "down" );
 		GSUI.setAttribute( this.rootElement, "duration", this.#dawcore.getFocusedDuration() );
@@ -380,8 +380,8 @@ class GSDAW {
 		this.#pianorollKeyboardEvent( false, e );
 	}
 	#pianorollKeyboardEvent( status, e ) {
-		const uiKeys = this.#pianoroll.getUIKeys(),
-			midi = uiKeys.getMidiKeyFromKeyboard( e );
+		const uiKeys = this.#pianoroll.getUIKeys();
+		const midi = uiKeys.getMidiKeyFromKeyboard( e );
 
 		if ( midi !== false ) {
 			status
@@ -451,8 +451,8 @@ class GSDAW {
 		).then( b => {
 			if ( b ) {
 				( saveMode === "cloud"
-				? gsapiClient.deleteComposition( id )
-				: Promise.resolve() )
+					? gsapiClient.deleteComposition( id )
+					: Promise.resolve() )
 					.catch( err => {
 						if ( err.code !== 404 ) {
 							GSUI.popup.alert( `Error ${ err.code }`,
@@ -500,8 +500,8 @@ class GSDAW {
 		}
 	}
 	#ondrop( e ) {
-		const files = Array.from( e.dataTransfer.files ),
-			cmpFile = files.find( f => f.name.split( "." ).pop().toLowerCase() in GSDAW.#dropExtensions );
+		const files = Array.from( e.dataTransfer.files );
+		const cmpFile = files.find( f => f.name.split( "." ).pop().toLowerCase() in GSDAW.#dropExtensions );
 
 		e.preventDefault();
 		if ( cmpFile ) {
@@ -512,21 +512,21 @@ class GSDAW {
 		}
 	}
 	#oncmpDrop( saveMode, id ) {
-		const to = saveMode === "local" ? "cloud" : "local",
-			cmpFrom = this.#dawcore.get.composition( saveMode, id ),
-			cmpTo = this.#dawcore.get.composition( to, id );
+		const to = saveMode === "local" ? "cloud" : "local";
+		const cmpFrom = this.#dawcore.get.composition( saveMode, id );
+		const cmpTo = this.#dawcore.get.composition( to, id );
 
 		return !cmpTo
 			? Promise.resolve( cmpFrom )
 			: GSUI.popup.confirm( "Warning",
 				"Are you sure you want to overwrite " +
 				`the <b>${ to }</b> composition <i>${ cmpTo.name || "Untitled" }</i>&nbsp;?` )
-			.then( b => {
-				if ( b ) {
-					return cmpFrom;
-				}
-				throw undefined;
-			} );
+				.then( b => {
+					if ( b ) {
+						return cmpFrom;
+					}
+					throw undefined;
+				} );
 	}
 	#oncmpLocalDrop( saveMode, id ) {
 		this.#oncmpDrop( saveMode, id )
@@ -630,8 +630,8 @@ class GSDAW {
 	}
 	static #cmpChangedFns = new Map( [
 		[ [ "channels" ], function( obj ) {
-			const synOpenedChan = obj.channels[ this.#dawcore.get.synth( this.#dawcore.get.opened( "synth" ) ).dest ],
-				mixerSelectedChan = obj.channels[ this.#effects.getDestFilter() ];
+			const synOpenedChan = obj.channels[ this.#dawcore.get.synth( this.#dawcore.get.opened( "synth" ) ).dest ];
+			const mixerSelectedChan = obj.channels[ this.#effects.getDestFilter() ];
 
 			if ( synOpenedChan && "name" in synOpenedChan ) {
 				this.#elements.synthChannelBtnText.textContent = synOpenedChan.name;
@@ -755,16 +755,16 @@ class GSDAW {
 		}
 	}
 	#onpatternsBuffersLoaded( buffers ) {
-		const patSli = this.#dawcore.get.pattern( this.#dawcore.get.opened( "slices" ) ),
-			sliBuf = patSli?.source && this.#dawcore.get.pattern( patSli.source ).buffer;
+		const patSli = this.#dawcore.get.pattern( this.#dawcore.get.opened( "slices" ) );
+		const sliBuf = patSli?.source && this.#dawcore.get.pattern( patSli.source ).buffer;
 
 		if ( sliBuf in buffers ) {
 			this.#slicer.rootElement.setBuffer( buffers[ sliBuf ].buffer );
 		}
 		this.#patterns.bufferLoaded( buffers );
 		this.#patternroll.rootElement.getBlocks().forEach( ( elBlc, blcId ) => {
-			const blc = this.#dawcore.get.block( blcId ),
-				pat = this.#dawcore.get.pattern( blc.pattern );
+			const blc = this.#dawcore.get.block( blcId );
+			const pat = this.#dawcore.get.pattern( blc.pattern );
 
 			if ( pat.type === "buffer" && pat.buffer in buffers ) {
 				const bpm = pat.bufferBpm || this.#dawcore.get.bpm();
