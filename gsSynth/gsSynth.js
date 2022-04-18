@@ -8,9 +8,9 @@ class GSSynth {
 		dataCallbacks: {
 			addOsc: ( id, osc ) => this.rootElement.addOscillator( id, osc ),
 			removeOsc: id => this.rootElement.removeOscillator( id ),
-			changeEnvProp: ( k, v ) => GSUI.setAttribute( this.rootElement.env, k, v ),
-			changeLFOProp: ( k, v ) => GSUI.setAttribute( this.rootElement.lfo, k, v ),
-			changeOscProp: ( id, k, v ) => GSUI.setAttribute( this.rootElement.getOscillator( id ), k, v ),
+			changeEnvProp: ( k, v ) => GSUI.setAttr( this.rootElement.env, k, v ),
+			changeLFOProp: ( k, v ) => GSUI.setAttr( this.rootElement.lfo, k, v ),
+			changeOscProp: ( id, k, v ) => GSUI.setAttr( this.rootElement.getOscillator( id ), k, v ),
 			updateEnvWave: () => this.rootElement.env.updateWave(),
 			updateLFOWave: () => this.rootElement.lfo.updateWave(),
 			updateOscWave: id => this.rootElement.getOscillator( id ).updateWave(),
@@ -82,8 +82,8 @@ class GSSynth {
 		const get = this.#dawcore.get;
 
 		if ( "beatsPerMeasure" in obj || "stepsPerBeat" in obj ) {
-			GSUI.setAttribute( this.rootElement.env, "timedivision", `${ get.beatsPerMeasure() }/${ get.stepsPerBeat() }` );
-			GSUI.setAttribute( this.rootElement.lfo, "timedivision", `${ get.beatsPerMeasure() }/${ get.stepsPerBeat() }` );
+			GSUI.setAttr( this.rootElement.env, "timedivision", `${ get.beatsPerMeasure() }/${ get.stepsPerBeat() }` );
+			GSUI.setAttr( this.rootElement.lfo, "timedivision", `${ get.beatsPerMeasure() }/${ get.stepsPerBeat() }` );
 		}
 		if ( synObj ) {
 			this.#dataSynth.change( synObj );

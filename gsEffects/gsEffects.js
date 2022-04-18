@@ -64,7 +64,7 @@ class GSEffects {
 	#changeEffectData( id, obj ) {
 		const uiFx = this.rootElement.getFxHTML( id ).uiFx;
 
-		Object.entries( obj ).forEach( kv => GSUI.setAttribute( uiFx, ...kv ) );
+		Object.entries( obj ).forEach( kv => GSUI.setAttr( uiFx, ...kv ) );
 		if ( uiFx.updateWave ) {
 			uiFx.updateWave();
 		}

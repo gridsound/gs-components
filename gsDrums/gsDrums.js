@@ -86,7 +86,7 @@ class GSDrums {
 				},
 			},
 		} );
-		GSUI.setAttribute( this.rootElement, "disabled", true );
+		GSUI.setAttr( this.rootElement, "disabled", true );
 	}
 
 	// .........................................................................
@@ -98,7 +98,7 @@ class GSDrums {
 			this.#patternId = id;
 			this.#drumsId = null;
 			this.#dataDrums.clear();
-			GSUI.setAttribute( this.rootElement, "disabled", !id );
+			GSUI.setAttr( this.rootElement, "disabled", !id );
 			if ( id ) {
 				const pat = this.#dawcore.get.pattern( id );
 				const drums = this.#dawcore.get.drums( pat.drums );
