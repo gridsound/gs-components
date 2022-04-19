@@ -115,7 +115,7 @@ class GSDAW {
 		window.onblur = () => this.#pianoroll.getUIKeys().midiReleaseAllKeys();
 		window.onkeyup = this.#onkeyup.bind( this );
 		window.onkeydown = this.#onkeydown.bind( this );
-		window.onbeforeunload = this.#oncmpBeforeUnload;
+		window.onbeforeunload = this.#oncmpBeforeUnload.bind( this );
 		this.rootElement.ondragover = () => false;
 		this.rootElement.oncontextmenu = () => location.host === "localhost" ? undefined : false;
 		this.rootElement.addEventListener( "wheel", GSDAW.#onwheel, { passive: false } );
