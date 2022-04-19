@@ -60,7 +60,7 @@ class GSDAW {
 		GSUI.setAttr( this.rootElement.clock, "mode", localStorage.getItem( "gsuiClock.display" ) || "second" );
 		gsuiClock.numbering( localStorage.getItem( "uiTimeNumbering" ) || "1" );
 		gsuiTimeline.numbering( localStorage.getItem( "uiTimeNumbering" ) || "1" );
-		this.#elements = GSUI.findElements( document.body, {
+		this.#elements = GSUI.findElem( document.body, {
 			drumsName: "[data-target=drums]",
 			synthName: "[data-target=synth]",
 			slicesName: "[data-target=slices]",
