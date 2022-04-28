@@ -20,7 +20,7 @@ class GSPatterns {
 
 		uiPatterns.onpatternDataTransfer = elPat => elPat.dataset.id;
 		uiPatterns.onchange = ( act, ...args ) => {
-			if ( act in DAWCore.actions ) {
+			if ( DAWCore.actions.has( act ) ) {
 				const daw = this.#dawcore;
 
 				if ( act === "removePattern" && daw.isPlaying() ) {
