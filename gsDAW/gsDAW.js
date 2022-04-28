@@ -126,7 +126,6 @@ class GSDAW {
 			GSUI.setAttr( this.#controlsGetFocusedGrid( focused ), "currenttime", beat );
 			GSUI.setAttr( this.rootElement, "currenttime", beat );
 		};
-		// this.#dawcore.cb.clockUpdate = beat => GSUI.setAttr( this.rootElement, "currenttime", beat );
 		this.#dawcore.cb.buffersLoaded = this.#onpatternsBuffersLoaded.bind( this );
 		this.#dawcore.cb.compositionAdded = cmp => this.rootElement.addComposition( cmp );
 		this.#dawcore.cb.compositionOpened = cmp => {
