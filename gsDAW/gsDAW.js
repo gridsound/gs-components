@@ -181,7 +181,7 @@ class GSDAW {
 				).then( cmp => this.#dawcore.openComposition( "local", cmp.id ) );
 			}
 		};
-		this.rootElement.onExportJSON = ( saveMode, id ) => this.#dawcore.exportCompositionToJSON( saveMode, id );
+		this.rootElement.onExportJSON = ( saveMode, id ) => this.#dawcore.exportCompositionJSON( saveMode, id );
 
 		GSUI.listenEv( this.rootElement, {
 			gsuiDAW: {
