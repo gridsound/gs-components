@@ -3,7 +3,6 @@
 class GSSlicer {
 	rootElement = GSUI.createElem( "gsui-slicer" );
 	#dawcore = null;
-	#patternId = null;
 	#ctrlSlices = new DAWCore.controllers.slicer( {
 		dataCallbacks: {
 			disabled: b => GSUI.setAttr( this.rootElement, "disabled", b ),
