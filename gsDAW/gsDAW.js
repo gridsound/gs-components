@@ -14,7 +14,7 @@ class GSDAW {
 	rootElement = GSUI.createElem( "gsui-daw", {
 		"oki-cookies": document.cookie.indexOf( "cookieAccepted" ) > -1,
 		version: "0.36.1",
-		volume: this.#dawcore.destination.getGain(),
+		volume: this.#dawcore.destinationGetGain(),
 		uirate: +localStorage.getItem( "uiRefreshRate" ) || "auto",
 		samplerate: this.#dawcore.env.sampleRate,
 		timelinenumbering: localStorage.getItem( "uiTimeNumbering" ) || "1",
@@ -229,7 +229,7 @@ class GSDAW {
 						this.rootElement.readyToDownload( obj.url, obj.name );
 					} );
 				},
-				abortExport: () => this.#dawcore.abortWAVExport(),
+				abortExport: () => this.#dawcore.abortCompositionWAV(),
 				save: () => this.#oncmpClickSave(),
 				open: d => this.#oncmpClickOpen( ...d.args ),
 				delete: d => this.#oncmpClickDelete( ...d.args ),
