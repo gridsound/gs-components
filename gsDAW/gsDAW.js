@@ -25,8 +25,8 @@ class GSDAW {
 		[ true,  false, "o", () => this.rootElement.showOpenPopup() ],
 		[ true,  false, "s", () => this.#oncmpClickSave() ],
 		[ true,  true,  "n", () => this.#oncmpClickNewLocal() ],
-		[ true,  false, "z", () => this.#dawcore.history.undo() ],
-		[ true,  false, "Z", () => this.#dawcore.history.redo() ],
+		[ true,  false, "z", () => this.#dawcore.historyUndo() ],
+		[ true,  false, "Z", () => this.#dawcore.historyRedo() ],
 		[ false, false, " ", () => this.#dawcore.isPlaying() ? this.#dawcore.stop() : this.#dawcore.play() ],
 	];
 	static #dropExtensions = { gs: true, txt: true, json: true };
@@ -276,18 +276,18 @@ class GSDAW {
 					}
 				},
 				reset: () => this.#dawcore.resetAudioContext(),
-				undo: () => this.#dawcore.history.undo(),
-				redo: () => this.#dawcore.history.redo(),
+				undo: () => this.#dawcore.historyUndo(),
+				redo: () => this.#dawcore.historyRedo(),
 				redoN: d => {
 					let n = d.args[ 0 ];
 
 					if ( n < 0 ) {
 						while ( n++ < 0 ) {
-							this.#dawcore.history.undo();
+							this.#dawcore.historyUndo();
 						}
 					} else {
 						while ( n-- > 0 ) {
-							this.#dawcore.history.redo();
+							this.#dawcore.historyRedo();
 						}
 					}
 				},
