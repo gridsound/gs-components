@@ -263,7 +263,7 @@ class GSDAW {
 				currentTimeLive: d => this.#controlsGetFocusedGrid().timeline.previewCurrentTime( d.args[ 0 ] ),
 				currentTime: d => {
 					this.#controlsGetFocusedGrid().timeline.previewCurrentTime( false );
-					this.#dawcore.getFocusedObject().setCurrentTime( d.args[ 0 ] );
+					this.#dawcore.setCurrentTime( d.args[ 0 ] );
 				},
 				play: () => this.#dawcore.togglePlay(),
 				stop: () => {
@@ -348,7 +348,7 @@ class GSDAW {
 
 	// .........................................................................
 	#oncontrolsFocus( focStr ) {
-		const beat = this.#dawcore.getFocusedObject().getCurrentTime();
+		const beat = this.#dawcore.getCurrentTime();
 		const grid = this.#controlsGetFocusedGrid( focStr );
 		const onCmp = focStr === "composition";
 
