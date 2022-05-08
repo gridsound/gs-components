@@ -258,7 +258,7 @@ class GSDAW {
 				openWindow: d => this.#windows.window( d.args[ 0 ] ).open(),
 				closeWindow: d => this.#windows.window( d.args[ 0 ] ).close(),
 				focusSwitch: () => this.#dawcore.focusSwitch(),
-				volume: d => this.#dawcore.destination.setGain( d.args[ 0 ] ),
+				volume: d => this.#dawcore.destinationSetGain( d.args[ 0 ] ),
 				rename: d => this.#dawcore.callAction( "renameComposition", d.args[ 0 ] ),
 				currentTimeLive: d => this.#controlsGetFocusedGrid().timeline.previewCurrentTime( d.args[ 0 ] ),
 				currentTime: d => {
