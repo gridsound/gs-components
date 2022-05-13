@@ -11,7 +11,7 @@ class GSSlicer {
 			renameBuffer: name => this.rootElement.setBufferName( name ),
 			removeBuffer: () => {
 				this.rootElement.removeBuffer();
-				GSUI.setAttr( this.rootElement, "duration", this.#dawcore.get.beatsPerMeasure() );
+				GSUI.setAttr( this.rootElement, "duration", this.#dawcore.$getBeatsPerMeasure() );
 			},
 			changeDuration: dur => GSUI.setAttr( this.rootElement, "duration", dur ),
 			addSlice: ( id, obj ) => this.rootElement.addSlice( id, obj ),

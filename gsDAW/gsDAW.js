@@ -218,7 +218,7 @@ class GSDAW {
 					localStorage.setItem( "gsuiClock.display", display );
 				},
 				export: () => {
-					const dur = this.#dawcore.get.duration() * 60 / this.#dawcore.get.bpm();
+					const dur = this.#dawcore.$getDuration() * 60 / this.#dawcore.$getBPM();
 					const intervalId = setInterval( () => {
 						GSUI.setAttr( this.rootElement, "exporting", this.#dawcore.ctx.currentTime / dur );
 					}, 100 );
@@ -248,7 +248,7 @@ class GSDAW {
 							GSUI.setAttr( this.rootElement, "username", false );
 							this.#dawcore.$getCompositions( "cloud" )
 								.forEach( cmp => this.#dawcore.deleteComposition( "cloud", cmp.id ) );
-							if ( !this.#dawcore.get.cmp() ) {
+							if ( !this.#dawcore.$getCmp() ) {
 								this.#oncmpClickNewLocal();
 							}
 						} );
@@ -462,7 +462,7 @@ class GSDAW {
 						}
 					} )
 					.then( () => {
-						if ( id === this.#dawcore.get.id() ) {
+						if ( id === this.#dawcore.$getId() ) {
 							this.#oncmpClickNewLocal();
 						}
 						this.#dawcore.deleteComposition( saveMode, id );
@@ -494,7 +494,7 @@ class GSDAW {
 		const id = this.#dawcore.$getOpened( "synth" );
 
 		if ( id ) {
-			gsuiChannels.openSelectChannelPopup( this.#dawcore.get.synth( id ).dest )
+			gsuiChannels.openSelectChannelPopup( this.#dawcore.$getSynth( id ).dest )
 				.then( chanId => chanId && this.#dawcore.callAction( "redirectSynth", id, chanId ) );
 		}
 	}
@@ -585,7 +585,7 @@ class GSDAW {
 		document.title = this.#dawcore.compositionNeedSave() ? `*${ name }` : name;
 	}
 	#selectChannel( id ) {
-		this.#elements.channelName.textContent = this.#dawcore.get.channel( id ).name;
+		this.#elements.channelName.textContent = this.#dawcore.$getChannel( id ).name;
 		this.#effects.setDestFilter( id );
 	}
 
@@ -629,7 +629,7 @@ class GSDAW {
 	}
 	static #cmpChangedFns = new Map( [
 		[ [ "channels" ], function( obj ) {
-			const synOpenedChan = obj.channels[ this.#dawcore.get.synth( this.#dawcore.$getOpened( "synth" ) ).dest ];
+			const synOpenedChan = obj.channels[ this.#dawcore.$getSynth( this.#dawcore.$getOpened( "synth" ) ).dest ];
 			const mixerSelectedChan = obj.channels[ this.#effects.getDestFilter() ];
 
 			if ( synOpenedChan && "name" in synOpenedChan ) {
@@ -647,7 +647,7 @@ class GSDAW {
 					this.#elements.synthName.textContent = synOpened.name;
 				}
 				if ( "dest" in synOpened ) {
-					this.#elements.synthChannelBtnText.textContent = this.#dawcore.get.channel( synOpened.dest ).name;
+					this.#elements.synthChannelBtnText.textContent = this.#dawcore.$getChannel( synOpened.dest ).name;
 				}
 			}
 		} ],
@@ -655,26 +655,26 @@ class GSDAW {
 			Object.entries( obj.patterns ).forEach( kv => this.#onupdatePattern( ...kv ) );
 		} ],
 		[ [ "beatsPerMeasure", "stepsPerBeat" ], function() {
-			GSUI.setAttr( this.rootElement, "timedivision", `${ this.#dawcore.get.beatsPerMeasure() }/${ this.#dawcore.get.stepsPerBeat() }` );
+			GSUI.setAttr( this.rootElement, "timedivision", `${ this.#dawcore.$getBeatsPerMeasure() }/${ this.#dawcore.$getStepsPerBeat() }` );
 		} ],
 		[ [ "bpm" ], function( { bpm } ) {
 			GSUI.setAttr( this.rootElement, "bpm", bpm );
-			this.rootElement.updateComposition( this.#dawcore.get.cmp() );
+			this.rootElement.updateComposition( this.#dawcore.$getCmp() );
 		} ],
 		[ [ "name" ], function( { name } ) {
 			this.#setTitle( name );
-			this.rootElement.updateComposition( this.#dawcore.get.cmp() );
+			this.rootElement.updateComposition( this.#dawcore.$getCmp() );
 			GSUI.setAttr( this.rootElement, "name", name );
 		} ],
 		[ [ "duration" ], function( { duration } ) {
 			if ( this.#dawcore.getFocusedName() === "composition" ) {
 				GSUI.setAttr( this.rootElement, "duration", duration );
 			}
-			this.rootElement.updateComposition( this.#dawcore.get.cmp() );
+			this.rootElement.updateComposition( this.#dawcore.$getCmp() );
 		} ],
 		[ [ "patternSlicesOpened" ], function( obj ) {
 			if ( obj.patternSlicesOpened ) {
-				const pat = this.#dawcore.get.pattern( obj.patternSlicesOpened );
+				const pat = this.#dawcore.$getPattern( obj.patternSlicesOpened );
 
 				this.#elements.slicesName.textContent = pat.name;
 				this.#windows.window( "slicer" ).open();
@@ -687,7 +687,7 @@ class GSDAW {
 		} ],
 		[ [ "patternDrumsOpened" ], function( obj ) {
 			if ( obj.patternDrumsOpened ) {
-				const pat = this.#dawcore.get.pattern( obj.patternDrumsOpened );
+				const pat = this.#dawcore.$getPattern( obj.patternDrumsOpened );
 
 				this.#elements.drumsName.textContent = pat.name;
 				this.#windows.window( "drums" ).open();
@@ -700,10 +700,10 @@ class GSDAW {
 		} ],
 		[ [ "synthOpened" ], function( obj ) {
 			if ( obj.synthOpened ) {
-				const syn = this.#dawcore.get.synth( obj.synthOpened );
+				const syn = this.#dawcore.$getSynth( obj.synthOpened );
 
 				this.#elements.synthName.textContent = syn.name;
-				this.#elements.synthChannelBtnText.textContent = this.#dawcore.get.channel( this.#dawcore.get.synth( obj.synthOpened ).dest ).name;
+				this.#elements.synthChannelBtnText.textContent = this.#dawcore.$getChannel( this.#dawcore.$getSynth( obj.synthOpened ).dest ).name;
 				this.#windows.window( "synth" ).open();
 			} else {
 				this.#elements.synthName.textContent = "";
@@ -712,7 +712,7 @@ class GSDAW {
 		} ],
 		[ [ "patternKeysOpened" ], function( { patternKeysOpened } ) {
 			if ( patternKeysOpened ) {
-				const pat = this.#dawcore.get.pattern( patternKeysOpened );
+				const pat = this.#dawcore.$getPattern( patternKeysOpened );
 
 				this.#elements.pianorollName.textContent = pat.name;
 				if ( this.#dawcore.getFocusedName() === "keys" ) {
@@ -754,19 +754,19 @@ class GSDAW {
 		}
 	}
 	#onpatternsBuffersLoaded( buffers ) {
-		const patSli = this.#dawcore.get.pattern( this.#dawcore.$getOpened( "slices" ) );
-		const sliBuf = patSli?.source && this.#dawcore.get.pattern( patSli.source ).buffer;
+		const patSli = this.#dawcore.$getPattern( this.#dawcore.$getOpened( "slices" ) );
+		const sliBuf = patSli?.source && this.#dawcore.$getPattern( patSli.source ).buffer;
 
 		if ( sliBuf in buffers ) {
 			this.#slicer.rootElement.setBuffer( buffers[ sliBuf ].buffer );
 		}
 		this.#patterns.bufferLoaded( buffers );
 		this.#patternroll.rootElement.getBlocks().forEach( ( elBlc, blcId ) => {
-			const blc = this.#dawcore.get.block( blcId );
-			const pat = this.#dawcore.get.pattern( blc.pattern );
+			const blc = this.#dawcore.$getBlock( blcId );
+			const pat = this.#dawcore.$getPattern( blc.pattern );
 
 			if ( pat.type === "buffer" && pat.buffer in buffers ) {
-				const bpm = pat.bufferBpm || this.#dawcore.get.bpm();
+				const bpm = pat.bufferBpm || this.#dawcore.$getBPM();
 
 				GSUI.setAttr( elBlc, "data-missing", false );
 				this.#patterns.svgForms.buffer.setSVGViewbox( elBlc._gsuiSVGform, blc.offset, blc.duration, bpm / 60 );

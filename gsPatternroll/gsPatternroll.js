@@ -17,7 +17,7 @@ class GSPatternroll {
 	#dataBlocks = new DAWCore.controllers.blocks( {
 		dataCallbacks: {
 			addBlock: ( id, blc ) => {
-				const pat = this.#dawcore.get.pattern( blc.pattern );
+				const pat = this.#dawcore.$getPattern( blc.pattern );
 				const dataReady = pat.type === "buffer"
 					? !!this.#dawcore.$getAudioBuffer( pat.buffer )
 					: true;
@@ -54,13 +54,13 @@ class GSPatternroll {
 		this.#dataBlocks.change( obj );
 		if ( "loopA" in obj || "loopB" in obj ) {
 			this.rootElement.loop(
-				this.#dawcore.get.loopA(),
-				this.#dawcore.get.loopB() );
+				this.#dawcore.$getLoopA(),
+				this.#dawcore.$getLoopB() );
 		}
 		if ( "beatsPerMeasure" in obj || "stepsPerBeat" in obj ) {
 			this.rootElement.timeDivision(
-				this.#dawcore.get.beatsPerMeasure(),
-				this.#dawcore.get.stepsPerBeat() );
+				this.#dawcore.$getBeatsPerMeasure(),
+				this.#dawcore.$getStepsPerBeat() );
 		}
 		if ( "patterns" in obj ) {
 			Object.entries( obj.patterns ).forEach( ( [ id, pat ] ) => {
@@ -120,20 +120,20 @@ class GSPatternroll {
 	}
 	#oneditBlock( id, obj, blc ) {
 		if ( blc._gsuiSVGform ) {
-			const pat = this.#dawcore.get.pattern( obj.pattern );
-			const bpm = pat.bufferBpm || this.#dawcore.get.bpm();
+			const pat = this.#dawcore.$getPattern( obj.pattern );
+			const bpm = pat.bufferBpm || this.#dawcore.$getBPM();
 
 			this.#svgForms[ pat.type ].setSVGViewbox( blc._gsuiSVGform, obj.offset, obj.duration, bpm / 60 );
 		}
 	}
 	#onaddBlock( id, obj, blc ) {
-		const pat = this.#dawcore.get.pattern( obj.pattern );
+		const pat = this.#dawcore.$getPattern( obj.pattern );
 		const SVGs = this.#svgForms[ pat.type ];
 		const svg = SVGs.createSVG( obj.pattern );
 
 		blc._gsuiSVGform = svg;
 		blc.children[ 3 ].append( svg );
-		SVGs.setSVGViewbox( svg, obj.offset, obj.duration, this.#dawcore.get.bpm() / 60 );
+		SVGs.setSVGViewbox( svg, obj.offset, obj.duration, this.#dawcore.$getBPS() );
 		blc.ondblclick = () => this.#dawcore.callAction( "openPattern", obj.pattern );
 		blc.querySelector( ".gsuiPatternroll-block-name" ).textContent = pat.name;
 	}

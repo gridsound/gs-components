@@ -57,8 +57,8 @@ class GSPianoroll {
 			this.rootElement.reset();
 			GSUI.setAttr( this.rootElement, "disabled", !id );
 			if ( id ) {
-				const pat = this.#dawcore.get.pattern( id );
-				const keys = this.#dawcore.get.keys( pat.keys );
+				const pat = this.#dawcore.$getPattern( id );
+				const keys = this.#dawcore.$getKeys( pat.keys );
 
 				this.#keysId = pat.keys;
 				this.#dataKeys.change( keys );
@@ -69,8 +69,8 @@ class GSPianoroll {
 	change( obj ) {
 		if ( "beatsPerMeasure" in obj || "stepsPerBeat" in obj ) {
 			this.rootElement.timeDivision(
-				this.#dawcore.get.beatsPerMeasure(),
-				this.#dawcore.get.stepsPerBeat() );
+				this.#dawcore.$getBeatsPerMeasure(),
+				this.#dawcore.$getStepsPerBeat() );
 		}
 		if ( "patternKeysOpened" in obj ) {
 			this.selectPattern( obj.patternKeysOpened );

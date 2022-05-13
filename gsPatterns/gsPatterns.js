@@ -25,7 +25,7 @@ class GSPatterns {
 
 				if ( act === "removePattern" && daw.isPlaying() ) {
 					const id = args[ 0 ];
-					const type = daw.get.pattern( id ).type;
+					const type = daw.$getPattern( id ).type;
 
 					if ( type === daw.getFocusedName() && id === daw.$getOpened( type ) ) {
 						daw.stop();
@@ -77,7 +77,7 @@ class GSPatterns {
 		this.svgForms.bufferHD.empty();
 	}
 	bufferLoaded( buffers ) {
-		const pats = Object.entries( this.#dawcore.get.patterns() );
+		const pats = Object.entries( this.#dawcore.$getPatterns() );
 		const bufToPat = pats.reduce( ( map, [ id, pat ] ) => {
 			map[ pat.buffer ] = id;
 			return map;
@@ -95,7 +95,7 @@ class GSPatterns {
 		this.#patternsCrud( obj.patterns );
 		this.#channelsCrud( obj.channels );
 		if ( obj.keys || obj.drums || obj.slices || obj.drumrows || obj.patterns ) {
-			Object.entries( this.#dawcore.get.patterns() ).forEach( ( [ id, pat ] ) => {
+			Object.entries( this.#dawcore.$getPatterns() ).forEach( ( [ id, pat ] ) => {
 				const objPat = obj.patterns?.[ id ];
 
 				if (
@@ -126,23 +126,23 @@ class GSPatterns {
 
 	// .........................................................................
 	#updatePatternContent( id ) {
-		const get = this.#dawcore.get;
-		const pat = get.pattern( id );
+		const daw = this.#dawcore;
+		const pat = daw.$getPattern( id );
 		const elPat = this.#uiPatterns.getPattern( id );
 
 		if ( elPat ) {
 			const type = pat.type;
-			const dur = get.patternDuration( id );
+			const dur = daw.$getPatternDuration( id );
 
 			switch ( type ) {
 				case "keys":
-					this.svgForms.keys.update( id, get.keys( pat.keys ), dur );
+					this.svgForms.keys.update( id, daw.$getKeys( pat.keys ), dur );
 					break;
 				case "slices":
-					this.svgForms.slices.update( id, get.slices( pat.slices ), dur );
+					this.svgForms.slices.update( id, daw.$getSlices( pat.slices ), dur );
 					break;
 				case "drums":
-					this.svgForms.drums.update( id, get.drums( pat.drums ), get.drumrows(), dur, get.stepsPerBeat() );
+					this.svgForms.drums.update( id, daw.$getDrums( pat.drums ), daw.$getDrumrows(), dur, daw.$getStepsPerBeat() );
 					break;
 				case "buffer": {
 					const buf = this.#buffers[ pat.buffer ];
@@ -173,7 +173,7 @@ class GSPatterns {
 			this.#uiPatterns.changeSynth( id, prop, val );
 		} );
 		if ( "dest" in obj ) {
-			this.#uiPatterns.changeSynth( id, "destName", this.#dawcore.get.channel( obj.dest ).name );
+			this.#uiPatterns.changeSynth( id, "destName", this.#dawcore.$getChannel( obj.dest ).name );
 		}
 	}
 	#deleteSynth( id ) {
@@ -212,7 +212,7 @@ class GSPatterns {
 			this.#uiPatterns.changePattern( id, prop, val );
 		} );
 		if ( "dest" in obj ) {
-			this.#uiPatterns.changePattern( id, "destName", this.#dawcore.get.channel( obj.dest ).name );
+			this.#uiPatterns.changePattern( id, "destName", this.#dawcore.$getChannel( obj.dest ).name );
 		}
 	}
 	#deletePattern( id ) {

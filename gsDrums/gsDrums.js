@@ -33,10 +33,10 @@ class GSDrums {
 						this.#uiDrumrows.change( id, prop, this.#svgManager.createSVG( val ) );
 						break;
 					case "duration": {
-						const patId = this.#dawcore.get.drumrow( id ).pattern;
-						const bufId = this.#dawcore.get.pattern( patId ).buffer;
+						const patId = this.#dawcore.$getDrumrow( id ).pattern;
+						const bufId = this.#dawcore.$getPattern( patId ).buffer;
 
-						this.#uiDrumrows.change( id, prop, this.#dawcore.get.buffer( bufId ).duration );
+						this.#uiDrumrows.change( id, prop, this.#dawcore.$getBuffer( bufId ).duration );
 					} break;
 				}
 			},
@@ -100,8 +100,8 @@ class GSDrums {
 			this.#dataDrums.clear();
 			GSUI.setAttr( this.rootElement, "disabled", !id );
 			if ( id ) {
-				const pat = this.#dawcore.get.pattern( id );
-				const drums = this.#dawcore.get.drums( pat.drums );
+				const pat = this.#dawcore.$getPattern( id );
+				const drums = this.#dawcore.$getDrums( pat.drums );
 
 				this.#drumsId = pat.drums;
 				this.#dataDrums.change( drums );
@@ -125,8 +125,8 @@ class GSDrums {
 			this.rootElement.drumrows.reorderDrumrows( obj.drumrows );
 		}
 		if ( "beatsPerMeasure" in obj || "stepsPerBeat" in obj ) {
-			const bPM = obj.beatsPerMeasure || this.#dawcore.get.beatsPerMeasure();
-			const sPB = obj.stepsPerBeat || this.#dawcore.get.stepsPerBeat();
+			const bPM = obj.beatsPerMeasure || this.#dawcore.$getBeatsPerMeasure();
+			const sPB = obj.stepsPerBeat || this.#dawcore.$getStepsPerBeat();
 
 			this.rootElement.timeDivision( bPM, sPB );
 		}
@@ -144,7 +144,7 @@ class GSDrums {
 
 	// .........................................................................
 	#setPropFilter( rowId, prop ) {
-		const propValues = Object.entries( this.#dawcore.get.drums( this.#drumsId ) )
+		const propValues = Object.entries( this.#dawcore.$getDrums( this.#drumsId ) )
 			.filter( ( [ , drm ] ) => drm.row === rowId && "gain" in drm )
 			.map( ( [ id, drm ] ) => [ id, drm[ prop ] ] );
 
@@ -152,7 +152,7 @@ class GSDrums {
 		this.rootElement.setPropValues( rowId, prop, propValues );
 	}
 	#setAllPropFilters( prop ) {
-		Object.keys( this.#dawcore.get.drumrows() )
+		Object.keys( this.#dawcore.$getDrumrows() )
 			.forEach( id => this.#setPropFilter( id, prop ) );
 	}
 }

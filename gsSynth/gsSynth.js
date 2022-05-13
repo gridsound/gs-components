@@ -73,17 +73,17 @@ class GSSynth {
 			this.#synthId = id;
 			this.#dataSynth.clear();
 			if ( id ) {
-				this.#dataSynth.change( this.#dawcore.get.synth( id ) );
+				this.#dataSynth.change( this.#dawcore.$getSynth( id ) );
 			}
 		}
 	}
 	change( obj ) {
+		const daw = this.#dawcore;
 		const synObj = obj.synths && obj.synths[ this.#synthId ];
-		const get = this.#dawcore.get;
 
 		if ( "beatsPerMeasure" in obj || "stepsPerBeat" in obj ) {
-			GSUI.setAttr( this.rootElement.env, "timedivision", `${ get.beatsPerMeasure() }/${ get.stepsPerBeat() }` );
-			GSUI.setAttr( this.rootElement.lfo, "timedivision", `${ get.beatsPerMeasure() }/${ get.stepsPerBeat() }` );
+			GSUI.setAttr( this.rootElement.env, "timedivision", `${ daw.$getBeatsPerMeasure() }/${ daw.$getStepsPerBeat() }` );
+			GSUI.setAttr( this.rootElement.lfo, "timedivision", `${ daw.$getBeatsPerMeasure() }/${ daw.$getStepsPerBeat() }` );
 		}
 		if ( synObj ) {
 			this.#dataSynth.change( synObj );
