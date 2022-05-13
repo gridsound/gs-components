@@ -25,17 +25,17 @@ class GSPianoroll {
 			},
 			gsuiTimeline: {
 				changeCurrentTime: d => {
-					this.#dawcore.keys.setCurrentTime( d.args[ 0 ] );
+					this.#dawcore.keysSetCurrentTime( d.args[ 0 ] );
 				},
 				changeLoop: d => {
 					d.args[ 0 ] !== false
-						? this.#dawcore.keys.setLoop( ...d.args )
-						: this.#dawcore.keys.clearLoop();
+						? this.#dawcore.keysSetLoop( ...d.args )
+						: this.#dawcore.keysClearLoop();
 				},
 			},
 			gsuiKeys: {
-				keyUp: d => { this.#dawcore.keys.liveKeyup( d.args[ 0 ] ); },
-				keyDown: d => { this.#dawcore.keys.liveKeydown( d.args[ 0 ] ); },
+				keyUp: d => { this.#dawcore.liveKeyup( d.args[ 0 ] ); },
+				keyDown: d => { this.#dawcore.liveKeydown( d.args[ 0 ] ); },
 			},
 		} );
 		this.rootElement.setData( this.#dataKeys.data );

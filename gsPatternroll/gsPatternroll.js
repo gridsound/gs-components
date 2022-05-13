@@ -89,7 +89,7 @@ class GSPatternroll {
 						this.#dawcore.callAction( "changeLoop", ...d.args );
 						break;
 					case "changeCurrentTime":
-						this.#dawcore.composition.setCurrentTime( d.args[ 0 ] );
+						this.#dawcore.compositionSetCurrentTime( d.args[ 0 ] );
 						break;
 				}
 				break;

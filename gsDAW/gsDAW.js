@@ -530,7 +530,7 @@ class GSDAW {
 	#oncmpLocalDrop( saveMode, id ) {
 		this.#oncmpDrop( saveMode, id )
 			.then( cmp => this.#dawcore.addCompositionByJSObject( cmp, { saveMode: "local" } ) )
-			.then( cmp => DAWCore.LocalStorage.put( cmp.id, cmp ) );
+			.then( cmp => DAWCoreLocalStorage.put( cmp.id, cmp ) );
 	}
 	#oncmpCloudDrop( saveMode, id ) {
 		if ( gsapiClient.user.id ) {

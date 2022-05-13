@@ -51,9 +51,9 @@ class GSDrums {
 				change: d => { this.#dawcore.callAction( ...d.args ); },
 				propFilter: d => { this.#setPropFilter( ...d.args ); },
 				propFilters: d => { this.#setAllPropFilters( ...d.args ); },
-				liveStopDrum: d => { this.#dawcore.drums.stopLiveDrum( ...d.args ); },
-				liveStartDrum: d => { this.#dawcore.drums.startLiveDrum( ...d.args ); },
-				liveChangeDrumrow: d => { this.#dawcore.drums.changeLiveDrumrow( ...d.args ); },
+				liveStopDrum: d => { this.#dawcore.liveDrumStop( ...d.args ); },
+				liveStartDrum: d => { this.#dawcore.liveDrumStart( ...d.args ); },
+				liveChangeDrumrow: d => { this.#dawcore.liveDrumrowChange( ...d.args ); },
 			},
 			gsuiDrums: {
 				change: d => {
@@ -64,14 +64,14 @@ class GSDrums {
 			},
 			gsuiTimeline: {
 				changeCurrentTime: d => {
-					this.#dawcore.drums.setCurrentTime( d.args[ 0 ] );
+					this.#dawcore.drumsSetCurrentTime( d.args[ 0 ] );
 				},
 				changeLoop: d => {
 					const [ a, b ] = d.args;
 
 					a !== false
-						? this.#dawcore.drums.setLoop( a, b )
-						: this.#dawcore.drums.clearLoop();
+						? this.#dawcore.drumsSetLoop( a, b )
+						: this.#dawcore.drumsClearLoop();
 				},
 			},
 			gsuiSliderGroup: {
