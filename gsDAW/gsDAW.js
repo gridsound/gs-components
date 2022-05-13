@@ -246,7 +246,7 @@ class GSDAW {
 							GSUI.setAttr( this.rootElement, "logged", false );
 							GSUI.setAttr( this.rootElement, "useravatar", false );
 							GSUI.setAttr( this.rootElement, "username", false );
-							this.#dawcore.get.compositions( "cloud" )
+							this.#dawcore.$getCompositions( "cloud" )
 								.forEach( cmp => this.#dawcore.deleteComposition( "cloud", cmp.id ) );
 							if ( !this.#dawcore.get.cmp() ) {
 								this.#oncmpClickNewLocal();
@@ -442,7 +442,7 @@ class GSDAW {
 		}
 	}
 	#oncmpClickDelete( saveMode, id ) {
-		const cmp = this.#dawcore.get.composition( saveMode, id );
+		const cmp = this.#dawcore.$getComposition( saveMode, id );
 
 		GSUI.popup.confirm( "Warning",
 			`Are you sure you want to delete "${ cmp.name }" ? (no undo possible)`,
@@ -483,7 +483,7 @@ class GSDAW {
 	#onclickName( title, action, area, e ) {
 		const id = area === "channels"
 			? this.#mixer.getSelectedChannelId()
-			: this.#dawcore.get.opened( area );
+			: this.#dawcore.$getOpened( area );
 
 		if ( id ) {
 			GSUI.popup.prompt( title, "", e.currentTarget.textContent, "Rename" )
@@ -491,7 +491,7 @@ class GSDAW {
 		}
 	}
 	#onclickSynthChannel() {
-		const id = this.#dawcore.get.opened( "synth" );
+		const id = this.#dawcore.$getOpened( "synth" );
 
 		if ( id ) {
 			gsuiChannels.openSelectChannelPopup( this.#dawcore.get.synth( id ).dest )
@@ -512,8 +512,8 @@ class GSDAW {
 	}
 	#oncmpDrop( saveMode, id ) {
 		const to = saveMode === "local" ? "cloud" : "local";
-		const cmpFrom = this.#dawcore.get.composition( saveMode, id );
-		const cmpTo = this.#dawcore.get.composition( to, id );
+		const cmpFrom = this.#dawcore.$getComposition( saveMode, id );
+		const cmpTo = this.#dawcore.$getComposition( to, id );
 
 		return !cmpTo
 			? Promise.resolve( cmpFrom )
@@ -629,7 +629,7 @@ class GSDAW {
 	}
 	static #cmpChangedFns = new Map( [
 		[ [ "channels" ], function( obj ) {
-			const synOpenedChan = obj.channels[ this.#dawcore.get.synth( this.#dawcore.get.opened( "synth" ) ).dest ];
+			const synOpenedChan = obj.channels[ this.#dawcore.get.synth( this.#dawcore.$getOpened( "synth" ) ).dest ];
 			const mixerSelectedChan = obj.channels[ this.#effects.getDestFilter() ];
 
 			if ( synOpenedChan && "name" in synOpenedChan ) {
@@ -640,7 +640,7 @@ class GSDAW {
 			}
 		} ],
 		[ [ "synths" ], function( obj ) {
-			const synOpened = obj.synths[ this.#dawcore.get.opened( "synth" ) ];
+			const synOpened = obj.synths[ this.#dawcore.$getOpened( "synth" ) ];
 
 			if ( synOpened ) {
 				if ( "name" in synOpened ) {
@@ -729,7 +729,7 @@ class GSDAW {
 			if ( "duration" in obj ) {
 				const foc = this.#dawcore.getFocusedName();
 
-				if ( foc !== "composition" && id === this.#dawcore.get.opened( foc ) ) {
+				if ( foc !== "composition" && id === this.#dawcore.$getOpened( foc ) ) {
 					GSUI.setAttr( this.rootElement, "duration", obj.duration );
 				}
 			}
@@ -741,20 +741,20 @@ class GSDAW {
 						blc.querySelector( ".gsuiPatternroll-block-name" ).textContent = name;
 					}
 				} );
-				if ( id === this.#dawcore.get.opened( "slices" ) ) {
+				if ( id === this.#dawcore.$getOpened( "slices" ) ) {
 					this.#elements.slicesName.textContent = name;
 				}
-				if ( id === this.#dawcore.get.opened( "keys" ) ) {
+				if ( id === this.#dawcore.$getOpened( "keys" ) ) {
 					this.#elements.pianorollName.textContent = name;
 				}
-				if ( id === this.#dawcore.get.opened( "drums" ) ) {
+				if ( id === this.#dawcore.$getOpened( "drums" ) ) {
 					this.#elements.drumsName.textContent = name;
 				}
 			}
 		}
 	}
 	#onpatternsBuffersLoaded( buffers ) {
-		const patSli = this.#dawcore.get.pattern( this.#dawcore.get.opened( "slices" ) );
+		const patSli = this.#dawcore.get.pattern( this.#dawcore.$getOpened( "slices" ) );
 		const sliBuf = patSli?.source && this.#dawcore.get.pattern( patSli.source ).buffer;
 
 		if ( sliBuf in buffers ) {

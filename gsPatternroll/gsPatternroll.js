@@ -19,7 +19,7 @@ class GSPatternroll {
 			addBlock: ( id, blc ) => {
 				const pat = this.#dawcore.get.pattern( blc.pattern );
 				const dataReady = pat.type === "buffer"
-					? !!this.#dawcore.get.audioBuffer( pat.buffer )
+					? !!this.#dawcore.$getAudioBuffer( pat.buffer )
 					: true;
 
 				this.rootElement.addBlock( id, blc, { dataReady } );

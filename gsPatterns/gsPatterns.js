@@ -27,7 +27,7 @@ class GSPatterns {
 					const id = args[ 0 ];
 					const type = daw.get.pattern( id ).type;
 
-					if ( type === daw.getFocusedName() && id === daw.get.opened( type ) ) {
+					if ( type === daw.getFocusedName() && id === daw.$getOpened( type ) ) {
 						daw.stop();
 					}
 				}
