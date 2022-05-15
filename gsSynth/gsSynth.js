@@ -62,11 +62,22 @@ class GSSynth {
 	}
 
 	// .........................................................................
+	loadWaves() {
+		return new Promise( resolve => {
+			const wavesJS = GSUI.createElem( "script", { type: "text/javascript", src: "assets/gswaPeriodicWavesList-v1.js" } );
+
+			wavesJS.onload = () => {
+				const waves = gswaPeriodicWaves.loadWaves( gswaPeriodicWavesList );
+
+				this.rootElement.setWaveList( Array.from( waves.keys() ) );
+				waves.forEach( ( w, name ) => gsuiPeriodicWave.addWave( name, w.real, w.imag ) );
+				resolve();
+			};
+			document.head.append( wavesJS );
+		} );
+	}
 	setDAWCore( core ) {
 		this.#dawcore = core;
-	}
-	setWaveList( arr ) {
-		this.rootElement.setWaveList( arr );
 	}
 	selectSynth( id ) {
 		if ( id !== this.#synthId ) {

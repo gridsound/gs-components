@@ -83,7 +83,6 @@ class GSDAW {
 		this.#windows.window( "drums" ).contentAppend( this.#drums.rootElement );
 		this.#windows.window( "mixer" ).contentAppend( this.#mixer.rootElement );
 		this.#windows.window( "piano" ).contentAppend( this.#pianoroll.rootElement );
-		this.#windows.window( "synth" ).contentAppend( this.#synth.rootElement );
 		this.#windows.window( "blocks" ).contentAppend( this.#patterns.rootElement );
 		this.#windows.window( "slicer" ).contentAppend( this.#slicer.rootElement );
 		this.#windows.window( "effects" ).contentAppend( this.#effects.rootElement );
@@ -106,10 +105,10 @@ class GSDAW {
 		this.#pianoroll.rootElement.octaves( 1, 7 );
 		this.#drums.rootElement.setPxPerBeat( 120 );
 		this.#drums.setWaveforms( this.#patterns.svgForms.bufferHD );
-		this.#synth.setWaveList( Array.from( gswaPeriodicWaves.list.keys() ) );
 		this.#windows.window( "main" ).open();
 		this.#windows.window( "mixer" ).open();
 		this.#windows.window( "blocks" ).open();
+		this.#synth.loadWaves().then( () => this.#windows.window( "synth" ).contentAppend( this.#synth.rootElement ) );
 	}
 	#initEvents() {
 		window.onblur = () => this.#pianoroll.getUIKeys().midiReleaseAllKeys();
