@@ -64,7 +64,7 @@ class GSSynth {
 	// .........................................................................
 	loadWaves() {
 		return new Promise( resolve => {
-			const wavesJS = GSUI.createElem( "script", { type: "text/javascript", src: "assets/gswaPeriodicWavesList-v1.js" } );
+			const wavesJS = GSUI.createElem( "script", { type: "text/javascript", src: "/assets/gswaPeriodicWavesList-v1.js" } );
 
 			wavesJS.onload = () => {
 				const waves = gswaPeriodicWaves.loadWaves( gswaPeriodicWavesList );
