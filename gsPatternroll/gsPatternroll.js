@@ -3,7 +3,7 @@
 class GSPatternroll {
 	#dawcore = null;
 	#svgForms = null;
-	rootElement = GSUI.createElem( "gsui-patternroll" );
+	rootElement = GSUI.$createElement( "gsui-patternroll" );
 	timeline = this.rootElement.timeline;
 	#dataTracks = new DAWCore.controllers.tracks( {
 		dataCallbacks: {

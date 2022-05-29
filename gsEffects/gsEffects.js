@@ -21,7 +21,7 @@ class GSEffects {
 				return this.#dawcore.$getAudioEffect( fxId )?.updateResponse?.( args[ 0 ] );
 			}
 		};
-		GSUI.listenEv( this.rootElement, {
+		GSUI.$listenEvents( this.rootElement, {
 			gsuiEffects: {
 				liveChangeEffect: d => {
 					this.#dawcore.liveChangeEffect( ...d.args );
@@ -62,7 +62,7 @@ class GSEffects {
 	#changeEffectData( id, obj ) {
 		const uiFx = this.rootElement.getFxHTML( id ).uiFx;
 
-		Object.entries( obj ).forEach( kv => GSUI.setAttr( uiFx, ...kv ) );
+		Object.entries( obj ).forEach( kv => GSUI.$setAttribute( uiFx, ...kv ) );
 		if ( uiFx.updateWave ) {
 			uiFx.updateWave();
 		}

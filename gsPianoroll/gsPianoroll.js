@@ -17,7 +17,7 @@ class GSPianoroll {
 	constructor() {
 		Object.seal( this );
 
-		GSUI.listenEv( this.rootElement, {
+		GSUI.$listenEvents( this.rootElement, {
 			gsuiPianoroll: {
 				changeKeysProps: d => {
 					this.#dawcore.callAction( "changeKeysProps", this.#patternId, ...d.args );
@@ -42,7 +42,7 @@ class GSPianoroll {
 		this.rootElement.setCallbacks( {
 			onchange: this.#onchange.bind( this ),
 		} );
-		GSUI.setAttr( this.rootElement, "disabled", true );
+		GSUI.$setAttribute( this.rootElement, "disabled", true );
 	}
 
 	// .........................................................................
@@ -55,7 +55,7 @@ class GSPianoroll {
 			this.#keysId = null;
 			this.#dataKeys.clear();
 			this.rootElement.reset();
-			GSUI.setAttr( this.rootElement, "disabled", !id );
+			GSUI.$setAttribute( this.rootElement, "disabled", !id );
 			if ( id ) {
 				const pat = this.#dawcore.$getPattern( id );
 				const keys = this.#dawcore.$getKeys( pat.keys );

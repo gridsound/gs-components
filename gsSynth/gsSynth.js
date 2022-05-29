@@ -3,14 +3,14 @@
 class GSSynth {
 	#dawcore = null;
 	#synthId = null;
-	rootElement = GSUI.createElem( "gsui-synthesizer" );
+	rootElement = GSUI.$createElement( "gsui-synthesizer" );
 	#dataSynth = new DAWCore.controllers.synth( {
 		dataCallbacks: {
 			addOsc: ( id, osc ) => this.rootElement.addOscillator( id, osc ),
 			removeOsc: id => this.rootElement.removeOscillator( id ),
-			changeEnvProp: ( k, v ) => GSUI.setAttr( this.rootElement.env, k, v ),
-			changeLFOProp: ( k, v ) => GSUI.setAttr( this.rootElement.lfo, k, v ),
-			changeOscProp: ( id, k, v ) => GSUI.setAttr( this.rootElement.getOscillator( id ), k, v ),
+			changeEnvProp: ( k, v ) => GSUI.$setAttribute( this.rootElement.env, k, v ),
+			changeLFOProp: ( k, v ) => GSUI.$setAttribute( this.rootElement.lfo, k, v ),
+			changeOscProp: ( id, k, v ) => GSUI.$setAttribute( this.rootElement.getOscillator( id ), k, v ),
 			updateEnvWave: () => this.rootElement.env.updateWave(),
 			updateLFOWave: () => this.rootElement.lfo.updateWave(),
 			updateOscWave: id => this.rootElement.getOscillator( id ).updateWave(),
@@ -64,7 +64,7 @@ class GSSynth {
 	// .........................................................................
 	loadWaves() {
 		return new Promise( resolve => {
-			const wavesJS = GSUI.createElem( "script", { type: "text/javascript", src: "/assets/gswaPeriodicWavesList-v1.js" } );
+			const wavesJS = GSUI.$createElement( "script", { type: "text/javascript", src: "/assets/gswaPeriodicWavesList-v1.js" } );
 
 			wavesJS.onload = () => {
 				const waves = gswaPeriodicWaves.loadWaves( gswaPeriodicWavesList );
@@ -93,8 +93,8 @@ class GSSynth {
 		const synObj = obj.synths && obj.synths[ this.#synthId ];
 
 		if ( "beatsPerMeasure" in obj || "stepsPerBeat" in obj ) {
-			GSUI.setAttr( this.rootElement.env, "timedivision", `${ daw.$getBeatsPerMeasure() }/${ daw.$getStepsPerBeat() }` );
-			GSUI.setAttr( this.rootElement.lfo, "timedivision", `${ daw.$getBeatsPerMeasure() }/${ daw.$getStepsPerBeat() }` );
+			GSUI.$setAttribute( this.rootElement.env, "timedivision", `${ daw.$getBeatsPerMeasure() }/${ daw.$getStepsPerBeat() }` );
+			GSUI.$setAttribute( this.rootElement.lfo, "timedivision", `${ daw.$getBeatsPerMeasure() }/${ daw.$getStepsPerBeat() }` );
 		}
 		if ( synObj ) {
 			this.#dataSynth.change( synObj );

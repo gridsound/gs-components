@@ -10,8 +10,8 @@ class GSDAW {
 	#patterns = new GSPatterns();
 	#pianoroll = new GSPianoroll();
 	#patternroll = new GSPatternroll();
-	#windows = GSUI.createElem( "gsui-windows" );
-	rootElement = GSUI.createElem( "gsui-daw", {
+	#windows = GSUI.$createElement( "gsui-windows" );
+	rootElement = GSUI.$createElement( "gsui-daw", {
 		"oki-cookies": document.cookie.indexOf( "cookieAccepted" ) > -1,
 		version: "0.36.1",
 		volume: this.#dawcore.$getAudioDestinationGain(),
@@ -45,22 +45,22 @@ class GSDAW {
 	#initHTML() {
 		document.body.append(
 			this.rootElement,
-			GSUI.getTemplate( "gsui-daw-window-main" ),
-			GSUI.getTemplate( "gsui-daw-window-piano" ),
-			GSUI.getTemplate( "gsui-daw-window-drums" ),
-			GSUI.getTemplate( "gsui-daw-window-synth" ),
-			GSUI.getTemplate( "gsui-daw-window-mixer" ),
-			GSUI.getTemplate( "gsui-daw-window-blocks" ),
-			GSUI.getTemplate( "gsui-daw-window-slicer" ),
-			GSUI.getTemplate( "gsui-daw-window-effects" ),
+			GSUI.$getTemplate( "gsui-daw-window-main" ),
+			GSUI.$getTemplate( "gsui-daw-window-piano" ),
+			GSUI.$getTemplate( "gsui-daw-window-drums" ),
+			GSUI.$getTemplate( "gsui-daw-window-synth" ),
+			GSUI.$getTemplate( "gsui-daw-window-mixer" ),
+			GSUI.$getTemplate( "gsui-daw-window-blocks" ),
+			GSUI.$getTemplate( "gsui-daw-window-slicer" ),
+			GSUI.$getTemplate( "gsui-daw-window-effects" ),
 		);
 		this.rootElement.querySelector( ".gsuiDAW-body" ).append( this.#windows );
 		this.#dawcore.setLoopRate( +localStorage.getItem( "uiRefreshRate" ) || 60 );
 		this.#windows.lowGraphics( !!+( localStorage.getItem( "gsuiWindows.lowGraphics" ) || "0" ) );
-		GSUI.setAttr( this.rootElement.clock, "mode", localStorage.getItem( "gsuiClock.display" ) || "second" );
+		GSUI.$setAttribute( this.rootElement.clock, "mode", localStorage.getItem( "gsuiClock.display" ) || "second" );
 		gsuiClock.numbering( localStorage.getItem( "uiTimeNumbering" ) || "1" );
 		gsuiTimeline.numbering( localStorage.getItem( "uiTimeNumbering" ) || "1" );
-		this.#elements = GSUI.findElem( document.body, {
+		this.#elements = GSUI.$findElements( document.body, {
 			drumsName: "[data-target=drums]",
 			synthName: "[data-target=synth]",
 			slicesName: "[data-target=slices]",
@@ -122,13 +122,13 @@ class GSDAW {
 
 		this.#dawcore.cb.focusOn = this.#oncontrolsFocus.bind( this );
 		this.#dawcore.cb.currentTime = ( beat, focused ) => {
-			GSUI.setAttr( this.#controlsGetFocusedGrid( focused ), "currenttime", beat );
-			GSUI.setAttr( this.rootElement, "currenttime", beat );
+			GSUI.$setAttribute( this.#controlsGetFocusedGrid( focused ), "currenttime", beat );
+			GSUI.$setAttribute( this.rootElement, "currenttime", beat );
 		};
 		this.#dawcore.cb.buffersLoaded = this.#onpatternsBuffersLoaded.bind( this );
 		this.#dawcore.cb.compositionAdded = cmp => this.rootElement.addComposition( cmp );
 		this.#dawcore.cb.compositionOpened = cmp => {
-			GSUI.setAttr( this.rootElement, "currentcomposition", `${ cmp.options.saveMode }:${ cmp.id }` );
+			GSUI.$setAttribute( this.rootElement, "currentcomposition", `${ cmp.options.saveMode }:${ cmp.id }` );
 			this.#patterns.rootElement.expandSynth( cmp.synthOpened, true );
 			this.#selectChannel( "main" );
 			this.#setTitle( cmp.name );
@@ -136,9 +136,9 @@ class GSDAW {
 		this.#dawcore.cb.compositionClosed = this.#oncmpClosed.bind( this );
 		this.#dawcore.cb.compositionChanged = this.#oncmpChanged.bind( this );
 		this.#dawcore.cb.compositionDeleted = cmp => this.rootElement.deleteComposition( cmp );
-		this.#dawcore.cb.compositionLoading = ( cmp, loading ) => GSUI.setAttr( this.rootElement, "saving", loading );
+		this.#dawcore.cb.compositionLoading = ( cmp, loading ) => GSUI.$setAttribute( this.rootElement, "saving", loading );
 		this.#dawcore.cb.compositionSavedStatus = ( cmp, saved ) => {
-			GSUI.setAttr( this.rootElement, "saved", saved );
+			GSUI.$setAttribute( this.rootElement, "saved", saved );
 			this.#setTitle( cmp.name );
 		};
 		this.#dawcore.cb.compositionSavingPromise = this.#authSaveComposition.bind( this );
@@ -150,12 +150,12 @@ class GSDAW {
 		this.#dawcore.cb.analyserFilled = data => this.rootElement.updateSpectrum( data );
 		this.#dawcore.cb.channelAnalyserFilled = ( chanId, ldata, rdata ) => this.#mixer.updateAudioData( chanId, ldata, rdata );
 		this.#dawcore.cb.pause =
-		this.#dawcore.cb.stop = () => GSUI.setAttr( this.rootElement, "playing", false );
-		this.#dawcore.cb.play = () => GSUI.setAttr( this.rootElement, "playing", true );
+		this.#dawcore.cb.stop = () => GSUI.$setAttribute( this.rootElement, "playing", false );
+		this.#dawcore.cb.play = () => GSUI.$setAttribute( this.rootElement, "playing", true );
 
 		this.rootElement.onSubmitLogin = ( email, pass ) => {
-			GSUI.setAttr( this.rootElement, "logging", true );
-			GSUI.setAttr( this.rootElement, "errauth", false );
+			GSUI.$setAttribute( this.rootElement, "logging", true );
+			GSUI.$setAttribute( this.rootElement, "errauth", false );
 			return gsapiClient.login( email, pass )
 				.then( me => {
 					this.#authLoginThen( me );
@@ -167,10 +167,10 @@ class GSDAW {
 					cmps.forEach( cmp => this.#dawcore.addCompositionByJSObject( cmp.data, opt ) );
 				} )
 				.catch( res => {
-					GSUI.setAttr( this.rootElement, "errauth", res.msg );
+					GSUI.$setAttribute( this.rootElement, "errauth", res.msg );
 					throw res;
 				} )
-				.finally( () => GSUI.setAttr( this.rootElement, "logging", false ) );
+				.finally( () => GSUI.$setAttribute( this.rootElement, "logging", false ) );
 		};
 		this.rootElement.onSubmitOpen = ( url, file ) => {
 			if ( url || file[ 0 ] ) {
@@ -182,11 +182,11 @@ class GSDAW {
 		};
 		this.rootElement.onExportJSON = ( saveMode, id ) => this.#dawcore.compositionExportJSON( saveMode, id );
 
-		GSUI.listenEv( this.rootElement, {
+		GSUI.$listenEvents( this.rootElement, {
 			gsuiDAW: {
 				"oki-cookies": () => {
 					document.cookie = "cookieAccepted";
-					GSUI.setAttr( this.rootElement, "oki-cookies", "" );
+					GSUI.$setAttribute( this.rootElement, "oki-cookies", "" );
 				},
 				switchCompositionLocation: d => {
 					const [ saveMode, id ] = d.args;
@@ -206,10 +206,10 @@ class GSDAW {
 					localStorage.setItem( "uiRefreshRate", data.uiRate );
 					localStorage.setItem( "gsuiWindows.lowGraphics", +data.windowsLowGraphics );
 					localStorage.setItem( "uiTimeNumbering", data.timelineNumbering );
-					GSUI.setAttr( this.rootElement, "uirate", data.uiRate );
-					GSUI.setAttr( this.rootElement, "samplerate", data.sampleRate );
-					GSUI.setAttr( this.rootElement, "timelinenumbering", data.timelineNumbering );
-					GSUI.setAttr( this.rootElement, "windowslowgraphics", data.windowsLowGraphics );
+					GSUI.$setAttribute( this.rootElement, "uirate", data.uiRate );
+					GSUI.$setAttribute( this.rootElement, "samplerate", data.sampleRate );
+					GSUI.$setAttribute( this.rootElement, "timelinenumbering", data.timelineNumbering );
+					GSUI.$setAttribute( this.rootElement, "windowslowgraphics", data.windowsLowGraphics );
 				},
 				changeDisplayClock( d ) {
 					const display = d.args[ 0 ];
@@ -219,12 +219,12 @@ class GSDAW {
 				export: () => {
 					const dur = this.#dawcore.$getDuration() * 60 / this.#dawcore.$getBPM();
 					const intervalId = setInterval( () => {
-						GSUI.setAttr( this.rootElement, "exporting", this.#dawcore.ctx.currentTime / dur );
+						GSUI.$setAttribute( this.rootElement, "exporting", this.#dawcore.ctx.currentTime / dur );
 					}, 100 );
 
 					this.#dawcore.compositionExportWAV().then( obj => {
 						clearInterval( intervalId );
-						GSUI.setAttr( this.rootElement, "exporting", 1 );
+						GSUI.$setAttribute( this.rootElement, "exporting", 1 );
 						this.rootElement.readyToDownload( obj.url, obj.name );
 					} );
 				},
@@ -238,13 +238,13 @@ class GSDAW {
 					this.#dawcore.callAction( "changeTempo", o.bpm, o.beatsPerMeasure, o.stepsPerBeat );
 				},
 				logout: () => {
-					GSUI.setAttr( this.rootElement, "logging", true );
+					GSUI.$setAttribute( this.rootElement, "logging", true );
 					gsapiClient.logout()
-						.finally( () => GSUI.setAttr( this.rootElement, "logging", false ) )
+						.finally( () => GSUI.$setAttribute( this.rootElement, "logging", false ) )
 						.then( () => {
-							GSUI.setAttr( this.rootElement, "logged", false );
-							GSUI.setAttr( this.rootElement, "useravatar", false );
-							GSUI.setAttr( this.rootElement, "username", false );
+							GSUI.$setAttribute( this.rootElement, "logged", false );
+							GSUI.$setAttribute( this.rootElement, "useravatar", false );
+							GSUI.$setAttribute( this.rootElement, "username", false );
 							this.#dawcore.$getCompositions( "cloud" )
 								.forEach( cmp => this.#dawcore.deleteComposition( "cloud", cmp.id ) );
 							if ( !this.#dawcore.$getCmp() ) {
@@ -351,9 +351,9 @@ class GSDAW {
 		const grid = this.#controlsGetFocusedGrid( focStr );
 		const onCmp = focStr === "composition";
 
-		GSUI.setAttr( this.rootElement, "focus", onCmp ? "up" : "down" );
-		GSUI.setAttr( this.rootElement, "duration", this.#dawcore.getFocusedDuration() );
-		GSUI.setAttr( this.rootElement, "currenttime", beat );
+		GSUI.$setAttribute( this.rootElement, "focus", onCmp ? "up" : "down" );
+		GSUI.$setAttribute( this.rootElement, "duration", this.#dawcore.getFocusedDuration() );
+		GSUI.$setAttribute( this.rootElement, "currenttime", beat );
 		this.#pianoroll.rootElement.classList.toggle( "selected", focStr === "keys" );
 		this.#drums.rootElement.classList.toggle( "selected", focStr === "drums" );
 		this.#slicer.rootElement.classList.toggle( "selected", focStr === "slices" );
@@ -404,24 +404,24 @@ class GSDAW {
 		if ( document.cookie.indexOf( "cookieAccepted" ) > -1 ) {
 			this.#dawcore.saveComposition();
 		} else {
-			GSUI.popup.alert( "Error", "You have to accept our cookies before saving locally your composition." );
+			GSUI.$popup.alert( "Error", "You have to accept our cookies before saving locally your composition." );
 		}
 	}
 	#oncmpClickNewLocal() {
 		( !this.#dawcore.compositionNeedSave()
 			? this.#dawcore.newComposition()
-			: GSUI.popup.confirm( "Warning", "Are you sure you want to discard unsaved works" )
+			: GSUI.$popup.confirm( "Warning", "Are you sure you want to discard unsaved works" )
 				.then( b => b && this.#dawcore.newComposition() )
 		).then( cmp => cmp && this.#dawcore.openComposition( "local", cmp.id ) );
 	}
 	#oncmpClickNewCloud() {
 		if ( !gsapiClient.user.id ) {
-			GSUI.popup.alert( "Error",
+			GSUI.$popup.alert( "Error",
 				"You can not create a new composition in the <b>cloud</b><br/>without being connected" );
 		} else {
 			( !this.#dawcore.compositionNeedSave()
 				? this.#dawcore.newComposition( { saveMode: "cloud" } )
-				: GSUI.popup.confirm( "Warning", "Are you sure you want to discard unsaved works" )
+				: GSUI.$popup.confirm( "Warning", "Are you sure you want to discard unsaved works" )
 					.then( b => b && this.#dawcore.newComposition( { saveMode: "cloud" } ) )
 			).then( cmp => cmp && this.#dawcore.openComposition( "cloud", cmp.id ) );
 		}
@@ -433,7 +433,7 @@ class GSDAW {
 	}
 	#oncmpClickOpen( saveMode, id ) {
 		if ( this.#dawcore.compositionNeedSave() ) {
-			GSUI.popup.confirm( "Warning",
+			GSUI.$popup.confirm( "Warning",
 				"Are you sure you want to discard unsaved works"
 			).then( ok => ok && this.#dawcore.openComposition( saveMode, id ) );
 		} else {
@@ -443,7 +443,7 @@ class GSDAW {
 	#oncmpClickDelete( saveMode, id ) {
 		const cmp = this.#dawcore.$getComposition( saveMode, id );
 
-		GSUI.popup.confirm( "Warning",
+		GSUI.$popup.confirm( "Warning",
 			`Are you sure you want to delete "${ cmp.name }" ? (no undo possible)`,
 			"Delete"
 		).then( b => {
@@ -453,7 +453,7 @@ class GSDAW {
 					: Promise.resolve() )
 					.catch( err => {
 						if ( err.code !== 404 ) {
-							GSUI.popup.alert( `Error ${ err.code }`,
+							GSUI.$popup.alert( `Error ${ err.code }`,
 								"An error happened while deleting " +
 								"your composition&nbsp;:<br/>" +
 								`<code>${ err.msg || err }</code>` );
@@ -485,7 +485,7 @@ class GSDAW {
 			: this.#dawcore.$getOpened( area );
 
 		if ( id ) {
-			GSUI.popup.prompt( title, "", e.currentTarget.textContent, "Rename" )
+			GSUI.$popup.prompt( title, "", e.currentTarget.textContent, "Rename" )
 				.then( name => this.#dawcore.callAction( action, id, name ) );
 		}
 	}
@@ -516,7 +516,7 @@ class GSDAW {
 
 		return !cmpTo
 			? Promise.resolve( cmpFrom )
-			: GSUI.popup.confirm( "Warning",
+			: GSUI.$popup.confirm( "Warning",
 				"Are you sure you want to overwrite " +
 				`the <b>${ to }</b> composition <i>${ cmpTo.name || "Untitled" }</i>&nbsp;?` )
 				.then( b => {
@@ -537,14 +537,14 @@ class GSDAW {
 				.then( cmp => this.#authSaveComposition( cmp ) )
 				.then( cmp => this.#dawcore.addCompositionByJSObject( cmp, { saveMode: "cloud" } ) );
 		} else {
-			GSUI.popup.alert( "Error",
+			GSUI.$popup.alert( "Error",
 				"You need to be connected to your account before uploading your composition" );
 		}
 	}
 	#authSaveComposition( cmp ) {
 		return gsapiClient.saveComposition( cmp )
 			.then( () => cmp, err => {
-				GSUI.popup.alert( `Error ${ err.code }`,
+				GSUI.$popup.alert( `Error ${ err.code }`,
 					"An error happened while saving your composition&nbsp;:<br/>" +
 					`<code>${ err.msg || err }</code>`
 				);
@@ -552,7 +552,7 @@ class GSDAW {
 			} );
 	}
 	#authGetMe() {
-		GSUI.setAttr( this.rootElement, "logging", true );
+		GSUI.$setAttribute( this.rootElement, "logging", true );
 		return gsapiClient.getMe()
 			.then( me => {
 				this.#authLoginThen( me );
@@ -568,12 +568,12 @@ class GSDAW {
 					throw res;
 				}
 			} )
-			.finally( () => GSUI.setAttr( this.rootElement, "logging", false ) );
+			.finally( () => GSUI.$setAttribute( this.rootElement, "logging", false ) );
 	}
 	#authLoginThen( me ) {
-		GSUI.setAttr( this.rootElement, "useravatar", me.avatar );
-		GSUI.setAttr( this.rootElement, "username", me.username );
-		GSUI.setAttr( this.rootElement, "logged", true );
+		GSUI.$setAttribute( this.rootElement, "useravatar", me.avatar );
+		GSUI.$setAttribute( this.rootElement, "username", me.username );
+		GSUI.$setAttribute( this.rootElement, "logged", true );
 		return me;
 	}
 
@@ -595,7 +595,7 @@ class GSDAW {
 			name: cmp.name,
 			duration: cmp.duration,
 		}, {} );
-		GSUI.setAttr( this.rootElement, "currentcomposition", false );
+		GSUI.$setAttribute( this.rootElement, "currentcomposition", false );
 		this.#effects.clear();
 		this.#synth.clear();
 		this.#mixer.clear();
@@ -654,20 +654,20 @@ class GSDAW {
 			Object.entries( obj.patterns ).forEach( kv => this.#onupdatePattern( ...kv ) );
 		} ],
 		[ [ "beatsPerMeasure", "stepsPerBeat" ], function() {
-			GSUI.setAttr( this.rootElement, "timedivision", `${ this.#dawcore.$getBeatsPerMeasure() }/${ this.#dawcore.$getStepsPerBeat() }` );
+			GSUI.$setAttribute( this.rootElement, "timedivision", `${ this.#dawcore.$getBeatsPerMeasure() }/${ this.#dawcore.$getStepsPerBeat() }` );
 		} ],
 		[ [ "bpm" ], function( { bpm } ) {
-			GSUI.setAttr( this.rootElement, "bpm", bpm );
+			GSUI.$setAttribute( this.rootElement, "bpm", bpm );
 			this.rootElement.updateComposition( this.#dawcore.$getCmp() );
 		} ],
 		[ [ "name" ], function( { name } ) {
 			this.#setTitle( name );
 			this.rootElement.updateComposition( this.#dawcore.$getCmp() );
-			GSUI.setAttr( this.rootElement, "name", name );
+			GSUI.$setAttribute( this.rootElement, "name", name );
 		} ],
 		[ [ "duration" ], function( { duration } ) {
 			if ( this.#dawcore.getFocusedName() === "composition" ) {
-				GSUI.setAttr( this.rootElement, "duration", duration );
+				GSUI.$setAttribute( this.rootElement, "duration", duration );
 			}
 			this.rootElement.updateComposition( this.#dawcore.$getCmp() );
 		} ],
@@ -678,7 +678,7 @@ class GSDAW {
 				this.#elements.slicesName.textContent = pat.name;
 				this.#windows.window( "slicer" ).open();
 				if ( this.#dawcore.getFocusedName() === "slices" ) {
-					GSUI.setAttr( this.rootElement, "duration", pat.duration );
+					GSUI.$setAttribute( this.rootElement, "duration", pat.duration );
 				}
 			} else {
 				this.#elements.slicesName.textContent = "";
@@ -691,7 +691,7 @@ class GSDAW {
 				this.#elements.drumsName.textContent = pat.name;
 				this.#windows.window( "drums" ).open();
 				if ( this.#dawcore.getFocusedName() === "drums" ) {
-					GSUI.setAttr( this.rootElement, "duration", pat.duration );
+					GSUI.$setAttribute( this.rootElement, "duration", pat.duration );
 				}
 			} else {
 				this.#elements.drumsName.textContent = "";
@@ -715,7 +715,7 @@ class GSDAW {
 
 				this.#elements.pianorollName.textContent = pat.name;
 				if ( this.#dawcore.getFocusedName() === "keys" ) {
-					GSUI.setAttr( this.rootElement, "duration", pat.duration );
+					GSUI.$setAttribute( this.rootElement, "duration", pat.duration );
 				}
 				this.#windows.window( "piano" ).open();
 			} else {
@@ -729,7 +729,7 @@ class GSDAW {
 				const foc = this.#dawcore.getFocusedName();
 
 				if ( foc !== "composition" && id === this.#dawcore.$getOpened( foc ) ) {
-					GSUI.setAttr( this.rootElement, "duration", obj.duration );
+					GSUI.$setAttribute( this.rootElement, "duration", obj.duration );
 				}
 			}
 			if ( "name" in obj ) {
@@ -767,7 +767,7 @@ class GSDAW {
 			if ( pat.type === "buffer" && pat.buffer in buffers ) {
 				const bpm = pat.bufferBpm || this.#dawcore.$getBPM();
 
-				GSUI.setAttr( elBlc, "data-missing", false );
+				GSUI.$setAttribute( elBlc, "data-missing", false );
 				this.#patterns.svgForms.buffer.setSVGViewbox( elBlc._gsuiSVGform, blc.offset, blc.duration, bpm / 60 );
 			}
 		} );

@@ -5,7 +5,7 @@ class GSDrums {
 	#drumsId = null;
 	#patternId = null;
 	#svgManager = null;
-	rootElement = GSUI.createElem( "gsui-drums" );
+	rootElement = GSUI.$createElement( "gsui-drums" );
 	timeline = this.rootElement.timeline;
 	#uiDrumrows = this.rootElement.drumrows;
 	#dataDrums = new DAWCore.controllers.drums( {
@@ -46,7 +46,7 @@ class GSDrums {
 	constructor() {
 		Object.seal( this );
 
-		GSUI.listenEv( this.rootElement, {
+		GSUI.$listenEvents( this.rootElement, {
 			gsuiDrumrows: {
 				change: d => { this.#dawcore.callAction( ...d.args ); },
 				propFilter: d => { this.#setPropFilter( ...d.args ); },
@@ -86,7 +86,7 @@ class GSDrums {
 				},
 			},
 		} );
-		GSUI.setAttr( this.rootElement, "disabled", true );
+		GSUI.$setAttribute( this.rootElement, "disabled", true );
 	}
 
 	// .........................................................................
@@ -98,7 +98,7 @@ class GSDrums {
 			this.#patternId = id;
 			this.#drumsId = null;
 			this.#dataDrums.clear();
-			GSUI.setAttr( this.rootElement, "disabled", !id );
+			GSUI.$setAttribute( this.rootElement, "disabled", !id );
 			if ( id ) {
 				const pat = this.#dawcore.$getPattern( id );
 				const drums = this.#dawcore.$getDrums( pat.drums );
