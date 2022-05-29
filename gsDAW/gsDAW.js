@@ -13,7 +13,7 @@ class GSDAW {
 	#windows = GSUI.$createElement( "gsui-windows" );
 	rootElement = GSUI.$createElement( "gsui-daw", {
 		"oki-cookies": document.cookie.indexOf( "cookieAccepted" ) > -1,
-		version: "0.36.1",
+		version: "0.0.0",
 		volume: this.#dawcore.$getAudioDestinationGain(),
 		uirate: +localStorage.getItem( "uiRefreshRate" ) || "auto",
 		samplerate: this.#dawcore.env.sampleRate,
