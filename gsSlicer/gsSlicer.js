@@ -32,6 +32,16 @@ class GSSlicer {
 					this.#dawcore.callAction( "changePatternSlices", this.#ctrlSlices.getPatternId(), ...obj.args );
 				},
 			},
+			gsuiTimeline: {
+				changeCurrentTime: d => {
+					this.#dawcore.slicesSetCurrentTime( d.args[ 0 ] );
+				},
+				changeLoop: d => {
+					d.args[ 0 ] !== false
+						? this.#dawcore.slicesSetLoop( ...d.args )
+						: this.#dawcore.slicesClearLoop();
+				},
+			},
 		} );
 	}
 
