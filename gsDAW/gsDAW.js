@@ -259,10 +259,13 @@ class GSDAW {
 				focusSwitch: () => this.#dawcore.focusSwitch(),
 				volume: d => this.#dawcore.destinationSetGain( d.args[ 0 ] ),
 				rename: d => this.#dawcore.callAction( "renameComposition", d.args[ 0 ] ),
-				currentTimeLive: d => this.#controlsGetFocusedGrid().timeline.previewCurrentTime( d.args[ 0 ] ),
+				currentTimeLive: d => GSUI.$setAttribute( this.#controlsGetFocusedGrid().timeline, "currenttime-preview", d.args[ 0 ] ),
 				currentTime: d => {
-					this.#controlsGetFocusedGrid().timeline.previewCurrentTime( false );
-					this.#dawcore.setCurrentTime( d.args[ 0 ] );
+					const timeline = this.#controlsGetFocusedGrid().timeline;
+					const tpreview = GSUI.$getAttribute( timeline, "currenttime-preview" );
+
+					GSUI.$setAttribute( timeline, "currenttime-preview", null );
+					this.#dawcore.setCurrentTime( +( tpreview || d.args[ 0 ] ) );
 				},
 				play: () => this.#dawcore.togglePlay(),
 				stop: () => {
@@ -678,7 +681,7 @@ class GSDAW {
 				this.#elements.slicesName.textContent = pat.name;
 				this.#windows.window( "slicer" ).open();
 				if ( this.#dawcore.getFocusedName() === "slices" ) {
-					GSUI.$setAttribute( this.rootElement, "duration", pat.duration );
+					GSUI.$setAttribute( this.rootElement, "duration", this.#dawcore.$getPattern( pat.source )?.duration ?? this.#dawcore.$getBeatsPerMeasure() );
 				}
 			} else {
 				this.#elements.slicesName.textContent = "";
