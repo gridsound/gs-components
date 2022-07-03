@@ -8,7 +8,7 @@ class GSDrums {
 	rootElement = GSUI.$createElement( "gsui-drums" );
 	timeline = this.rootElement.timeline;
 	#uiDrumrows = this.rootElement.drumrows;
-	#dataDrums = new DAWCore.controllers.drums( {
+	#dataDrums = new DAWCoreControllers.drums( {
 		dataCallbacks: {
 			addDrum: ( id, drum ) => this.rootElement.addDrum( id, drum ),
 			addDrumcut: ( id, drumcut ) => this.rootElement.addDrumcut( id, drumcut ),
@@ -17,7 +17,7 @@ class GSDrums {
 			removeDrumcut: id => this.rootElement.removeDrumcut( id ),
 		},
 	} );
-	#dataDrumrows = new DAWCore.controllers.drumrows( {
+	#dataDrumrows = new DAWCoreControllers.drumrows( {
 		dataCallbacks: {
 			addDrumrow: id => {
 				this.#uiDrumrows.add( id, this.rootElement.createDrumrow( id ) );
@@ -51,9 +51,9 @@ class GSDrums {
 				change: d => { this.#dawcore.callAction( ...d.args ); },
 				propFilter: d => { this.#setPropFilter( ...d.args ); },
 				propFilters: d => { this.#setAllPropFilters( ...d.args ); },
-				liveStopDrum: d => { this.#dawcore.liveDrumStop( ...d.args ); },
-				liveStartDrum: d => { this.#dawcore.liveDrumStart( ...d.args ); },
-				liveChangeDrumrow: d => { this.#dawcore.liveDrumrowChange( ...d.args ); },
+				liveStopDrum: d => { this.#dawcore.$liveDrumStop( ...d.args ); },
+				liveStartDrum: d => { this.#dawcore.$liveDrumStart( ...d.args ); },
+				liveChangeDrumrow: d => { this.#dawcore.$liveDrumrowChange( ...d.args ); },
 			},
 			gsuiDrums: {
 				change: d => {
@@ -64,14 +64,14 @@ class GSDrums {
 			},
 			gsuiTimeline: {
 				changeCurrentTime: d => {
-					this.#dawcore.drumsSetCurrentTime( d.args[ 0 ] );
+					this.#dawcore.$drumsSetCurrentTime( d.args[ 0 ] );
 				},
 				changeLoop: d => {
 					const [ a, b ] = d.args;
 
 					a !== false
-						? this.#dawcore.drumsSetLoop( a, b )
-						: this.#dawcore.drumsClearLoop();
+						? this.#dawcore.$drumsSetLoop( a, b )
+						: this.#dawcore.$drumsClearLoop();
 				},
 			},
 			gsuiSliderGroup: {

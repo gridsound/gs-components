@@ -4,7 +4,7 @@ class GSSynth {
 	#dawcore = null;
 	#synthId = null;
 	rootElement = GSUI.$createElement( "gsui-synthesizer" );
-	#dataSynth = new DAWCore.controllers.synth( {
+	#dataSynth = new DAWCoreControllers.synth( {
 		dataCallbacks: {
 			addOsc: ( id, osc ) => this.rootElement.addOscillator( id, osc ),
 			removeOsc: id => this.rootElement.removeOscillator( id ),
@@ -31,14 +31,14 @@ class GSSynth {
 					switch ( d.eventName ) {
 						case "toggle": dc.callAction( "toggleEnv", id ); break;
 						case "change": dc.callAction( "changeEnv", id, ...a ); break;
-						// case "liveChange": dc.liveChangeSynth( id, { env: { [ a[ 0 ] ]: a[ 1 ] } } ); break;
+						// case "liveChange": dc.$liveChangeSynth( id, { env: { [ a[ 0 ] ]: a[ 1 ] } } ); break;
 					}
 					break;
 				case "gsuiLFO":
 					switch ( d.eventName ) {
 						case "toggle": dc.callAction( "toggleLFO", id ); break;
 						case "change": dc.callAction( "changeLFO", id, ...a ); break;
-						case "liveChange": dc.liveChangeSynth( id, { lfo: { [ a[ 0 ] ]: a[ 1 ] } } ); break;
+						case "liveChange": dc.$liveChangeSynth( id, { lfo: { [ a[ 0 ] ]: a[ 1 ] } } ); break;
 					}
 					break;
 				case "gsuiSynthesizer":
@@ -53,7 +53,7 @@ class GSSynth {
 					switch ( d.eventName ) {
 						case "remove": dc.callAction( "removeOscillator", id, oscId ); break;
 						case "change": dc.callAction( "changeOscillator", id, oscId, ...a ); break;
-						case "liveChange": dc.liveChangeSynth( id, { oscillators: { [ oscId ]: { [ a[ 0 ] ]: a[ 1 ] } } } ); break;
+						case "liveChange": dc.$liveChangeSynth( id, { oscillators: { [ oscId ]: { [ a[ 0 ] ]: a[ 1 ] } } } ); break;
 					}
 				} break;
 			}

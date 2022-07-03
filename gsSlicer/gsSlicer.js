@@ -3,7 +3,7 @@
 class GSSlicer {
 	rootElement = GSUI.$createElement( "gsui-slicer" );
 	#dawcore = null;
-	#ctrlSlices = new DAWCore.controllers.slicer( {
+	#ctrlSlices = new DAWCoreControllers.slicer( {
 		dataCallbacks: {
 			disabled: b => GSUI.$setAttribute( this.rootElement, "disabled", b ),
 			timedivision: timediv => GSUI.$setAttribute( this.rootElement, "timedivision", timediv ),
@@ -34,12 +34,12 @@ class GSSlicer {
 			},
 			gsuiTimeline: {
 				changeCurrentTime: d => {
-					this.#dawcore.slicesSetCurrentTime( d.args[ 0 ] );
+					this.#dawcore.$slicesSetCurrentTime( d.args[ 0 ] );
 				},
 				changeLoop: d => {
 					d.args[ 0 ] !== false
-						? this.#dawcore.slicesSetLoop( ...d.args )
-						: this.#dawcore.slicesClearLoop();
+						? this.#dawcore.$slicesSetLoop( ...d.args )
+						: this.#dawcore.$slicesClearLoop();
 				},
 			},
 		} );

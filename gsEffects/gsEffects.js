@@ -4,7 +4,7 @@ class GSEffects {
 	#dawcore = null;
 	#destFilter = "main";
 	rootElement = new gsuiEffects();
-	#ctrlEffects = new DAWCore.controllers.effects( {
+	#ctrlEffects = new DAWCoreControllers.effects( {
 		dataCallbacks: {
 			addEffect: ( id, obj ) => this.rootElement.addEffect( id, obj ),
 			removeEffect: id => this.rootElement.removeEffect( id ),
@@ -24,7 +24,7 @@ class GSEffects {
 		GSUI.$listenEvents( this.rootElement, {
 			gsuiEffects: {
 				liveChangeEffect: d => {
-					this.#dawcore.liveChangeEffect( ...d.args );
+					this.#dawcore.$liveChangeEffect( ...d.args );
 				},
 				addEffect: d => {
 					d.args.unshift( this.#destFilter );

@@ -25,8 +25,8 @@ class GSDAW {
 		[ true,  false, "o", () => this.rootElement.showOpenPopup() ],
 		[ true,  false, "s", () => this.#oncmpClickSave() ],
 		[ true,  true,  "n", () => this.#oncmpClickNewLocal() ],
-		[ true,  false, "z", () => this.#dawcore.historyUndo() ],
-		[ true,  false, "Z", () => this.#dawcore.historyRedo() ],
+		[ true,  false, "z", () => this.#dawcore.$historyUndo() ],
+		[ true,  false, "Z", () => this.#dawcore.$historyRedo() ],
 		[ false, false, " ", () => this.#dawcore.isPlaying() ? this.#dawcore.stop() : this.#dawcore.play() ],
 	];
 	static #dropExtensions = { gs: true, txt: true, json: true };
@@ -162,7 +162,7 @@ class GSDAW {
 				.then( cmps => {
 					const opt = { saveMode: "cloud" };
 
-					cmps.forEach( cmp => this.#dawcore.addCompositionByJSObject( cmp.data, opt ) );
+					cmps.forEach( cmp => this.#dawcore.$addCompositionByJSObject( cmp.data, opt ) );
 				} )
 				.catch( res => {
 					GSUI.$setAttribute( this.rootElement, "errauth", res.msg );
@@ -173,12 +173,12 @@ class GSDAW {
 		this.rootElement.onSubmitOpen = ( url, file ) => {
 			if ( url || file[ 0 ] ) {
 				return ( url
-					? this.#dawcore.addCompositionByURL( url )
-					: this.#dawcore.addCompositionByBlob( file[ 0 ] )
+					? this.#dawcore.$addCompositionByURL( url )
+					: this.#dawcore.$addCompositionByBlob( file[ 0 ] )
 				).then( cmp => this.#dawcore.openComposition( "local", cmp.id ) );
 			}
 		};
-		this.rootElement.onExportJSON = ( saveMode, id ) => this.#dawcore.compositionExportJSON( saveMode, id );
+		this.rootElement.onExportJSON = ( saveMode, id ) => this.#dawcore.$compositionExportJSON( saveMode, id );
 
 		GSUI.$listenEvents( this.rootElement, {
 			gsuiDAW: {
@@ -220,13 +220,13 @@ class GSDAW {
 						GSUI.$setAttribute( this.rootElement, "exporting", this.#dawcore.ctx.currentTime / dur );
 					}, 100 );
 
-					this.#dawcore.compositionExportWAV().then( obj => {
+					this.#dawcore.$compositionExportWAV().then( obj => {
 						clearInterval( intervalId );
 						GSUI.$setAttribute( this.rootElement, "exporting", 1 );
 						this.rootElement.readyToDownload( obj.url, obj.name );
 					} );
 				},
-				abortExport: () => this.#dawcore.compositionAbortWAV(),
+				abortExport: () => this.#dawcore.$compositionAbortWAV(),
 				save: () => this.#oncmpClickSave(),
 				open: d => this.#oncmpClickOpen( ...d.args ),
 				delete: d => this.#oncmpClickDelete( ...d.args ),
@@ -255,7 +255,7 @@ class GSDAW {
 				openWindow: d => this.#windows.window( d.args[ 0 ] ).open(),
 				closeWindow: d => this.#windows.window( d.args[ 0 ] ).close(),
 				focusSwitch: () => this.#dawcore.focusSwitch(),
-				volume: d => this.#dawcore.destinationSetGain( d.args[ 0 ] ),
+				volume: d => this.#dawcore.$destinationSetGain( d.args[ 0 ] ),
 				rename: d => this.#dawcore.callAction( "renameComposition", d.args[ 0 ] ),
 				currentTimeLive: d => GSUI.$setAttribute( this.#controlsGetFocusedGrid().timeline, "currenttime-preview", d.args[ 0 ] ),
 				currentTime: d => {
@@ -276,18 +276,18 @@ class GSDAW {
 					}
 				},
 				reset: () => this.#dawcore.resetAudioContext(),
-				undo: () => this.#dawcore.historyUndo(),
-				redo: () => this.#dawcore.historyRedo(),
+				undo: () => this.#dawcore.$historyUndo(),
+				redo: () => this.#dawcore.$historyRedo(),
 				redoN: d => {
 					let n = d.args[ 0 ];
 
 					if ( n < 0 ) {
 						while ( n++ < 0 ) {
-							this.#dawcore.historyUndo();
+							this.#dawcore.$historyUndo();
 						}
 					} else {
 						while ( n-- > 0 ) {
-							this.#dawcore.historyRedo();
+							this.#dawcore.$historyRedo();
 						}
 					}
 				},
@@ -408,10 +408,10 @@ class GSDAW {
 		}
 	}
 	#oncmpClickNewLocal() {
-		( !this.#dawcore.compositionNeedSave()
-			? this.#dawcore.newComposition()
+		( !this.#dawcore.$compositionNeedSave()
+			? this.#dawcore.$newComposition()
 			: GSUI.$popup.confirm( "Warning", "Are you sure you want to discard unsaved works" )
-				.then( b => b && this.#dawcore.newComposition() )
+				.then( b => b && this.#dawcore.$newComposition() )
 		).then( cmp => cmp && this.#dawcore.openComposition( "local", cmp.id ) );
 	}
 	#oncmpClickNewCloud() {
@@ -419,20 +419,20 @@ class GSDAW {
 			GSUI.$popup.alert( "Error",
 				"You can not create a new composition in the <b>cloud</b><br/>without being connected" );
 		} else {
-			( !this.#dawcore.compositionNeedSave()
-				? this.#dawcore.newComposition( { saveMode: "cloud" } )
+			( !this.#dawcore.$compositionNeedSave()
+				? this.#dawcore.$newComposition( { saveMode: "cloud" } )
 				: GSUI.$popup.confirm( "Warning", "Are you sure you want to discard unsaved works" )
-					.then( b => b && this.#dawcore.newComposition( { saveMode: "cloud" } ) )
+					.then( b => b && this.#dawcore.$newComposition( { saveMode: "cloud" } ) )
 			).then( cmp => cmp && this.#dawcore.openComposition( "cloud", cmp.id ) );
 		}
 	}
 	#oncmpBeforeUnload() {
-		if ( this.#dawcore.compositionNeedSave() ) {
+		if ( this.#dawcore.$compositionNeedSave() ) {
 			return "Data unsaved";
 		}
 	}
 	#oncmpClickOpen( saveMode, id ) {
-		if ( this.#dawcore.compositionNeedSave() ) {
+		if ( this.#dawcore.$compositionNeedSave() ) {
 			GSUI.$popup.confirm( "Warning",
 				"Are you sure you want to discard unsaved works"
 			).then( ok => ok && this.#dawcore.openComposition( saveMode, id ) );
@@ -503,7 +503,7 @@ class GSDAW {
 
 		e.preventDefault();
 		if ( cmpFile ) {
-			this.#dawcore.addCompositionByBlob( cmpFile )
+			this.#dawcore.$addCompositionByBlob( cmpFile )
 				.then( cmp => this.#dawcore.openComposition( "local", cmp.id ) );
 		} else {
 			this.#dawcore.dropAudioFiles( files );
@@ -528,14 +528,14 @@ class GSDAW {
 	}
 	#oncmpLocalDrop( saveMode, id ) {
 		this.#oncmpDrop( saveMode, id )
-			.then( cmp => this.#dawcore.addCompositionByJSObject( cmp, { saveMode: "local" } ) )
-			.then( cmp => DAWCoreLocalStorage.put( cmp.id, cmp ) );
+			.then( cmp => this.#dawcore.$addCompositionByJSObject( cmp, { saveMode: "local" } ) )
+			.then( cmp => DAWCoreLocalStorage.$put( cmp.id, cmp ) );
 	}
 	#oncmpCloudDrop( saveMode, id ) {
 		if ( gsapiClient.user.id ) {
 			this.#oncmpDrop( saveMode, id )
 				.then( cmp => this.#authSaveComposition( cmp ) )
-				.then( cmp => this.#dawcore.addCompositionByJSObject( cmp, { saveMode: "cloud" } ) );
+				.then( cmp => this.#dawcore.$addCompositionByJSObject( cmp, { saveMode: "cloud" } ) );
 		} else {
 			GSUI.$popup.alert( "Error",
 				"You need to be connected to your account before uploading your composition" );
@@ -561,7 +561,7 @@ class GSDAW {
 			.then( cmps => {
 				const opt = { saveMode: "cloud" };
 
-				cmps.forEach( cmp => this.#dawcore.addCompositionByJSObject( cmp.data, opt ) );
+				cmps.forEach( cmp => this.#dawcore.$addCompositionByJSObject( cmp.data, opt ) );
 			} )
 			.catch( res => {
 				if ( res.code !== 401 ) {
@@ -581,7 +581,7 @@ class GSDAW {
 	#setTitle( cmpName ) {
 		const name = cmpName || "GridSound";
 
-		document.title = this.#dawcore.compositionNeedSave() ? `*${ name }` : name;
+		document.title = this.#dawcore.$compositionNeedSave() ? `*${ name }` : name;
 	}
 	#selectChannel( id ) {
 		this.#elements.channelName.textContent = this.#dawcore.$getChannel( id ).name;

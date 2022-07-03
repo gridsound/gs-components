@@ -5,7 +5,7 @@ class GSPatternroll {
 	#svgForms = null;
 	rootElement = GSUI.$createElement( "gsui-patternroll" );
 	timeline = this.rootElement.timeline;
-	#dataTracks = new DAWCore.controllers.tracks( {
+	#dataTracks = new DAWCoreControllers.tracks( {
 		dataCallbacks: {
 			addTrack: id => this.rootElement.addTrack( id ),
 			removeTrack: id => this.rootElement.removeTrack( id ),
@@ -14,7 +14,7 @@ class GSPatternroll {
 			reorderTrack: ( id, n ) => this.rootElement.reorderTrack( id, n ),
 		}
 	} );
-	#dataBlocks = new DAWCore.controllers.blocks( {
+	#dataBlocks = new DAWCoreControllers.blocks( {
 		dataCallbacks: {
 			addBlock: ( id, blc ) => {
 				const pat = this.#dawcore.$getPattern( blc.pattern );
@@ -89,7 +89,7 @@ class GSPatternroll {
 						this.#dawcore.callAction( "changeLoop", ...d.args );
 						break;
 					case "changeCurrentTime":
-						this.#dawcore.compositionSetCurrentTime( d.args[ 0 ] );
+						this.#dawcore.$compositionSetCurrentTime( d.args[ 0 ] );
 						break;
 				}
 				break;

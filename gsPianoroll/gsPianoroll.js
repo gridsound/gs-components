@@ -6,7 +6,7 @@ class GSPianoroll {
 	#patternId = null;
 	rootElement = new gsuiPianoroll();
 	timeline = this.rootElement.timeline;
-	#dataKeys = new DAWCore.controllers.keys( {
+	#dataKeys = new DAWCoreControllers.keys( {
 		dataCallbacks: {
 			addKey: ( id, blc ) => this.rootElement.addKey( id, blc ),
 			removeKey: id => this.rootElement.removeKey( id ),
@@ -25,17 +25,17 @@ class GSPianoroll {
 			},
 			gsuiTimeline: {
 				changeCurrentTime: d => {
-					this.#dawcore.keysSetCurrentTime( d.args[ 0 ] );
+					this.#dawcore.$keysSetCurrentTime( d.args[ 0 ] );
 				},
 				changeLoop: d => {
 					d.args[ 0 ] !== false
-						? this.#dawcore.keysSetLoop( ...d.args )
-						: this.#dawcore.keysClearLoop();
+						? this.#dawcore.$keysSetLoop( ...d.args )
+						: this.#dawcore.$keysClearLoop();
 				},
 			},
 			gsuiKeys: {
-				keyUp: d => { this.#dawcore.liveKeyup( d.args[ 0 ] ); },
-				keyDown: d => { this.#dawcore.liveKeydown( d.args[ 0 ] ); },
+				keyUp: d => { this.#dawcore.$liveKeyup( d.args[ 0 ] ); },
+				keyDown: d => { this.#dawcore.$liveKeydown( d.args[ 0 ] ); },
 			},
 		} );
 		this.rootElement.setData( this.#dataKeys.data );

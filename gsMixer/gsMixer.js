@@ -4,7 +4,7 @@ class GSMixer {
 	#dawcore = null;
 	onselectChan = null;
 	rootElement = GSUI.$createElement( "gsui-channels" );
-	#ctrlMixer = new DAWCore.controllers.mixer( {
+	#ctrlMixer = new DAWCoreControllers.mixer( {
 		dataCallbacks: {
 			addChannel: ( id, chan ) => this.rootElement.addChannel( id, chan ),
 			removeChannel: id => this.rootElement.removeChannel( id ),
@@ -50,7 +50,7 @@ class GSMixer {
 
 	// .........................................................................
 	#oninput( id, prop, val ) {
-		this.#dawcore.liveChangeChannel( id, prop, val );
+		this.#dawcore.$liveChangeChannel( id, prop, val );
 	}
 	#onchange( act, ...args ) {
 		this.#dawcore.callAction( act, ...args );
