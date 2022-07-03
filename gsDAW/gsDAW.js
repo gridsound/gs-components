@@ -50,11 +50,10 @@ class GSDAW {
 			GSUI.$getTemplate( "gsui-daw-window-drums" ),
 			GSUI.$getTemplate( "gsui-daw-window-synth" ),
 			GSUI.$getTemplate( "gsui-daw-window-mixer" ),
-			GSUI.$getTemplate( "gsui-daw-window-blocks" ),
 			GSUI.$getTemplate( "gsui-daw-window-slicer" ),
 			GSUI.$getTemplate( "gsui-daw-window-effects" ),
 		);
-		this.rootElement.querySelector( ".gsuiDAW-body" ).append( this.#windows );
+		this.rootElement.querySelector( ".gsuiDAW-windows" ).append( this.#windows );
 		this.#dawcore.setLoopRate( +localStorage.getItem( "uiRefreshRate" ) || 60 );
 		this.#windows.lowGraphics( !!+( localStorage.getItem( "gsuiWindows.lowGraphics" ) || "0" ) );
 		GSUI.$setAttribute( this.rootElement.clock, "mode", localStorage.getItem( "gsuiClock.display" ) || "second" );
@@ -79,11 +78,11 @@ class GSDAW {
 		this.#patterns.setDAWCore( this.#dawcore );
 		this.#pianoroll.setDAWCore( this.#dawcore );
 		this.#patternroll.setDAWCore( this.#dawcore );
+		this.rootElement.querySelector( ".gsuiDAW-patterns" ).append( this.#patterns.rootElement );
 		this.#windows.window( "main" ).contentAppend( this.#patternroll.rootElement );
 		this.#windows.window( "drums" ).contentAppend( this.#drums.rootElement );
 		this.#windows.window( "mixer" ).contentAppend( this.#mixer.rootElement );
 		this.#windows.window( "piano" ).contentAppend( this.#pianoroll.rootElement );
-		this.#windows.window( "blocks" ).contentAppend( this.#patterns.rootElement );
 		this.#windows.window( "slicer" ).contentAppend( this.#slicer.rootElement );
 		this.#windows.window( "effects" ).contentAppend( this.#effects.rootElement );
 		this.#drums.rootElement.onfocus = () => this.#dawcore.focusOn( "drums" );
@@ -107,7 +106,6 @@ class GSDAW {
 		this.#drums.setWaveforms( this.#patterns.svgForms.bufferHD );
 		this.#windows.window( "main" ).open();
 		this.#windows.window( "mixer" ).open();
-		this.#windows.window( "blocks" ).open();
 		this.#synth.loadWaves().then( () => this.#windows.window( "synth" ).contentAppend( this.#synth.rootElement ) );
 	}
 	#initEvents() {
@@ -306,14 +304,13 @@ class GSDAW {
 				case "slicer": this.#dawcore.callAction( "closePattern", "slices" ); break;
 			}
 		};
-		this.#initWindowsPos( "blocks",   20,  20, 180, 380, 320, 780, "folder-tree", "blocks" );
-		this.#initWindowsPos( "mixer",   360,  20, 266, 200, 400, 300, "mixer",       "mixer" );
-		this.#initWindowsPos( "main",    780,  20, 380, 180, 600, 360, "music",       "composition" );
-		this.#initWindowsPos( "synth",   360, 340, 340, 220, 400, 460, "oscillator",  "synth" );
-		this.#initWindowsPos( "piano",   780, 400, 380, 180, 600, 400, "keys",        "pianoroll" );
-		this.#initWindowsPos( "drums",   410, 450, 380, 180, 900, 400, "drums",       "drums" );
-		this.#initWindowsPos( "slicer",  500, 140, 306, 250, 420, 360, "slices",      "slicer" );
-		this.#initWindowsPos( "effects", 480, 120, 230, 180, 420, 360, "effects",     "effects" );
+		this.#initWindowsPos( "mixer",    20,  20, 266, 200, 400, 300, "mixer",       "mixer" );
+		this.#initWindowsPos( "main",    440,  20, 380, 180, 600, 360, "music",       "composition" );
+		this.#initWindowsPos( "synth",    20, 340, 340, 220, 400, 460, "oscillator",  "synth" );
+		this.#initWindowsPos( "piano",   440, 400, 380, 180, 600, 400, "keys",        "pianoroll" );
+		this.#initWindowsPos( "drums",    70, 450, 380, 180, 900, 400, "drums",       "drums" );
+		this.#initWindowsPos( "slicer",  160, 140, 306, 250, 420, 360, "slices",      "slicer" );
+		this.#initWindowsPos( "effects", 140, 120, 230, 180, 420, 360, "effects",     "effects" );
 	}
 	#initWindowsPos( winId, x, y, wmin, hmin, w, h, icon, title ) {
 		const win = this.#windows.window( winId );
