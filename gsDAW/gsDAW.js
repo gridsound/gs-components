@@ -16,7 +16,7 @@ class GSDAW {
 		version: "0.0.0",
 		volume: this.#dawcore.$getAudioDestinationGain(),
 		uirate: +localStorage.getItem( "uiRefreshRate" ) || "auto",
-		samplerate: this.#dawcore.env.sampleRate,
+		samplerate: this.#dawcore.$env.sampleRate,
 		timelinenumbering: localStorage.getItem( "uiTimeNumbering" ) || "1",
 		windowslowgraphics: !!+( localStorage.getItem( "gsuiWindows.lowGraphics" ) || "0" ),
 	} );
