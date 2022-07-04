@@ -29,30 +29,30 @@ class GSSynth {
 			switch ( d.component ) {
 				case "gsuiEnvelope":
 					switch ( d.eventName ) {
-						case "toggle": dc.callAction( "toggleEnv", id ); break;
-						case "change": dc.callAction( "changeEnv", id, ...a ); break;
+						case "toggle": dc.$callAction( "toggleEnv", id ); break;
+						case "change": dc.$callAction( "changeEnv", id, ...a ); break;
 						// case "liveChange": dc.$liveChangeSynth( id, { env: { [ a[ 0 ] ]: a[ 1 ] } } ); break;
 					}
 					break;
 				case "gsuiLFO":
 					switch ( d.eventName ) {
-						case "toggle": dc.callAction( "toggleLFO", id ); break;
-						case "change": dc.callAction( "changeLFO", id, ...a ); break;
+						case "toggle": dc.$callAction( "toggleLFO", id ); break;
+						case "change": dc.$callAction( "changeLFO", id, ...a ); break;
 						case "liveChange": dc.$liveChangeSynth( id, { lfo: { [ a[ 0 ] ]: a[ 1 ] } } ); break;
 					}
 					break;
 				case "gsuiSynthesizer":
 					switch ( d.eventName ) {
-						case "addOscillator": dc.callAction( "addOscillator", id ); break;
-						case "reorderOscillator": dc.callAction( "reorderOscillator", id, a[ 0 ] ); break;
+						case "addOscillator": dc.$callAction( "addOscillator", id ); break;
+						case "reorderOscillator": dc.$callAction( "reorderOscillator", id, a[ 0 ] ); break;
 					}
 					break;
 				case "gsuiOscillator": {
 					const oscId = e.target.dataset.id;
 
 					switch ( d.eventName ) {
-						case "remove": dc.callAction( "removeOscillator", id, oscId ); break;
-						case "change": dc.callAction( "changeOscillator", id, oscId, ...a ); break;
+						case "remove": dc.$callAction( "removeOscillator", id, oscId ); break;
+						case "change": dc.$callAction( "changeOscillator", id, oscId, ...a ); break;
 						case "liveChange": dc.$liveChangeSynth( id, { oscillators: { [ oscId ]: { [ a[ 0 ] ]: a[ 1 ] } } } ); break;
 					}
 				} break;

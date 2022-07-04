@@ -26,10 +26,10 @@ class GSSlicer {
 		GSUI.$listenEvents( this.rootElement, {
 			gsuiSlicer: {
 				dropBuffer: obj => {
-					this.#dawcore.callAction( "redirectPatternSlices", this.#ctrlSlices.getPatternId(), obj.args[ 0 ] );
+					this.#dawcore.$callAction( "redirectPatternSlices", this.#ctrlSlices.getPatternId(), obj.args[ 0 ] );
 				},
 				changeProp: obj => {
-					this.#dawcore.callAction( "changePatternSlices", this.#ctrlSlices.getPatternId(), ...obj.args );
+					this.#dawcore.$callAction( "changePatternSlices", this.#ctrlSlices.getPatternId(), ...obj.args );
 				},
 			},
 			gsuiTimeline: {

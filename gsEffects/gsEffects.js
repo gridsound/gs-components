@@ -28,10 +28,10 @@ class GSEffects {
 				},
 				addEffect: d => {
 					d.args.unshift( this.#destFilter );
-					this.#dawcore.callAction( "addEffect", ...d.args );
+					this.#dawcore.$callAction( "addEffect", ...d.args );
 				},
 				default: d => {
-					this.#dawcore.callAction( d.eventName, ...d.args );
+					this.#dawcore.$callAction( d.eventName, ...d.args );
 				},
 			},
 		} );

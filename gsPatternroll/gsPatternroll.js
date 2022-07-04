@@ -81,12 +81,12 @@ class GSPatternroll {
 
 		switch ( d.component ) {
 			case "gsuiTracklist":
-				this.#dawcore.callAction( d.eventName, ...d.args );
+				this.#dawcore.$callAction( d.eventName, ...d.args );
 				break;
 			case "gsuiTimeline":
 				switch ( d.eventName ) {
 					case "changeLoop":
-						this.#dawcore.callAction( "changeLoop", ...d.args );
+						this.#dawcore.$callAction( "changeLoop", ...d.args );
 						break;
 					case "changeCurrentTime":
 						this.#dawcore.$compositionSetCurrentTime( d.args[ 0 ] );
@@ -107,15 +107,15 @@ class GSPatternroll {
 	}
 	#onchange( obj, ...args ) {
 		switch ( obj ) { // tmp
-			case "add": this.#dawcore.callAction( "addBlock", ...args ); break;
-			case "move": this.#dawcore.callAction( "moveBlocks", ...args ); break;
-			case "cropEnd": this.#dawcore.callAction( "cropEndBlocks", ...args ); break;
-			case "cropStart": this.#dawcore.callAction( "cropStartBlocks", ...args ); break;
-			case "duplicate": this.#dawcore.callAction( "duplicateSelectedBlocks", ...args ); break;
-			case "deletion": this.#dawcore.callAction( "removeBlocks", ...args ); break;
-			case "selection": this.#dawcore.callAction( "selectBlocks", ...args ); break;
-			case "unselection": this.#dawcore.callAction( "unselectAllBlocks", ...args ); break;
-			case "unselectionOne": this.#dawcore.callAction( "unselectBlock", ...args ); break;
+			case "add": this.#dawcore.$callAction( "addBlock", ...args ); break;
+			case "move": this.#dawcore.$callAction( "moveBlocks", ...args ); break;
+			case "cropEnd": this.#dawcore.$callAction( "cropEndBlocks", ...args ); break;
+			case "cropStart": this.#dawcore.$callAction( "cropStartBlocks", ...args ); break;
+			case "duplicate": this.#dawcore.$callAction( "duplicateSelectedBlocks", ...args ); break;
+			case "deletion": this.#dawcore.$callAction( "removeBlocks", ...args ); break;
+			case "selection": this.#dawcore.$callAction( "selectBlocks", ...args ); break;
+			case "unselection": this.#dawcore.$callAction( "unselectAllBlocks", ...args ); break;
+			case "unselectionOne": this.#dawcore.$callAction( "unselectBlock", ...args ); break;
 		}
 	}
 	#oneditBlock( id, obj, blc ) {
@@ -134,7 +134,7 @@ class GSPatternroll {
 		blc._gsuiSVGform = svg;
 		blc.children[ 3 ].append( svg );
 		SVGs.setSVGViewbox( svg, obj.offset, obj.duration, this.#dawcore.$getBPS() );
-		blc.ondblclick = () => this.#dawcore.callAction( "openPattern", obj.pattern );
+		blc.ondblclick = () => this.#dawcore.$callAction( "openPattern", obj.pattern );
 		blc.querySelector( ".gsuiPatternroll-block-name" ).textContent = pat.name;
 	}
 }

@@ -23,15 +23,15 @@ class GSPatterns {
 			if ( DAWCoreActions.has( act ) ) {
 				const daw = this.#dawcore;
 
-				if ( act === "removePattern" && daw.isPlaying() ) {
+				if ( act === "removePattern" && daw.$isPlaying() ) {
 					const id = args[ 0 ];
 					const type = daw.$getPattern( id ).type;
 
-					if ( type === daw.getFocusedName() && id === daw.$getOpened( type ) ) {
-						daw.stop();
+					if ( type === daw.$getFocusedName() && id === daw.$getOpened( type ) ) {
+						daw.$stop();
 					}
 				}
-				daw.callAction( act, ...args );
+				daw.$callAction( act, ...args );
 			} else {
 				console.log( "GSPatterns.onchange", act, ...args );
 			}

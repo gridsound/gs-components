@@ -48,7 +48,7 @@ class GSDrums {
 
 		GSUI.$listenEvents( this.rootElement, {
 			gsuiDrumrows: {
-				change: d => { this.#dawcore.callAction( ...d.args ); },
+				change: d => { this.#dawcore.$callAction( ...d.args ); },
 				propFilter: d => { this.#setPropFilter( ...d.args ); },
 				propFilters: d => { this.#setAllPropFilters( ...d.args ); },
 				liveStopDrum: d => { this.#dawcore.$liveDrumStop( ...d.args ); },
@@ -59,7 +59,7 @@ class GSDrums {
 				change: d => {
 					const [ act, ...args ] = d.args;
 
-					this.#dawcore.callAction( act, this.#patternId, ...args );
+					this.#dawcore.$callAction( act, this.#patternId, ...args );
 				},
 			},
 			gsuiTimeline: {
@@ -76,7 +76,7 @@ class GSDrums {
 			},
 			gsuiSliderGroup: {
 				change: d => {
-					this.#dawcore.callAction( "changeDrumsProps", this.#patternId, ...d.args );
+					this.#dawcore.$callAction( "changeDrumsProps", this.#patternId, ...d.args );
 				},
 				input: d => {
 					this.#uiDrumrows.setDrumPropValue( d.args[ 0 ], d.args[ 2 ], d.args[ 3 ] );

@@ -53,7 +53,7 @@ class GSMixer {
 		this.#dawcore.$liveChangeChannel( id, prop, val );
 	}
 	#onchange( act, ...args ) {
-		this.#dawcore.callAction( act, ...args );
+		this.#dawcore.$callAction( act, ...args );
 	}
 	#onselectChan( id ) {
 		if ( this.onselectChan ) {

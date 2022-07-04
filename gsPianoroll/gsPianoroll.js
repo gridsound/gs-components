@@ -20,7 +20,7 @@ class GSPianoroll {
 		GSUI.$listenEvents( this.rootElement, {
 			gsuiPianoroll: {
 				changeKeysProps: d => {
-					this.#dawcore.callAction( "changeKeysProps", this.#patternId, ...d.args );
+					this.#dawcore.$callAction( "changeKeysProps", this.#patternId, ...d.args );
 				},
 			},
 			gsuiTimeline: {
@@ -93,15 +93,15 @@ class GSPianoroll {
 	// .........................................................................
 	#onchange( obj, ...args ) {
 		switch ( obj ) { // tmp
-			case "add": this.#dawcore.callAction( "addKey", this.#patternId, ...args ); break;
-			case "move": this.#dawcore.callAction( "moveKeys", this.#patternId, ...args ); break;
-			case "clone": this.#dawcore.callAction( "cloneSelectedKeys", this.#patternId, ...args ); break;
-			case "remove": this.#dawcore.callAction( "removeKeys", this.#patternId, ...args ); break;
-			case "cropEnd": this.#dawcore.callAction( "cropEndKeys", this.#patternId, ...args ); break;
-			case "redirect": this.#dawcore.callAction( "redirectKey", this.#patternId, ...args ); break;
-			case "selection": this.#dawcore.callAction( "selectKeys", this.#patternId, ...args ); break;
-			case "unselection": this.#dawcore.callAction( "unselectAllKeys", this.#patternId, ...args ); break;
-			case "unselectionOne": this.#dawcore.callAction( "unselectKey", this.#patternId, ...args ); break;
+			case "add": this.#dawcore.$callAction( "addKey", this.#patternId, ...args ); break;
+			case "move": this.#dawcore.$callAction( "moveKeys", this.#patternId, ...args ); break;
+			case "clone": this.#dawcore.$callAction( "cloneSelectedKeys", this.#patternId, ...args ); break;
+			case "remove": this.#dawcore.$callAction( "removeKeys", this.#patternId, ...args ); break;
+			case "cropEnd": this.#dawcore.$callAction( "cropEndKeys", this.#patternId, ...args ); break;
+			case "redirect": this.#dawcore.$callAction( "redirectKey", this.#patternId, ...args ); break;
+			case "selection": this.#dawcore.$callAction( "selectKeys", this.#patternId, ...args ); break;
+			case "unselection": this.#dawcore.$callAction( "unselectAllKeys", this.#patternId, ...args ); break;
+			case "unselectionOne": this.#dawcore.$callAction( "unselectKey", this.#patternId, ...args ); break;
 		}
 	}
 }
