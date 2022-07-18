@@ -63,17 +63,11 @@ class GSSynth {
 
 	// .........................................................................
 	loadWaves() {
-		return new Promise( resolve => {
-			const wavesJS = GSUI.$createElement( "script", { type: "text/javascript", src: "/assets/gswaPeriodicWavesList-v1.js" } );
+		return GSUI.$loadJSFile( "/assets/gswaPeriodicWavesList-v1.js" ).then( () => {
+			const waves = gswaPeriodicWaves.loadWaves( gswaPeriodicWavesList );
 
-			wavesJS.onload = () => {
-				const waves = gswaPeriodicWaves.loadWaves( gswaPeriodicWavesList );
-
-				this.rootElement.setWaveList( Array.from( waves.keys() ) );
-				waves.forEach( ( w, name ) => gsuiPeriodicWave.addWave( name, w.real, w.imag ) );
-				resolve();
-			};
-			document.head.append( wavesJS );
+			this.rootElement.setWaveList( Array.from( waves.keys() ) );
+			waves.forEach( ( w, name ) => gsuiPeriodicWave.addWave( name, w.real, w.imag ) );
 		} );
 	}
 	setDAWCore( core ) {
