@@ -7,6 +7,7 @@ class GSDAW {
 	#mixer = new GSMixer();
 	#slicer = new GSSlicer();
 	#effects = new GSEffects();
+	#library = new GSLibrary();
 	#patterns = new GSPatterns();
 	#pianoroll = new GSPianoroll();
 	#patternroll = new GSPatternroll();
@@ -75,9 +76,11 @@ class GSDAW {
 		this.#synth.setDAWCore( this.#dawcore );
 		this.#slicer.setDAWCore( this.#dawcore );
 		this.#effects.setDAWCore( this.#dawcore );
+		this.#library.setDAWCore( this.#dawcore );
 		this.#patterns.setDAWCore( this.#dawcore );
 		this.#pianoroll.setDAWCore( this.#dawcore );
 		this.#patternroll.setDAWCore( this.#dawcore );
+		this.rootElement.querySelector( ".gsuiDAW-library" ).append( this.#library.rootElement );
 		this.rootElement.querySelector( ".gsuiDAW-patterns" ).append( this.#patterns.rootElement );
 		this.#windows.window( "main" ).contentAppend( this.#patternroll.rootElement );
 		this.#windows.window( "drums" ).contentAppend( this.#drums.rootElement );
@@ -100,6 +103,7 @@ class GSDAW {
 		this.#elements.channelName.onclick = this.#onclickName.bind( this, "Rename channel", "renameChannel", "channels" );
 		this.#elements.synthChannelBtn.onclick = this.#onclickSynthChannel.bind( this );
 		this.#mixer.onselectChan = id => this.#selectChannel( id );
+		this.#library.loadSamples();
 		this.#patternroll.setSVGForms( this.#patterns.svgForms );
 		this.#pianoroll.rootElement.octaves( 1, 7 );
 		this.#drums.rootElement.setPxPerBeat( 120 );
