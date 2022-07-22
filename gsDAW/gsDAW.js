@@ -221,7 +221,7 @@ class GSDAW {
 				export: () => {
 					const dur = this.#dawcore.$getDuration() * 60 / this.#dawcore.$getBPM();
 					const intervalId = setInterval( () => {
-						GSUI.$setAttribute( this.rootElement, "exporting", this.#dawcore.ctx.currentTime / dur );
+						GSUI.$setAttribute( this.rootElement, "exporting", this.#dawcore.$getCtx().currentTime / dur );
 					}, 100 );
 
 					this.#dawcore.$compositionExportWAV().then( obj => {
