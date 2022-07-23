@@ -18,7 +18,7 @@ class GSEffects {
 
 		this.rootElement.askData = ( fxId, fxType, dataType, ...args ) => {
 			if ( fxType === "filter" && dataType === "curve" ) {
-				return this.#dawcore.$getAudioEffect( fxId )?.updateResponse?.( args[ 0 ] );
+				return this.#dawcore.$getAudioEffect( fxId )?.$updateResponse?.( args[ 0 ] );
 			}
 		};
 		GSUI.$listenEvents( this.rootElement, {

@@ -64,7 +64,7 @@ class GSSynth {
 	// .........................................................................
 	loadWaves() {
 		return GSUI.$loadJSFile( "/assets/gswaPeriodicWavesList-v1.js" ).then( () => {
-			const waves = gswaPeriodicWaves.loadWaves( gswaPeriodicWavesList );
+			const waves = gswaPeriodicWaves.$loadWaves( gswaPeriodicWavesList );
 
 			this.rootElement.setWaveList( Array.from( waves.keys() ) );
 			waves.forEach( ( w, name ) => gsuiPeriodicWave.addWave( name, w.real, w.imag ) );
