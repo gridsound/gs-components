@@ -28,7 +28,7 @@ class GSLibrary {
 		const buf = this.#buffers.get( id );
 
 		return buf
-			? Promise.resolve( buf )
+			? Promise.resolve( buf.buffer )
 			: this.#loadSample( id );
 	}
 	clear() {
