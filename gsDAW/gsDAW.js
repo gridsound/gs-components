@@ -104,6 +104,7 @@ class GSDAW {
 		this.#elements.synthChannelBtn.onclick = this.#onclickSynthChannel.bind( this );
 		this.#mixer.onselectChan = id => this.#selectChannel( id );
 		this.#library.loadSamples();
+		this.#patterns.setLibrary( this.#library );
 		this.#patternroll.setSVGForms( this.#patterns.svgForms );
 		this.#pianoroll.rootElement.octaves( 1, 7 );
 		this.#drums.rootElement.setPxPerBeat( 120 );

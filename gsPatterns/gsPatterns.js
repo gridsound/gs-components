@@ -3,6 +3,7 @@
 class GSPatterns {
 	#buffers = {};
 	#dawcore = null;
+	#gsLibrary = null;
 	#uiPatterns = null;
 	#synthsCrud = null;
 	#patternsCrud = null;
@@ -65,6 +66,9 @@ class GSPatterns {
 	// .........................................................................
 	setDAWCore( core ) {
 		this.#dawcore = core;
+	}
+	setLibrary( lib ) {
+		this.#gsLibrary = lib;
 	}
 	clear() {
 		Object.keys( this.data.patterns ).forEach( this.#deletePattern, this );
