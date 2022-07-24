@@ -9,7 +9,7 @@ class GSLibrary {
 		this.rootElement = GSUI.$createElement( "gsui-library" );
 		GSUI.$listenEvents( this.rootElement, {
 			gsuiLibrary: {
-				loadSample: d => this.#loadSample( d.args[ 0 ] ),
+				loadSample: d => this.#loadSample( d.args[ 0 ] ).then( () => this.#playSample( d.args[ 0 ] ) ),
 				playSample: d => this.#playSample( d.args[ 0 ] ),
 			},
 		} );
@@ -24,19 +24,26 @@ class GSLibrary {
 			this.rootElement.setLibrary( gsuiLibrarySamples );
 		} );
 	}
+	getSample( id ) {
+		const buf = this.#buffers.get( id );
+
+		return buf
+			? Promise.resolve( buf )
+			: this.#loadSample( id );
+	}
 	clear() {
 	}
 
 	// .........................................................................
 	#loadSample( id ) {
 		this.rootElement.loadSample( id );
-		fetch( `/samples/${ id }.wav` )
+		return fetch( `/🥁/${ id }.wav` )
 			.then( res => res.arrayBuffer() )
 			.then( arr => this.#dawcore.$getCtx().decodeAudioData( arr ) )
 			.then( buffer => {
 				this.#buffers.set( id, Object.seal( { buffer, absn: null } ) );
 				this.rootElement.readySample( id );
-				this.#playSample( id );
+				return buffer;
 			} );
 	}
 	#playSample( id ) {
