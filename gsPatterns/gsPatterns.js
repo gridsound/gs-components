@@ -37,6 +37,15 @@ class GSPatterns {
 				console.log( "GSPatterns.onchange", act, ...args );
 			}
 		};
+		GSUI.$listenEvents( uiPatterns, {
+			gsuiPatterns: {
+				libraryBufferDropped: d => {
+					this.#gsLibrary.getSample( d.args[ 0 ] ).then( buf => {
+						this.#dawcore.$callAction( "addPatternBuffer", d.args[ 0 ], buf.duration );
+					} );
+				},
+			},
+		} );
 		this.data = Object.freeze( {
 			synths: {},
 			patterns: {},
