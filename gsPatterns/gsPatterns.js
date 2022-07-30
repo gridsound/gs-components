@@ -3,7 +3,7 @@
 class GSPatterns {
 	#buffers = {};
 	#dawcore = null;
-	#gsLibrary = null;
+	#gsLibraries = null;
 	#uiPatterns = null;
 	#synthsCrud = null;
 	#patternsCrud = null;
@@ -40,8 +40,8 @@ class GSPatterns {
 		GSUI.$listenEvents( uiPatterns, {
 			gsuiPatterns: {
 				libraryBufferDropped: d => {
-					this.#gsLibrary.getSample( d.args[ 0 ] ).then( buf => {
-						this.#dawcore.$callAction( "addPatternBuffer", d.args[ 0 ], buf.duration );
+					this.#gsLibraries.getSample( ...d.args ).then( buf => {
+						this.#dawcore.$callAction( "addPatternBuffer", ...d.args, buf.duration );
 					} );
 				},
 			},
@@ -76,8 +76,8 @@ class GSPatterns {
 	setDAWCore( core ) {
 		this.#dawcore = core;
 	}
-	setLibrary( lib ) {
-		this.#gsLibrary = lib;
+	setLibraries( lib ) {
+		this.#gsLibraries = lib;
 	}
 	clear() {
 		Object.keys( this.data.patterns ).forEach( this.#deletePattern, this );
