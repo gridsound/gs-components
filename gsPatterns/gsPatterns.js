@@ -54,15 +54,15 @@ class GSPatterns {
 		this.rootElement = uiPatterns;
 		this.svgForms = svgForms;
 		this.#uiPatterns = uiPatterns;
-		this.#synthsCrud = DAWCoreUtils.createUpdateDelete.bind( null, this.data.synths,
+		this.#synthsCrud = DAWCoreUtils.$createUpdateDelete.bind( null, this.data.synths,
 			this.#createSynth.bind( this ),
 			this.#updateSynth.bind( this ),
 			this.#deleteSynth.bind( this ) );
-		this.#patternsCrud = DAWCoreUtils.createUpdateDelete.bind( null, this.data.patterns,
+		this.#patternsCrud = DAWCoreUtils.$createUpdateDelete.bind( null, this.data.patterns,
 			this.#createPattern.bind( this ),
 			this.#updatePattern.bind( this ),
 			this.#deletePattern.bind( this ) );
-		this.#channelsCrud = DAWCoreUtils.createUpdateDelete.bind( null, this.data.channels,
+		this.#channelsCrud = DAWCoreUtils.$createUpdateDelete.bind( null, this.data.channels,
 			this.#createChannel.bind( this ),
 			this.#updateChannel.bind( this ),
 			this.#deleteChannel.bind( this ) );
@@ -174,7 +174,7 @@ class GSPatterns {
 
 	// .........................................................................
 	#createSynth( id, obj ) {
-		this.data.synths[ id ] = DAWCoreUtils.jsonCopy( obj );
+		this.data.synths[ id ] = DAWCoreUtils.$jsonCopy( obj );
 		this.#uiPatterns.addSynth( id );
 		this.#updateSynth( id, obj );
 	}
@@ -199,7 +199,7 @@ class GSPatterns {
 		const isBuf = obj.type === "buffer";
 		const SVG = this.svgForms[ isBuf ? "bufferHD" : obj.type ];
 
-		this.data.patterns[ id ] = DAWCoreUtils.jsonCopy( obj );
+		this.data.patterns[ id ] = DAWCoreUtils.$jsonCopy( obj );
 		SVG.add( id );
 		if ( isBuf ) {
 			const buf = this.#buffers[ obj.buffer ];
