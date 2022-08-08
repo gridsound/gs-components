@@ -3,6 +3,7 @@
 class GSLibraries {
 	rootElement = null
 	#dawcore = null;
+	#absn = null;
 	#buffers = {
 		default: new Map(),
 		local: new Map(),
@@ -36,35 +37,66 @@ class GSLibraries {
 			this.rootElement.getLibrary( "default" ).setLibrary( gsuiLibrarySamples );
 		} );
 	}
-	getSample( lib, id ) {
+	addLocalSamples( arr ) {
+		if ( arr.length > 0 ) {
+			arr.forEach( smp => {
+				if ( Array.isArray( smp ) ) {
+					this.#buffers.local.set( smp[ 0 ], Object.seal( { buffer: smp[ 1 ] } ) );
+				}
+			} );
+			this.rootElement.getLibrary( "local" ).setLibrary( arr.map( smp =>
+				Array.isArray( smp )
+					? [ smp[ 0 ], smp[ 2 ], smp[ 3 ] ]
+					: smp
+			) );
+			GSUI.$setAttribute( this.rootElement, "lib", "local" );
+		}
+	}
+	getSample( lib, idStr ) {
+		const [ id, name ] = idStr.split( ":" );
 		const buf = this.#buffers[ lib ].get( id );
 
 		return buf
 			? Promise.resolve( buf.buffer )
 			: this.#loadSample( lib, id );
 	}
+	stop() {
+		this.#absn?.stop();
+		this.rootElement.getLibrary( "local" ).stopSample();
+		this.rootElement.getLibrary( "default" ).stopSample();
+	}
 	clear() {
+		this.stop();
+		this.#buffers.default.clear();
+		this.#buffers.local.clear();
+		this.rootElement.getLibrary( "local" ).clear();
 	}
 
 	// .........................................................................
 	#loadSample( lib, id ) {
-		this.rootElement.getLibrary( lib ).loadSample( id );
-		return fetch( `/🥁/${ id }.wav` )
-			.then( res => res.arrayBuffer() )
-			.then( arr => this.#dawcore.$getCtx().decodeAudioData( arr ) )
-			.then( buffer => {
-				this.#buffers.default.set( id, Object.seal( { buffer, absn: null } ) );
-				this.rootElement.getLibrary( lib ).readySample( id );
-				return buffer;
-			} );
+		switch ( lib ) {
+			case "local":
+				this.rootElement.getLibrary( "local" ).readySample( id );
+				return Promise.resolve();
+			case "default":
+				this.rootElement.getLibrary( "default" ).loadSample( id );
+				return fetch( `/🥁/${ id }.wav` )
+					.then( res => res.arrayBuffer() )
+					.then( arr => this.#dawcore.$getCtx().decodeAudioData( arr ) )
+					.then( buffer => {
+						this.#buffers.default.set( id, Object.seal( { buffer } ) );
+						this.rootElement.getLibrary( "default" ).readySample( id );
+						return buffer;
+					} );
+		}
 	}
 	#playSample( lib, id ) {
 		const obj = this.#buffers[ lib ].get( id );
 		const ctx = this.#dawcore.$getCtx();
 		const absn = ctx.createBufferSource();
 
-		obj.absn?.stop();
-		obj.absn = absn;
+		this.#absn?.stop();
+		this.#absn = absn;
 		absn.buffer = obj.buffer;
 		absn.connect( this.#dawcore.$getAudioDestination() );
 		absn.start();
