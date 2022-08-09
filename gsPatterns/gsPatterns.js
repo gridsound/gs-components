@@ -40,8 +40,15 @@ class GSPatterns {
 		GSUI.$listenEvents( uiPatterns, {
 			gsuiPatterns: {
 				libraryBufferDropped: d => {
-					this.#gsLibraries.getSample( ...d.args ).then( buf => {
-						this.#dawcore.$callAction( "addPatternBuffer", ...d.args, buf.duration );
+					const [ lib, bufURL ] = d.args;
+
+					this.#gsLibraries.getSample( lib, bufURL ).then( buf => {
+						const obj = this.#dawcore.$callAction( "addPatternBuffer", lib, bufURL, buf );
+						const buf2 = obj && Object.entries( obj.buffers )[ 0 ];
+
+						if ( buf2 ) {
+							this.#dawcore.$callCallback( "buffersLoaded", { [ buf2[ 0 ] ]: { ...buf2[ 1 ], buffer: buf } } );
+						}
 					} );
 				},
 			},
