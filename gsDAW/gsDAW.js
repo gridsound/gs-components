@@ -30,6 +30,7 @@ class GSDAW {
 		[ true,  false, "Z", () => this.#dawcore.$historyRedo() ],
 		[ false, false, " ", () => this.#dawcore.$isPlaying() ? this.#dawcore.$stop() : this.#dawcore.$play() ],
 	];
+	static #audioMIMEs = [ "audio/wav", "audio/wave", "audio/flac", "audio/webm", "audio/ogg", "audio/mpeg", "audio/mp3", "audio/mp4" ];
 	static #dropExtensions = { gs: true, txt: true, json: true };
 
 	constructor() {
@@ -273,6 +274,7 @@ class GSDAW {
 				play: () => this.#dawcore.$togglePlay(),
 				stop: () => {
 					this.#dawcore.$stop();
+					this.#libraries.stop();
 					switch ( document.activeElement ) {
 						case this.#pianoroll.rootElement: this.#dawcore.$focusOn( "keys", "-f" ); break;
 						case this.#drums.rootElement: this.#dawcore.$focusOn( "drums", "-f" ); break;
@@ -503,15 +505,40 @@ class GSDAW {
 		}
 	}
 	#ondrop( e ) {
-		const files = Array.from( e.dataTransfer.files );
-		const cmpFile = files.find( f => f.name.split( "." ).pop().toLowerCase() in GSDAW.#dropExtensions );
+		const promFiles = GSUI.$getFilesDataTransfert( e.dataTransfer.items );
 
 		e.preventDefault();
+		promFiles.then( files => GSDAW.#getBuffersDropped( this.#dawcore.$getCtx(), files ) )
+			.then( arr => ( this.#libraries.addLocalSamples( arr ), promFiles ) )
+			.then( files => GSDAW.#findCompositionFile( this.#dawcore, files ) );
+	}
+	static #getBuffersDropped( ctx, files ) {
+		let currFold;
+
+		return Promise.all( files
+			.filter( file => GSDAW.#audioMIMEs.includes( file.type ) )
+			.reduce( ( arr, file ) => {
+				const path = file.filepath.split( "/" );
+				const fold = ( path.pop(), path.pop() ) || "";
+				const prom = DAWCoreUtils.$getFileContent( file, "array" )
+					.then( arr => [ DAWCoreUtils.$hashBufferV1( new Uint8Array( arr ) ), arr, file.name ] ) // 1.
+					.then( ( [ hash, arr, name ] ) => ctx.decodeAudioData( arr ).then( buf => [ hash, buf, name ] ) )
+					.then( ( [ hash, buf, name ] ) => [ hash, buf, gsuiWaveform.getPointsFromBuffer( 40, 10, buf ), name ] );
+
+				if ( fold !== currFold ) {
+					currFold = fold;
+					arr.push( fold );
+				}
+				arr.push( prom );
+				return arr;
+			}, [] ) );
+	}
+	static #findCompositionFile( daw, files ) {
+		const cmpFile = files.find( f => f.name.split( "." ).pop().toLowerCase() in GSDAW.#dropExtensions );
+
 		if ( cmpFile ) {
-			this.#dawcore.$addCompositionByBlob( cmpFile )
-				.then( cmp => this.#dawcore.$openComposition( "local", cmp.id ) );
-		} else {
-			this.#dawcore.$dropAudioFiles( files );
+			daw.$addCompositionByBlob( cmpFile )
+				.then( cmp => daw.$openComposition( "local", cmp.id ) );
 		}
 	}
 	#oncmpDrop( saveMode, id ) {
@@ -614,6 +641,7 @@ class GSDAW {
 		this.#elements.synthName.textContent =
 		this.#elements.pianorollName.textContent = "";
 		this.#patterns.clear();
+		this.#libraries.clear();
 	}
 	#oncmpChanged( obj, prevObj ) {
 		console.log( "change", obj );
