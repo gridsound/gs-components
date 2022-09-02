@@ -1,7 +1,6 @@
 "use strict";
 
 class GSPatterns {
-	#buffers = {};
 	#dawcore = null;
 	#gsLibraries = null;
 	#uiPatterns = null;
@@ -41,15 +40,17 @@ class GSPatterns {
 			gsuiPatterns: {
 				libraryBufferDropped: d => {
 					const [ lib, bufURL ] = d.args;
+					const [ hash, name ] = bufURL.split( ":" );
 
-					this.#gsLibraries.getSample( lib, bufURL ).then( buf => {
-						const obj = this.#dawcore.$callAction( "addPatternBuffer", lib, bufURL, buf );
-						const buf2 = obj && Object.entries( obj.buffers )[ 0 ];
+					this.#dawcore.$buffersGetAudioBuffer( hash )
+						.then( buf => {
+							const obj = this.#dawcore.$callAction( "addPatternBuffer", lib, bufURL, buf );
+							const buf2 = obj && Object.entries( obj.buffers )[ 0 ];
 
-						if ( buf2 ) {
-							this.#dawcore.$callCallback( "buffersLoaded", { [ buf2[ 0 ] ]: { ...buf2[ 1 ], buffer: buf } } );
-						}
-					} );
+							if ( buf2 ) {
+								this.#dawcore.$callCallback( "buffersLoaded", buf2[ 0 ], { ...buf2[ 1 ], buffer: buf } );
+							}
+						} );
 				},
 			},
 		} );
@@ -89,26 +90,22 @@ class GSPatterns {
 	clear() {
 		Object.keys( this.data.patterns ).forEach( this.#deletePattern, this );
 		Object.keys( this.data.synths ).forEach( this.#deleteSynth, this );
-		Object.keys( this.#buffers ).forEach( id => delete this.#buffers[ id ] );
 		this.svgForms.keys.empty();
 		this.svgForms.drums.empty();
 		this.svgForms.slices.empty();
 		this.svgForms.buffer.empty();
 		this.svgForms.bufferHD.empty();
 	}
-	bufferLoaded( buffers ) {
+	bufferLoaded( id, buf ) {
 		const pats = Object.entries( this.#dawcore.$getPatterns() );
 		const bufToPat = pats.reduce( ( map, [ id, pat ] ) => {
 			map[ pat.buffer ] = id;
 			return map;
 		}, {} );
 
-		Object.entries( buffers ).forEach( ( [ idBuf, buf ] ) => {
-			this.#buffers[ idBuf ] = buf;
-			this.svgForms.buffer.update( bufToPat[ idBuf ], buf.buffer );
-			this.svgForms.bufferHD.update( bufToPat[ idBuf ], buf.buffer );
-			this.#uiPatterns.changePattern( bufToPat[ idBuf ], "data-missing", false );
-		} );
+		this.svgForms.buffer.update( bufToPat[ id ], buf );
+		this.svgForms.bufferHD.update( bufToPat[ id ], buf );
+		this.#uiPatterns.changePattern( bufToPat[ id ], "data-missing", false );
 	}
 	change( obj ) {
 		this.#synthsCrud( obj.synths );
@@ -165,11 +162,11 @@ class GSPatterns {
 					this.svgForms.drums.update( id, daw.$getDrums( pat.drums ), daw.$getDrumrows(), dur, daw.$getStepsPerBeat() );
 					break;
 				case "buffer": {
-					const buf = this.#buffers[ pat.buffer ];
+					const buf = this.#dawcore.$getAudioBuffer( pat.buffer );
 
 					if ( buf ) {
-						this.svgForms.buffer.update( id, buf.buffer );
-						this.svgForms.bufferHD.update( id, buf.buffer );
+						this.svgForms.buffer.update( id, buf );
+						this.svgForms.bufferHD.update( id, buf );
 					}
 				} break;
 			}
@@ -204,23 +201,22 @@ class GSPatterns {
 	// .........................................................................
 	#createPattern( id, obj ) {
 		const isBuf = obj.type === "buffer";
+		const buf = isBuf && this.#dawcore.$getAudioBuffer( obj.buffer );
 		const SVG = this.svgForms[ isBuf ? "bufferHD" : obj.type ];
 
 		this.data.patterns[ id ] = DAWCoreUtils.$jsonCopy( obj );
 		SVG.add( id );
 		if ( isBuf ) {
-			const buf = this.#buffers[ obj.buffer ];
-
 			this.svgForms.buffer.add( id );
 			if ( buf ) {
-				this.svgForms.buffer.update( id, buf.buffer );
-				SVG.update( id, buf.buffer );
+				this.svgForms.buffer.update( id, buf );
+				SVG.update( id, buf );
 			}
 		}
 		this.#uiPatterns.addPattern( id, obj );
 		this.#updatePattern( id, obj );
 		this.#uiPatterns.appendPatternSVG( id, SVG.createSVG( id ) );
-		if ( obj.type === "buffer" ) {
+		if ( isBuf && !buf ) {
 			this.#uiPatterns.changePattern( id, "data-missing", true );
 		}
 	}
@@ -242,7 +238,6 @@ class GSPatterns {
 		this.svgForms[ pat.type ].delete( id );
 		if ( pat.type === "buffer" ) {
 			this.svgForms.bufferHD.delete( id );
-			delete this.#buffers[ pat.buffer ];
 		}
 		this.#uiPatterns.deletePattern( id );
 	}

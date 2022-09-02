@@ -129,7 +129,8 @@ class GSDAW {
 			GSUI.$setAttribute( this.#controlsGetFocusedGrid( focused ), "currenttime", beat );
 			GSUI.$setAttribute( this.rootElement, "currenttime", beat );
 		};
-		this.#dawcore.cb.buffersLoaded = this.#onpatternsBuffersLoaded.bind( this );
+		this.#dawcore.cb.buffersLoaded = ( id, objBuf ) => this.#onpatternsBuffersLoaded( id, objBuf );
+		this.#dawcore.cb.buffersDropped = files => this.#libraries.addLocalSamples( files );
 		this.#dawcore.cb.compositionAdded = cmp => this.rootElement.addComposition( cmp );
 		this.#dawcore.cb.compositionOpened = cmp => {
 			GSUI.$setAttribute( this.rootElement, "currentcomposition", `${ cmp.options.saveMode }:${ cmp.id }` );
@@ -505,41 +506,8 @@ class GSDAW {
 		}
 	}
 	#ondrop( e ) {
-		const promFiles = GSUI.$getFilesDataTransfert( e.dataTransfer.items );
-
 		e.preventDefault();
-		promFiles.then( files => GSDAW.#getBuffersDropped( this.#dawcore.$getCtx(), files ) )
-			.then( arr => ( this.#libraries.addLocalSamples( arr ), promFiles ) )
-			.then( files => GSDAW.#findCompositionFile( this.#dawcore, files ) );
-	}
-	static #getBuffersDropped( ctx, files ) {
-		let currFold;
-
-		return Promise.all( files
-			.filter( file => GSDAW.#audioMIMEs.includes( file.type ) )
-			.reduce( ( arr, file ) => {
-				const path = file.filepath.split( "/" );
-				const fold = ( path.pop(), path.pop() ) || "";
-				const prom = DAWCoreUtils.$getFileContent( file, "array" )
-					.then( arr => [ DAWCoreUtils.$hashBufferV1( new Uint8Array( arr ) ), arr, file.name ] ) // 1.
-					.then( ( [ hash, arr, name ] ) => ctx.decodeAudioData( arr ).then( buf => [ hash, buf, name ] ) )
-					.then( ( [ hash, buf, name ] ) => [ hash, buf, gsuiWaveform.getPointsFromBuffer( 40, 10, buf ), name ] );
-
-				if ( fold !== currFold ) {
-					currFold = fold;
-					arr.push( fold );
-				}
-				arr.push( prom );
-				return arr;
-			}, [] ) );
-	}
-	static #findCompositionFile( daw, files ) {
-		const cmpFile = files.find( f => f.name.split( "." ).pop().toLowerCase() in GSDAW.#dropExtensions );
-
-		if ( cmpFile ) {
-			daw.$addCompositionByBlob( cmpFile )
-				.then( cmp => daw.$openComposition( "local", cmp.id ) );
-		}
+		this.#dawcore.$dropFiles( GSUI.$getFilesDataTransfert( e.dataTransfer.items ) );
 	}
 	#oncmpDrop( saveMode, id ) {
 		const to = saveMode === "local" ? "cloud" : "local";
@@ -785,19 +753,19 @@ class GSDAW {
 			}
 		}
 	}
-	#onpatternsBuffersLoaded( buffers ) {
+	#onpatternsBuffersLoaded( id, objBuf ) {
 		const patSli = this.#dawcore.$getPattern( this.#dawcore.$getOpened( "slices" ) );
 		const sliBuf = patSli?.source && this.#dawcore.$getPattern( patSli.source ).buffer;
 
-		if ( sliBuf in buffers ) {
-			this.#slicer.rootElement.setBuffer( buffers[ sliBuf ].buffer );
+		if ( sliBuf === id ) {
+			this.#slicer.rootElement.setBuffer( objBuf.buffer );
 		}
-		this.#patterns.bufferLoaded( buffers );
+		this.#patterns.bufferLoaded( id, objBuf.buffer );
 		this.#patternroll.rootElement.getBlocks().forEach( ( elBlc, blcId ) => {
 			const blc = this.#dawcore.$getBlock( blcId );
 			const pat = this.#dawcore.$getPattern( blc.pattern );
 
-			if ( pat.type === "buffer" && pat.buffer in buffers ) {
+			if ( pat.type === "buffer" && pat.buffer === id ) {
 				const bpm = pat.bufferBpm || this.#dawcore.$getBPM();
 
 				GSUI.$setAttribute( elBlc, "data-missing", false );
