@@ -596,6 +596,7 @@ class GSDAW {
 			duration: cmp.duration,
 		}, {} );
 		GSUI.$setAttribute( this.rootElement, "currentcomposition", false );
+		GSUI.$setAttribute( this.#libraries.rootElement, "lib", "default" );
 		this.#effects.clear();
 		this.#synth.clear();
 		this.#mixer.clear();
