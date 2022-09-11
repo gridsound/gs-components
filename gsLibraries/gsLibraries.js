@@ -47,11 +47,12 @@ class GSLibraries {
 		}
 	}
 	stop() {
-		this.rootElement.getLibrary( "local" ).stopSample();
 		this.rootElement.getLibrary( "default" ).stopSample();
+		this.rootElement.getLibrary( "local" ).stopSample();
 	}
 	clear() {
 		this.stop();
+		this.rootElement.getLibrary( "default" ).unloadSamples();
 		this.rootElement.getLibrary( "local" ).clear();
 	}
 
