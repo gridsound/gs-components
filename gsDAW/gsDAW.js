@@ -240,7 +240,7 @@ class GSDAW {
 				tempo: d => {
 					const o = d.args[ 0 ];
 
-					this.#dawcore.$callAction( "changeTempo", o.bpm, o.beatsPerMeasure, o.stepsPerBeat );
+					this.#dawcore.$callAction( "changeTempo", o.bpm, o.timedivision );
 				},
 				logout: () => {
 					GSUI.$setAttribute( this.rootElement, "logging", true );
@@ -612,7 +612,7 @@ class GSDAW {
 		this.#patterns.clear();
 		this.#libraries.clear();
 	}
-	#oncmpChanged( obj, prevObj ) {
+	#oncmpChanged( obj ) {
 		console.log( "change", obj );
 		this.#patterns.change( obj );
 		this.#synth.change( obj );
@@ -622,14 +622,14 @@ class GSDAW {
 		this.#slicer.change( obj );
 		this.#pianoroll.change( obj );
 		this.#patternroll.change( obj );
-		GSDAW.#cmpChangedFns.forEach( ( fn, attrs ) => {
-			if ( attrs.some( attr => attr in obj ) ) {
-				fn.call( this, obj, prevObj );
+		GSDAW.#cmpChangedFns.forEach( ( fn, prop ) => {
+			if ( prop in obj ) {
+				fn.call( this, obj );
 			}
 		} );
 	}
 	static #cmpChangedFns = new Map( [
-		[ [ "channels" ], function( obj ) {
+		[ "channels", function( obj ) {
 			const synOpenedChan = obj.channels[ this.#dawcore.$getSynth( this.#dawcore.$getOpened( "synth" ) ).dest ];
 			const mixerSelectedChan = obj.channels[ this.#effects.getDestFilter() ];
 
@@ -640,7 +640,7 @@ class GSDAW {
 				this.#elements.channelName.textContent = mixerSelectedChan.name;
 			}
 		} ],
-		[ [ "synths" ], function( obj ) {
+		[ "synths", function( obj ) {
 			const synOpened = obj.synths[ this.#dawcore.$getOpened( "synth" ) ];
 
 			if ( synOpened ) {
@@ -652,28 +652,28 @@ class GSDAW {
 				}
 			}
 		} ],
-		[ [ "patterns" ], function( obj ) {
+		[ "patterns", function( obj ) {
 			Object.entries( obj.patterns ).forEach( kv => this.#onupdatePattern( ...kv ) );
 		} ],
-		[ [ "beatsPerMeasure", "stepsPerBeat" ], function() {
-			GSUI.$setAttribute( this.rootElement, "timedivision", `${ this.#dawcore.$getBeatsPerMeasure() }/${ this.#dawcore.$getStepsPerBeat() }` );
+		[ "timedivision", function( obj ) {
+			GSUI.$setAttribute( this.rootElement, "timedivision", obj.timedivision );
 		} ],
-		[ [ "bpm" ], function( { bpm } ) {
+		[ "bpm", function( { bpm } ) {
 			GSUI.$setAttribute( this.rootElement, "bpm", bpm );
 			this.rootElement.updateComposition( this.#dawcore.$getCmp() );
 		} ],
-		[ [ "name" ], function( { name } ) {
+		[ "name", function( { name } ) {
 			this.#setTitle( name );
 			this.rootElement.updateComposition( this.#dawcore.$getCmp() );
 			GSUI.$setAttribute( this.rootElement, "name", name );
 		} ],
-		[ [ "duration" ], function( { duration } ) {
+		[ "duration", function( { duration } ) {
 			if ( this.#dawcore.$getFocusedName() === "composition" ) {
 				GSUI.$setAttribute( this.rootElement, "duration", duration );
 			}
 			this.rootElement.updateComposition( this.#dawcore.$getCmp() );
 		} ],
-		[ [ "patternSlicesOpened" ], function( obj ) {
+		[ "patternSlicesOpened", function( obj ) {
 			if ( obj.patternSlicesOpened ) {
 				const pat = this.#dawcore.$getPattern( obj.patternSlicesOpened );
 
@@ -686,7 +686,7 @@ class GSDAW {
 				this.#elements.slicesName.textContent = "";
 			}
 		} ],
-		[ [ "patternDrumsOpened" ], function( obj ) {
+		[ "patternDrumsOpened", function( obj ) {
 			if ( obj.patternDrumsOpened ) {
 				const pat = this.#dawcore.$getPattern( obj.patternDrumsOpened );
 
@@ -699,7 +699,7 @@ class GSDAW {
 				this.#elements.drumsName.textContent = "";
 			}
 		} ],
-		[ [ "synthOpened" ], function( obj ) {
+		[ "synthOpened", function( obj ) {
 			if ( obj.synthOpened ) {
 				const syn = this.#dawcore.$getSynth( obj.synthOpened );
 
@@ -711,7 +711,7 @@ class GSDAW {
 				this.#elements.synthChannelBtnText.textContent = "";
 			}
 		} ],
-		[ [ "patternKeysOpened" ], function( { patternKeysOpened } ) {
+		[ "patternKeysOpened", function( { patternKeysOpened } ) {
 			if ( patternKeysOpened ) {
 				const pat = this.#dawcore.$getPattern( patternKeysOpened );
 

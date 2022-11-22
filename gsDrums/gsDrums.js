@@ -124,11 +124,8 @@ class GSDrums {
 		if ( obj.drumrows ) {
 			this.rootElement.drumrows.reorderDrumrows( obj.drumrows );
 		}
-		if ( "beatsPerMeasure" in obj || "stepsPerBeat" in obj ) {
-			const bPM = obj.beatsPerMeasure || this.#dawcore.$getBeatsPerMeasure();
-			const sPB = obj.stepsPerBeat || this.#dawcore.$getStepsPerBeat();
-
-			this.rootElement.timeDivision( bPM, sPB );
+		if ( "timedivision" in obj ) {
+			this.rootElement.timedivision( obj.timedivision );
 		}
 		if ( drmObj ) {
 			this.#dataDrums.change( drmObj );

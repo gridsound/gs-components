@@ -67,10 +67,8 @@ class GSPianoroll {
 		}
 	}
 	change( obj ) {
-		if ( "beatsPerMeasure" in obj || "stepsPerBeat" in obj ) {
-			this.rootElement.timeDivision(
-				this.#dawcore.$getBeatsPerMeasure(),
-				this.#dawcore.$getStepsPerBeat() );
+		if ( "timedivision" in obj ) {
+			this.rootElement.timedivision( obj.timedivision );
 		}
 		if ( "patternKeysOpened" in obj ) {
 			this.selectPattern( obj.patternKeysOpened );

@@ -57,10 +57,8 @@ class GSPatternroll {
 				this.#dawcore.$getLoopA(),
 				this.#dawcore.$getLoopB() );
 		}
-		if ( "beatsPerMeasure" in obj || "stepsPerBeat" in obj ) {
-			this.rootElement.timeDivision(
-				this.#dawcore.$getBeatsPerMeasure(),
-				this.#dawcore.$getStepsPerBeat() );
+		if ( "timedivision" in obj ) {
+			this.rootElement.timedivision( obj.timedivision );
 		}
 		if ( "patterns" in obj ) {
 			Object.entries( obj.patterns ).forEach( ( [ id, pat ] ) => {

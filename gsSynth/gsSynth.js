@@ -86,9 +86,9 @@ class GSSynth {
 		const daw = this.#dawcore;
 		const synObj = obj.synths && obj.synths[ this.#synthId ];
 
-		if ( "beatsPerMeasure" in obj || "stepsPerBeat" in obj ) {
-			GSUI.$setAttribute( this.rootElement.env, "timedivision", `${ daw.$getBeatsPerMeasure() }/${ daw.$getStepsPerBeat() }` );
-			GSUI.$setAttribute( this.rootElement.lfo, "timedivision", `${ daw.$getBeatsPerMeasure() }/${ daw.$getStepsPerBeat() }` );
+		if ( obj.timedivision ) {
+			GSUI.$setAttribute( this.rootElement.env, "timedivision", obj.timedivision );
+			GSUI.$setAttribute( this.rootElement.lfo, "timedivision", obj.timedivision );
 		}
 		if ( synObj ) {
 			this.#dataSynth.change( synObj );
