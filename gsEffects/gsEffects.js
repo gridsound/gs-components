@@ -6,6 +6,7 @@ class GSEffects {
 	rootElement = new gsuiEffects();
 	#ctrlEffects = new DAWCoreControllers.effects( {
 		dataCallbacks: {
+			changeTimedivision: timediv => GSUI.$setAttribute( this.rootElement, "timedivision", timediv ),
 			addEffect: ( id, obj ) => this.rootElement.addEffect( id, obj ),
 			removeEffect: id => this.rootElement.removeEffect( id ),
 			changeEffect: ( id, prop, val ) => this.rootElement.changeEffect( id, prop, val ),
