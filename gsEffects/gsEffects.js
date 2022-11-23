@@ -7,9 +7,9 @@ class GSEffects {
 	#ctrlEffects = new DAWCoreControllers.effects( {
 		dataCallbacks: {
 			changeTimedivision: timediv => GSUI.$setAttribute( this.rootElement, "timedivision", timediv ),
-			addEffect: ( id, obj ) => this.rootElement.addEffect( id, obj ),
-			removeEffect: id => this.rootElement.removeEffect( id ),
-			changeEffect: ( id, prop, val ) => this.rootElement.changeEffect( id, prop, val ),
+			addEffect: ( id, obj ) => this.rootElement.$addEffect( id, obj ),
+			removeEffect: id => this.rootElement.$removeEffect( id ),
+			changeEffect: ( id, prop, val ) => this.rootElement.$changeEffect( id, prop, val ),
 			changeEffectData: ( id, obj ) => this.#changeEffectData( id, obj ),
 		},
 	} );
@@ -17,7 +17,7 @@ class GSEffects {
 	constructor() {
 		Object.seal( this );
 
-		this.rootElement.askData = ( fxId, fxType, dataType, ...args ) => {
+		this.rootElement.$askData = ( fxId, fxType, dataType, ...args ) => {
 			if ( fxType === "filter" && dataType === "curve" ) {
 				return this.#dawcore.$getAudioEffect( fxId )?.$updateResponse?.( args[ 0 ] );
 			}
@@ -52,7 +52,7 @@ class GSEffects {
 	change( obj ) {
 		this.#ctrlEffects.change( obj );
 		if ( obj.effects ) {
-			this.rootElement.reorderEffects( obj.effects );
+			this.rootElement.$reorderEffects( obj.effects );
 		}
 	}
 	clear() {
@@ -61,12 +61,10 @@ class GSEffects {
 
 	// .........................................................................
 	#changeEffectData( id, obj ) {
-		const uiFx = this.rootElement.getFxHTML( id ).uiFx;
+		const uiFx = this.rootElement.$getFxHTML( id ).uiFx;
 
 		Object.entries( obj ).forEach( kv => GSUI.$setAttribute( uiFx, ...kv ) );
-		if ( uiFx.updateWave ) {
-			uiFx.updateWave();
-		}
+		uiFx.$updateWave?.();
 	}
 }
 
