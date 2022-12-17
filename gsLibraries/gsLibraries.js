@@ -55,6 +55,10 @@ class GSLibraries {
 		this.rootElement.getLibrary( "default" ).unloadSamples();
 		this.rootElement.getLibrary( "local" ).clear();
 	}
+	$bookmarkBuffer( bufHash, b ) {
+		this.rootElement.getLibrary( "default" ).bookmarkSample( bufHash, b );
+		this.rootElement.getLibrary( "local" ).bookmarkSample( bufHash, b );
+	}
 
 	// .........................................................................
 	#loadSample( lib, id ) {
