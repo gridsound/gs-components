@@ -207,11 +207,16 @@ class GSPatterns {
 		this.data.patterns[ id ] = DAWCoreUtils.$jsonCopy( obj );
 		SVG.add( id );
 		if ( isBuf ) {
+			const objBuf = this.#dawcore.$getBuffer( obj.buffer );
+			const bufHash = objBuf.url || objBuf.hash;
+
 			this.svgForms.buffer.add( id );
 			if ( buf ) {
 				this.svgForms.buffer.update( id, buf );
 				SVG.update( id, buf );
 			}
+			this.data.patterns[ id ].bufferHash = bufHash;
+			this.#gsLibraries.$bookmarkBuffer( bufHash, true );
 		}
 		this.#uiPatterns.addPattern( id, obj );
 		this.#updatePattern( id, obj );
@@ -238,6 +243,7 @@ class GSPatterns {
 		this.svgForms[ pat.type ].delete( id );
 		if ( pat.type === "buffer" ) {
 			this.svgForms.bufferHD.delete( id );
+			this.#gsLibraries.$bookmarkBuffer( pat.bufferHash, false );
 		}
 		this.#uiPatterns.deletePattern( id );
 	}
