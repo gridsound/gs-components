@@ -11,6 +11,7 @@ class GSDAW {
 	#patterns = new GSPatterns();
 	#pianoroll = new GSPianoroll();
 	#patternroll = new GSPatternroll();
+	#midiControllersManager = null;
 	#windows = GSUI.$createElement( "gsui-windows" );
 	rootElement = GSUI.$createElement( "gsui-daw", {
 		"oki-cookies": document.cookie.indexOf( "cookieAccepted" ) > -1,
@@ -38,6 +39,7 @@ class GSDAW {
 		this.#initHTML();
 		this.#initWindowsHTML();
 		this.#initWindows();
+		this.#initMIDIAccess();
 		this.#initComponents();
 		this.#initEvents();
 		this.#authGetMe();
@@ -773,6 +775,33 @@ class GSDAW {
 				this.#patterns.svgForms.buffer.setSVGViewbox( elBlc._gsuiSVGform, blc.offset, blc.duration, bpm / 60 );
 			}
 		} );
+	}
+	#initMIDIAccess() {
+		navigator.requestMIDIAccess({ sysex: true })
+				 .then(( midiAccess ) => { onMIDISuccess( midiAccess, true )},
+				 ( msg ) => { onMIDIFailure( msg, true )});
+
+		const onMIDISuccess = ( midiAccess, sysex = false ) => {
+			console.log( "GSLogs: MIDI access is available" );
+			if ( sysex == false ) {
+				console.log( "GSLogs: Sysex is not allowed. Some features of your devices may be disabled." );
+			}
+			this.#midiControllersManager = new gswaMIDIControllersManager( midiAccess );
+			this.#midiControllersManager.$setDAWCore( this.#dawcore );
+			this.#midiControllersManager.$setPianorollKeys( this.#pianoroll.getUIKeys() );
+			console.log( "GSLogs: MidiDevicesManager created" );
+		};
+
+		const onMIDIFailure = ( msg, sysex = false ) => {
+			if ( sysex == true ) {
+				console.log( "GSLogs: Failed to get MIDI access with Sysex commands enabled: " + msg );
+				console.log( "GSLogs: Trying without Sysex commands enabled." );
+				navigator.requestMIDIAccess().then( onMIDISuccess, onMIDIFailure )
+			} else {
+				console.log( "GSLogs: Failed to get MIDI access - " + msg );
+				console.log( "GSLogs: MIDI devices are disabled" );
+			}
+		};
 	}
 }
 
