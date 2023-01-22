@@ -12,7 +12,7 @@ class GSDAW {
 	#pianoroll = new GSPianoroll();
 	#patternroll = new GSPatternroll();
 	#midiControllersManager = new gswaMIDIControllersManager();
-	#windows = GSUI.$createElement( "gsui-windows" );
+	#windows = null;
 	rootElement = GSUI.$createElement( "gsui-daw", {
 		"oki-cookies": document.cookie.indexOf( "cookieAccepted" ) > -1,
 		version: "0.0.0",
@@ -59,7 +59,7 @@ class GSDAW {
 			GSUI.$getTemplate( "gsui-daw-window-slicer" ),
 			GSUI.$getTemplate( "gsui-daw-window-effects" ),
 		);
-		this.rootElement.querySelector( ".gsuiDAW-windows" ).append( this.#windows );
+		this.#windows = this.rootElement.querySelector( "gsui-windows" );
 		this.#dawcore.$setLoopRate( +localStorage.getItem( "uiRefreshRate" ) || 60 );
 		this.#windows.lowGraphics( !!+( localStorage.getItem( "gsuiWindows.lowGraphics" ) || "0" ) );
 		GSUI.$setAttribute( this.rootElement.clock, "mode", localStorage.getItem( "gsuiClock.display" ) || "second" );
