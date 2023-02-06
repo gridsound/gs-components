@@ -6,7 +6,6 @@ class GSDAW {
 	#drums = new GSDrums();
 	#mixer = new GSMixer();
 	#slicer = new GSSlicer();
-	#effects = new GSEffects();
 	#libraries = new GSLibraries();
 	#patterns = new GSPatterns();
 	#pianoroll = new GSPianoroll();
@@ -57,7 +56,6 @@ class GSDAW {
 			GSUI.$getTemplate( "gsui-daw-window-synth" ),
 			GSUI.$getTemplate( "gsui-daw-window-mixer" ),
 			GSUI.$getTemplate( "gsui-daw-window-slicer" ),
-			GSUI.$getTemplate( "gsui-daw-window-effects" ),
 		);
 		this.#windows = this.rootElement.querySelector( "gsui-windows" );
 		this.#dawcore.$setLoopRate( +localStorage.getItem( "uiRefreshRate" ) || 60 );
@@ -69,7 +67,6 @@ class GSDAW {
 			drumsName: "[data-target=drums]",
 			synthName: "[data-target=synth]",
 			slicesName: "[data-target=slices]",
-			channelName: "[data-target=channel]",
 			pianorollName: "[data-target=pianoroll]",
 			synthChannelBtn: "[data-target=synthChannel]",
 			synthChannelBtnText: "[data-target=synthChannel] span",
@@ -80,7 +77,6 @@ class GSDAW {
 		this.#mixer.setDAWCore( this.#dawcore );
 		this.#synth.setDAWCore( this.#dawcore );
 		this.#slicer.setDAWCore( this.#dawcore );
-		this.#effects.setDAWCore( this.#dawcore );
 		this.#patterns.setDAWCore( this.#dawcore );
 		this.#libraries.setDAWCore( this.#dawcore );
 		this.#pianoroll.setDAWCore( this.#dawcore );
@@ -92,7 +88,6 @@ class GSDAW {
 		this.#windows.window( "mixer" ).contentAppend( this.#mixer.rootElement );
 		this.#windows.window( "piano" ).contentAppend( this.#pianoroll.rootElement );
 		this.#windows.window( "slicer" ).contentAppend( this.#slicer.rootElement );
-		this.#windows.window( "effects" ).contentAppend( this.#effects.rootElement );
 		this.#drums.rootElement.onfocus = () => this.#dawcore.$focusOn( "drums" );
 		this.#slicer.rootElement.onfocus = () => this.#dawcore.$focusOn( "slices" );
 		this.#pianoroll.rootElement.onfocus = () => this.#dawcore.$focusOn( "keys" );
@@ -105,9 +100,7 @@ class GSDAW {
 		this.#elements.drumsName.onclick = this.#onclickName.bind( this, "Rename pattern", "renamePattern", "drums" );
 		this.#elements.slicesName.onclick = this.#onclickName.bind( this, "Rename pattern", "renamePattern", "slices" );
 		this.#elements.pianorollName.onclick = this.#onclickName.bind( this, "Rename pattern", "renamePattern", "keys" );
-		this.#elements.channelName.onclick = this.#onclickName.bind( this, "Rename channel", "renameChannel", "channels" );
 		this.#elements.synthChannelBtn.onclick = this.#onclickSynthChannel.bind( this );
-		this.#mixer.onselectChan = id => this.#selectChannel( id );
 		this.#libraries.loadDefaultLibrary();
 		this.#patterns.setLibraries( this.#libraries );
 		this.#patternroll.setSVGForms( this.#patterns.svgForms );
@@ -139,7 +132,6 @@ class GSDAW {
 		this.#dawcore.cb.compositionOpened = cmp => {
 			GSUI.$setAttribute( this.rootElement, "currentcomposition", `${ cmp.options.saveMode }:${ cmp.id }` );
 			this.#patterns.rootElement.expandSynth( cmp.synthOpened, true );
-			this.#selectChannel( "main" );
 			this.#setTitle( cmp.name );
 		};
 		this.#dawcore.cb.compositionClosed = this.#oncmpClosed.bind( this );
@@ -316,13 +308,12 @@ class GSDAW {
 				case "slicer": this.#dawcore.$callAction( "closePattern", "slices" ); break;
 			}
 		};
-		this.#initWindowsPos( "mixer",    20,  20, 266, 200, 400, 300, "mixer",       "mixer" );
-		this.#initWindowsPos( "main",    440,  20, 380, 180, 600, 360, "music",       "composition" );
-		this.#initWindowsPos( "synth",    20, 340, 340, 220, 400, 460, "oscillator",  "synth" );
-		this.#initWindowsPos( "piano",   440, 400, 380, 180, 600, 400, "keys",        "pianoroll" );
+		this.#initWindowsPos( "mixer",    20,  20, 266, 200, 460, 300, "mixer",       "mixer" );
+		this.#initWindowsPos( "main",    500,  20, 380, 180, 600, 360, "music",       "composition" );
+		this.#initWindowsPos( "synth",    20, 340, 340, 220, 460, 460, "oscillator",  "synth" );
+		this.#initWindowsPos( "piano",   500, 400, 380, 180, 600, 400, "keys",        "pianoroll" );
 		this.#initWindowsPos( "drums",    70, 450, 380, 180, 900, 400, "drums",       "drums" );
 		this.#initWindowsPos( "slicer",  160, 140, 306, 250, 420, 360, "slices",      "slicer" );
-		this.#initWindowsPos( "effects", 140, 120, 230, 180, 420, 360, "effects",     "effects" );
 	}
 	#initWindowsPos( winId, x, y, wmin, hmin, w, h, icon, title ) {
 		const win = this.#windows.window( winId );
@@ -492,9 +483,7 @@ class GSDAW {
 		}
 	}
 	#onclickName( title, action, area, e ) {
-		const id = area === "channels"
-			? this.#mixer.getSelectedChannelId()
-			: this.#dawcore.$getOpened( area );
+		const id = this.#dawcore.$getOpened( area );
 
 		if ( id ) {
 			GSUI.$popup.prompt( title, "", e.currentTarget.textContent, "Rename" )
@@ -587,10 +576,6 @@ class GSDAW {
 
 		document.title = this.#dawcore.$compositionNeedSave() ? `*${ name }` : name;
 	}
-	#selectChannel( id ) {
-		this.#elements.channelName.textContent = this.#dawcore.$getChannel( id ).name;
-		this.#effects.setDestFilter( id );
-	}
 
 	// .........................................................................
 	#oncmpClosed( cmp ) {
@@ -601,7 +586,6 @@ class GSDAW {
 		}, {} );
 		GSUI.$setAttribute( this.rootElement, "currentcomposition", false );
 		GSUI.$setAttribute( this.#libraries.rootElement, "lib", "default" );
-		this.#effects.clear();
 		this.#synth.clear();
 		this.#mixer.clear();
 		this.#drums.clear();
@@ -621,7 +605,6 @@ class GSDAW {
 		this.#patterns.change( obj );
 		this.#synth.change( obj );
 		this.#drums.change( obj );
-		this.#effects.change( obj );
 		this.#mixer.change( obj );
 		this.#slicer.change( obj );
 		this.#pianoroll.change( obj );
@@ -635,13 +618,9 @@ class GSDAW {
 	static #cmpChangedFns = new Map( [
 		[ "channels", function( obj ) {
 			const synOpenedChan = obj.channels[ this.#dawcore.$getSynth( this.#dawcore.$getOpened( "synth" ) ).dest ];
-			const mixerSelectedChan = obj.channels[ this.#effects.getDestFilter() ];
 
 			if ( synOpenedChan && "name" in synOpenedChan ) {
 				this.#elements.synthChannelBtnText.textContent = synOpenedChan.name;
-			}
-			if ( mixerSelectedChan && "name" in mixerSelectedChan ) {
-				this.#elements.channelName.textContent = mixerSelectedChan.name;
 			}
 		} ],
 		[ "synths", function( obj ) {
