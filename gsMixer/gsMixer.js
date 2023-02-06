@@ -2,27 +2,57 @@
 
 class GSMixer {
 	#dawcore = null;
-	onselectChan = null;
-	rootElement = GSUI.$createElement( "gsui-channels" );
-	#ctrlMixer = new DAWCoreControllers.mixer( {
+	rootElement = GSUI.$createElement( "gsui-mixer" );
+	#channels = this.rootElement.getChannels();
+	#effects = this.rootElement.getEffects();
+	#destFilter = "main";
+	#ctrlChannels = new DAWCoreControllers.mixer( {
 		dataCallbacks: {
-			addChannel: ( id, chan ) => this.rootElement.addChannel( id, chan ),
-			removeChannel: id => this.rootElement.removeChannel( id ),
-			renameChannel: ( id, name ) => this.rootElement.renameChannel( id, name ),
-			redirectChannel: ( id, dest ) => this.rootElement.redirectChannel( id, dest ),
-			toggleChannel: ( id, b ) => this.rootElement.toggleChannel( id, b ),
-			reorderChannel: ( id, n ) => this.rootElement.reorderChannel( id, n ),
-			changePanChannel: ( id, val ) => this.rootElement.changePanChannel( id, val ),
-			changeGainChannel: ( id, val ) => this.rootElement.changeGainChannel( id, val ),
+			addChannel: ( id, chan ) => this.#channels.addChannel( id, chan ),
+			removeChannel: id => this.#channels.removeChannel( id ),
+			renameChannel: ( id, name ) => this.#channels.renameChannel( id, name ),
+			redirectChannel: ( id, dest ) => this.#channels.redirectChannel( id, dest ),
+			toggleChannel: ( id, b ) => this.#channels.toggleChannel( id, b ),
+			reorderChannel: ( id, n ) => this.#channels.reorderChannel( id, n ),
+			changePanChannel: ( id, val ) => this.#channels.changePanChannel( id, val ),
+			changeGainChannel: ( id, val ) => this.#channels.changeGainChannel( id, val ),
+		},
+	} );
+	#ctrlEffects = new DAWCoreControllers.effects( {
+		dataCallbacks: {
+			changeTimedivision: timediv => GSUI.$setAttribute( this.#effects, "timedivision", timediv ),
+			addEffect: ( id, obj ) => this.#effects.$addEffect( id, obj ),
+			removeEffect: id => this.#effects.$removeEffect( id ),
+			changeEffect: ( id, prop, val ) => this.#effects.$changeEffect( id, prop, val ),
+			changeEffectData: ( id, obj ) => this.#changeEffectData( id, obj ),
 		},
 	} );
 
 	constructor() {
 		Object.seal( this );
 
-		this.rootElement.oninput = this.#oninput.bind( this );
-		this.rootElement.onchange = this.#onchange.bind( this );
-		this.rootElement.onselectChan = this.#onselectChan.bind( this );
+		this.#channels.oninput = this.#oninput.bind( this );
+		this.#channels.onchange = this.#onchange.bind( this );
+		this.#channels.onselectChan = this.#onselectChan.bind( this );
+		this.#effects.$askData = ( fxId, fxType, dataType, ...args ) => {
+			if ( fxType === "filter" && dataType === "curve" ) {
+				return this.#dawcore.$getAudioEffect( fxId )?.$updateResponse?.( args[ 0 ] );
+			}
+		};
+		GSUI.$listenEvents( this.rootElement, {
+			gsuiEffects: {
+				liveChangeEffect: d => {
+					this.#dawcore.$liveChangeEffect( ...d.args );
+				},
+				addEffect: d => {
+					d.args.unshift( this.#destFilter );
+					this.#dawcore.$callAction( "addEffect", ...d.args );
+				},
+				default: d => {
+					this.#dawcore.$callAction( d.eventName, ...d.args );
+				},
+			},
+		} );
 	}
 
 	// .........................................................................
@@ -30,22 +60,22 @@ class GSMixer {
 		this.#dawcore = core;
 	}
 	clear() {
-		this.#ctrlMixer.clear();
+		this.#ctrlEffects.clear();
+		this.#ctrlChannels.clear();
+		this.#channels.selectChannel( "main" );
 	}
 	change( obj ) {
-		this.#ctrlMixer.change( obj );
+		this.#ctrlEffects.change( obj );
+		this.#ctrlChannels.change( obj );
+		if ( obj.effects ) {
+			this.#effects.$reorderEffects( obj.effects );
+		}
 		if ( obj.channels ) {
-			this.rootElement.reorderChannels( obj.channels );
+			this.#channels.reorderChannels( obj.channels );
 		}
 	}
 	updateAudioData( chanId, ldata, rdata ) {
-		this.rootElement.updateAudioData( chanId, ldata, rdata );
-	}
-	selectChannel( id ) {
-		this.rootElement.selectChannel( id );
-	}
-	getSelectedChannelId() {
-		return this.rootElement.getSelectedChannelId();
+		this.#channels.updateAudioData( chanId, ldata, rdata );
 	}
 
 	// .........................................................................
@@ -56,9 +86,14 @@ class GSMixer {
 		this.#dawcore.$callAction( act, ...args );
 	}
 	#onselectChan( id ) {
-		if ( this.onselectChan ) {
-			this.onselectChan( id );
-		}
+		this.#destFilter = id;
+		this.#ctrlEffects.setDestFilter( id );
+	}
+	#changeEffectData( id, obj ) {
+		const uiFx = this.#effects.$getFxHTML( id ).uiFx;
+
+		Object.entries( obj ).forEach( kv => GSUI.$setAttribute( uiFx, ...kv ) );
+		uiFx.$updateWave?.();
 	}
 }
 
