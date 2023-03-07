@@ -16,6 +16,9 @@ class GSMixer {
 			reorderChannel: ( id, n ) => this.#channels.reorderChannel( id, n ),
 			changePanChannel: ( id, val ) => this.#channels.changePanChannel( id, val ),
 			changeGainChannel: ( id, val ) => this.#channels.changeGainChannel( id, val ),
+			addEffect: ( chanId, fxId, obj ) => this.#channels.$getChannel( chanId ).$addEffect( fxId, obj ),
+			updateEffect: ( chanId, fxId, obj ) => this.#channels.$getChannel( chanId ).$updateEffect( fxId, obj ),
+			removeEffect: ( chanId, fxId ) => this.#channels.$getChannel( chanId ).$removeEffect( fxId ),
 		},
 	} );
 	#ctrlEffects = new DAWCoreControllers.effects( {
@@ -34,6 +37,7 @@ class GSMixer {
 		this.#channels.oninput = this.#oninput.bind( this );
 		this.#channels.onchange = this.#onchange.bind( this );
 		this.#channels.onselectChan = this.#onselectChan.bind( this );
+		this.#channels.onselectEffect = this.#onselectEffect.bind( this );
 		this.#effects.$askData = ( fxId, fxType, dataType, ...args ) => {
 			if ( fxType === "filter" && dataType === "curve" ) {
 				return this.#dawcore.$getAudioEffect( fxId )?.$updateResponse?.( args[ 0 ] );
@@ -88,6 +92,9 @@ class GSMixer {
 	#onselectChan( id ) {
 		this.#destFilter = id;
 		this.#ctrlEffects.setDestFilter( id );
+	}
+	#onselectEffect( chanId, fxId ) {
+		this.#effects.$expandToggleEffect( fxId );
 	}
 	#changeEffectData( id, obj ) {
 		const uiFx = this.#effects.$getFxHTML( id ).uiFx;
