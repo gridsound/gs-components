@@ -8,8 +8,8 @@ class GSSynth {
 		dataCallbacks: {
 			addOsc: ( id, osc ) => this.rootElement.addOscillator( id, osc ),
 			removeOsc: id => this.rootElement.removeOscillator( id ),
-			changeEnvProp: ( k, v ) => GSUI.$setAttribute( this.rootElement.env, k, v ),
-			changeLFOProp: ( k, v ) => GSUI.$setAttribute( this.rootElement.lfo, k, v ),
+			changeEnvProp: ( k, v ) => this.rootElement.changeEnvProp( k, v ),
+			changeLFOProp: ( k, v ) => this.rootElement.changeLFOProp( k, v ),
 			changeOscProp: ( id, k, v ) => GSUI.$setAttribute( this.rootElement.getOscillator( id ), k, v ),
 			updateEnvWave: () => this.rootElement.env.updateWave(),
 			updateLFOWave: () => this.rootElement.lfo.updateWave(),
@@ -29,20 +29,20 @@ class GSSynth {
 			switch ( d.component ) {
 				case "gsuiEnvelope":
 					switch ( d.eventName ) {
-						case "toggle": dc.$callAction( "toggleEnv", id ); break;
 						case "change": dc.$callAction( "changeEnv", id, ...a ); break;
 						// case "liveChange": dc.$liveChangeSynth( id, { env: { [ a[ 0 ] ]: a[ 1 ] } } ); break;
 					}
 					break;
 				case "gsuiLFO":
 					switch ( d.eventName ) {
-						case "toggle": dc.$callAction( "toggleLFO", id ); break;
 						case "change": dc.$callAction( "changeLFO", id, ...a ); break;
 						case "liveChange": dc.$liveChangeSynth( id, { lfo: { [ a[ 0 ] ]: a[ 1 ] } } ); break;
 					}
 					break;
 				case "gsuiSynthesizer":
 					switch ( d.eventName ) {
+						case "toggleEnv": dc.$callAction( "toggleEnv", id ); break;
+						case "toggleLFO": dc.$callAction( "toggleLFO", id ); break;
 						case "addOscillator": dc.$callAction( "addOscillator", id ); break;
 						case "reorderOscillator": dc.$callAction( "reorderOscillator", id, a[ 0 ] ); break;
 					}
