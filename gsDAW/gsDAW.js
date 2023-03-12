@@ -13,7 +13,6 @@ class GSDAW {
 	#midiControllersManager = new gswaMIDIControllersManager();
 	#windows = null;
 	rootElement = GSUI.$createElement( "gsui-daw", {
-		"oki-cookies": document.cookie.indexOf( "cookieAccepted" ) > -1,
 		version: "0.0.0",
 		volume: this.#dawcore.$getAudioDestinationGain(),
 		uirate: +localStorage.getItem( "uiRefreshRate" ) || "auto",
@@ -24,7 +23,7 @@ class GSDAW {
 	#elements = null;
 	#keyboardFns = [
 		[ true,  false, "o", () => this.rootElement.showOpenPopup() ],
-		[ true,  false, "s", () => this.#oncmpClickSave() ],
+		[ true,  false, "s", () => this.#dawcore.$saveComposition() ],
 		[ true,  true,  "n", () => this.#oncmpClickNewLocal() ],
 		[ true,  false, "z", () => this.#dawcore.$historyUndo() ],
 		[ true,  false, "Z", () => this.#dawcore.$historyRedo() ],
@@ -185,10 +184,6 @@ class GSDAW {
 
 		GSUI.$listenEvents( this.rootElement, {
 			gsuiDAW: {
-				"oki-cookies": () => {
-					document.cookie = "cookieAccepted";
-					GSUI.$setAttribute( this.rootElement, "oki-cookies", "" );
-				},
 				switchCompositionLocation: d => {
 					const [ saveMode, id ] = d.args;
 
@@ -230,7 +225,7 @@ class GSDAW {
 					} );
 				},
 				abortExport: () => this.#dawcore.$compositionAbortWAV(),
-				save: () => this.#oncmpClickSave(),
+				save: () => this.#dawcore.$saveComposition(),
 				open: d => this.#oncmpClickOpen( ...d.args ),
 				delete: d => this.#oncmpClickDelete( ...d.args ),
 				tempo: d => {
@@ -402,13 +397,6 @@ class GSDAW {
 				return true;
 			}
 		} );
-	}
-	#oncmpClickSave() {
-		if ( document.cookie.indexOf( "cookieAccepted" ) > -1 ) {
-			this.#dawcore.$saveComposition();
-		} else {
-			GSUI.$popup.alert( "Error", "You have to accept our cookies before saving locally your composition." );
-		}
 	}
 	#oncmpClickNewLocal() {
 		( !this.#dawcore.$compositionNeedSave()
