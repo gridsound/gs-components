@@ -6,6 +6,7 @@ class GSLibraries {
 
 	constructor() {
 		this.rootElement = GSUI.$createElement( "gsui-libraries" );
+		this.rootElement.getLibrary( "default" ).setLibrary( gsuiLibrarySamples );
 		GSUI.$setAttribute( this.rootElement.getLibrary( "local" ), "name", "local" );
 		GSUI.$setAttribute( this.rootElement.getLibrary( "default" ), "name", "default" );
 		GSUI.$listenEvents( this.rootElement, {
@@ -30,11 +31,6 @@ class GSLibraries {
 	// .........................................................................
 	setDAWCore( core ) {
 		this.#dawcore = core;
-	}
-	loadDefaultLibrary() {
-		return GSUI.$loadJSFile( "/assets/gsuiLibrarySamples-v1.js" ).then( () => {
-			this.rootElement.getLibrary( "default" ).setLibrary( gsuiLibrarySamples );
-		} );
 	}
 	addLocalSamples( files ) {
 		if ( files.length > 0 ) {
