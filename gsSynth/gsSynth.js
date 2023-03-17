@@ -20,6 +20,7 @@ class GSSynth {
 	constructor() {
 		Object.seal( this );
 
+		this.rootElement.setWaveList( gswaPeriodicWavesList.map( arr => arr[ 0 ] ) );
 		this.rootElement.addEventListener( "gsuiEvents", e => {
 			const d = e.detail;
 			const a = d.args;
@@ -62,14 +63,6 @@ class GSSynth {
 	}
 
 	// .........................................................................
-	loadWaves() {
-		return GSUI.$loadJSFile( "/assets/gswaPeriodicWavesList-v1.js" ).then( () => {
-			const waves = gswaPeriodicWaves.$loadWaves( gswaPeriodicWavesList );
-
-			this.rootElement.setWaveList( Array.from( waves.keys() ) );
-			waves.forEach( ( w, name ) => gsuiPeriodicWave.addWave( name, w.real, w.imag ) );
-		} );
-	}
 	setDAWCore( core ) {
 		this.#dawcore = core;
 	}
