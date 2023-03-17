@@ -83,6 +83,7 @@ class GSPianoroll {
 	clear() {
 		this.selectPattern( null );
 		this.#dataKeys.clear();
+		this.#dawcore.$keysClearLoop();
 	}
 	getUIKeys() {
 		return this.rootElement.uiKeys;

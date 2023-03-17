@@ -137,6 +137,7 @@ class GSDrums {
 	clear() {
 		this.selectPattern( null );
 		this.#dataDrumrows.clear();
+		this.#dawcore.$drumsClearLoop();
 	}
 
 	// .........................................................................
