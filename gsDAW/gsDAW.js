@@ -68,7 +68,7 @@ class GSDAW {
 		);
 		this.#windows = this.rootElement.querySelector( "gsui-windows" );
 		this.#dawcore.$setLoopRate( +localStorage.getItem( "uiRefreshRate" ) || 60 );
-		this.#windows.lowGraphics( !!+( localStorage.getItem( "gsuiWindows.lowGraphics" ) || "0" ) );
+		this.#windows.$lowGraphics( !!+( localStorage.getItem( "gsuiWindows.lowGraphics" ) || "0" ) );
 		GSUI.$setAttribute( this.rootElement.clock, "mode", localStorage.getItem( "gsuiClock.display" ) || "second" );
 		gsuiClock.numbering( localStorage.getItem( "uiTimeNumbering" ) || "1" );
 		gsuiTimeline.numbering( localStorage.getItem( "uiTimeNumbering" ) || "1" );
@@ -92,8 +92,8 @@ class GSDAW {
 		this.#elements.pianorollName.onclick = this.#onclickName.bind( this, "Rename pattern", "renamePattern", "keys" );
 		this.#elements.synthChannelBtn.onclick = this.#onclickSynthChannel.bind( this );
 		this.#patterns.setLibraries( this.#libraries );
-		this.#windows.window( "main" ).open();
-		this.#windows.window( "mixer" ).open();
+		this.#windows.$window( "main" ).$open();
+		this.#windows.$window( "mixer" ).$open();
 		gswaPeriodicWaves.$loadWaves( gswaPeriodicWavesList )
 			.forEach( ( w, name ) => gsuiPeriodicWave.addWave( name, w.real, w.imag ) );
 	}
@@ -187,7 +187,7 @@ class GSDAW {
 
 					this.#dawcore.$setLoopRate( data.uiRate === "auto" ? 60 : data.uiRate );
 					this.#dawcore.$setSampleRate( data.sampleRate );
-					this.#windows.lowGraphics( data.windowsLowGraphics );
+					this.#windows.$lowGraphics( data.windowsLowGraphics );
 					gsuiClock.numbering( data.timelineNumbering );
 					gsuiTimeline.numbering( data.timelineNumbering );
 					localStorage.setItem( "uiRefreshRate", data.uiRate );
@@ -241,8 +241,8 @@ class GSDAW {
 				},
 				localNewCmp: () => this.#oncmpClickNewLocal(),
 				cloudNewCmp: () => this.#oncmpClickNewCloud(),
-				openWindow: d => this.#windows.window( d.args[ 0 ] ).open(),
-				closeWindow: d => this.#windows.window( d.args[ 0 ] ).close(),
+				openWindow: d => this.#windows.$window( d.args[ 0 ] ).$open(),
+				closeWindow: d => this.#windows.$window( d.args[ 0 ] ).$close(),
 				focusSwitch: () => this.#dawcore.$focusSwitch(),
 				volume: d => this.#dawcore.$destinationSetGain( d.args[ 0 ] ),
 				rename: d => this.#dawcore.$callAction( "renameComposition", d.args[ 0 ] ),
@@ -310,17 +310,17 @@ class GSDAW {
 		this.#initWindowsPos( "slicer", 160, 140, 306, 250, 420, 360, "slices",     "slicer" );
 	}
 	#initWindowsPos( winId, x, y, wmin, hmin, w, h, icon, title ) {
-		const win = this.#windows.window( winId );
+		const win = this.#windows.$window( winId );
 
-		win.setSize( w, h );
-		win.setMinSize( wmin, hmin );
-		win.setTitle( title );
-		win.setPosition( x, y );
-		win.setTitleIcon( icon );
+		win.$setSize( w, h );
+		win.$setMinSize( wmin, hmin );
+		win.$setTitle( title );
+		win.$setPosition( x, y );
+		win.$setTitleIcon( icon );
 	}
 	#initWindowsHTML() {
 		document.querySelectorAll( "div[data-window]" ).forEach( winCnt => {
-			const win = this.#windows.createWindow( winCnt.dataset.window );
+			const win = this.#windows.$createWindow( winCnt.dataset.window );
 			const elWinCnt = win.querySelector( ".gsuiWindow-content" );
 			const children = Array.from( winCnt.children );
 
@@ -331,9 +331,9 @@ class GSDAW {
 
 				if ( child0.classList.contains( "gsuiDAW-winMenu" ) ) {
 					children.shift();
-					win.headAppend( ...child0.children );
+					win.$headAppend( ...child0.children );
 				}
-				win.contentAppend( ...children );
+				win.$contentAppend( ...children );
 			}
 		} );
 	}
@@ -344,7 +344,7 @@ class GSDAW {
 
 		this.#gsCmp[ id ] = winCnt;
 		winCnt.setDAWCore( this.#dawcore );
-		win.contentAppend( winCnt.rootElement );
+		win.$contentAppend( winCnt.rootElement );
 		if ( id === "main" ) {
 			winCnt.rootElement.onfocus = () => this.#dawcore.$focusOn( "composition" );
 			winCnt.setSVGForms( this.#patterns.svgForms );
@@ -687,7 +687,7 @@ class GSDAW {
 				const pat = this.#dawcore.$getPattern( obj.patternSlicesOpened );
 
 				this.#elements.slicesName.textContent = pat.name;
-				this.#windows.window( "slicer" ).open();
+				this.#windows.$window( "slicer" ).$open();
 				if ( this.#dawcore.$getFocusedName() === "slices" ) {
 					GSUI.$setAttribute( this.rootElement, "duration", this.#dawcore.$getPattern( pat.source )?.duration ?? this.#dawcore.$getBeatsPerMeasure() );
 				}
@@ -700,7 +700,7 @@ class GSDAW {
 				const pat = this.#dawcore.$getPattern( obj.patternDrumsOpened );
 
 				this.#elements.drumsName.textContent = pat.name;
-				this.#windows.window( "drums" ).open();
+				this.#windows.$window( "drums" ).$open();
 				if ( this.#dawcore.$getFocusedName() === "drums" ) {
 					GSUI.$setAttribute( this.rootElement, "duration", pat.duration );
 				}
@@ -714,7 +714,7 @@ class GSDAW {
 
 				this.#elements.synthName.textContent = syn.name;
 				this.#elements.synthChannelBtnText.textContent = this.#dawcore.$getChannel( this.#dawcore.$getSynth( obj.synthOpened ).dest ).name;
-				this.#windows.window( "synth" ).open();
+				this.#windows.$window( "synth" ).$open();
 			} else {
 				this.#elements.synthName.textContent = "";
 				this.#elements.synthChannelBtnText.textContent = "";
@@ -728,7 +728,7 @@ class GSDAW {
 				if ( this.#dawcore.$getFocusedName() === "keys" ) {
 					GSUI.$setAttribute( this.rootElement, "duration", pat.duration );
 				}
-				this.#windows.window( "piano" ).open();
+				this.#windows.$window( "piano" ).$open();
 			} else {
 				this.#elements.pianorollName.textContent = "";
 			}
