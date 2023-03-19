@@ -306,7 +306,7 @@ class GSDAW {
 		this.#initWindowsPos( "main",   500,  20, 380, 180, 600, 360, "music",      "composition" );
 		this.#initWindowsPos( "synth",   20, 340, 340, 220, 460, 460, "oscillator", "synth" );
 		this.#initWindowsPos( "piano",  500, 400, 380, 180, 600, 400, "keys",       "pianoroll" );
-		this.#initWindowsPos( "drums",   70, 450, 380, 180, 900, 400, "drums",      "drums" );
+		this.#initWindowsPos( "drums",   70, 450, 380, 180, 600, 400, "drums",      "drums" );
 		this.#initWindowsPos( "slicer", 160, 140, 306, 250, 420, 360, "slices",     "slicer" );
 	}
 	#initWindowsPos( winId, x, y, wmin, hmin, w, h, icon, title ) {
@@ -353,7 +353,6 @@ class GSDAW {
 			winCnt.rootElement.octaves( 1, 7 );
 		} else if ( id === "drums" ) {
 			winCnt.rootElement.onfocus = () => this.#dawcore.$focusOn( "drums" );
-			winCnt.rootElement.setPxPerBeat( 120 );
 			winCnt.setWaveforms( this.#patterns.svgForms.bufferHD );
 		} else if ( id === "slicer" ) {
 			winCnt.rootElement.onfocus = () => this.#dawcore.$focusOn( "slices" );
