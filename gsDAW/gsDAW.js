@@ -357,9 +357,6 @@ class GSDAW {
 		} else if ( id === "slicer" ) {
 			winCnt.rootElement.onfocus = () => this.#dawcore.$focusOn( "slices" );
 		}
-		if ( id === "main" || id === "piano" || id === "slicer" || id === "drums" ) {
-			win.onfocusin = e => GSDAW.#onfocusin( winCnt, e );
-		}
 		if ( cmpData ) {
 			winCnt.change( cmpData );
 		}
@@ -503,11 +500,6 @@ class GSDAW {
 	static #onwheel( e ) {
 		if ( e.ctrlKey ) {
 			e.preventDefault();
-		}
-	}
-	static #onfocusin( obj, e ) {
-		if ( !obj.rootElement.contains( e.target ) ) {
-			obj.rootElement.focus();
 		}
 	}
 	#onclickName( title, action, area, e ) {
