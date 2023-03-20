@@ -68,7 +68,7 @@ class GSDAW {
 		);
 		this.#windows = this.rootElement.querySelector( "gsui-windows" );
 		this.#dawcore.$setLoopRate( +localStorage.getItem( "uiRefreshRate" ) || 60 );
-		this.#windows.$lowGraphics( !!+( localStorage.getItem( "gsuiWindows.lowGraphics" ) || "0" ) );
+		this.#windows.$setLowGraphics( !!+( localStorage.getItem( "gsuiWindows.lowGraphics" ) || "0" ) );
 		GSUI.$setAttribute( this.rootElement.clock, "mode", localStorage.getItem( "gsuiClock.display" ) || "second" );
 		gsuiClock.numbering( localStorage.getItem( "uiTimeNumbering" ) || "1" );
 		gsuiTimeline.numbering( localStorage.getItem( "uiTimeNumbering" ) || "1" );
@@ -187,7 +187,7 @@ class GSDAW {
 
 					this.#dawcore.$setLoopRate( data.uiRate === "auto" ? 60 : data.uiRate );
 					this.#dawcore.$setSampleRate( data.sampleRate );
-					this.#windows.$lowGraphics( data.windowsLowGraphics );
+					this.#windows.$setLowGraphics( data.windowsLowGraphics );
 					gsuiClock.numbering( data.timelineNumbering );
 					gsuiTimeline.numbering( data.timelineNumbering );
 					localStorage.setItem( "uiRefreshRate", data.uiRate );
@@ -312,11 +312,7 @@ class GSDAW {
 	#initWindowsPos( winId, x, y, wmin, hmin, w, h, icon, title ) {
 		const win = this.#windows.$window( winId );
 
-		win.$setSize( w, h );
-		win.$setMinSize( wmin, hmin );
-		win.$setTitle( title );
-		win.$setPosition( x, y );
-		win.$setTitleIcon( icon );
+		GSUI.$setAttribute( win, { x, y, w, h, wmin, hmin, icon, title } );
 	}
 	#initWindowsHTML() {
 		document.querySelectorAll( "div[data-window]" ).forEach( winCnt => {
@@ -333,7 +329,6 @@ class GSDAW {
 					children.shift();
 					win.$headAppend( ...child0.children );
 				}
-				win.$contentAppend( ...children );
 			}
 		} );
 	}
@@ -390,7 +385,7 @@ class GSDAW {
 		this.#gsCmp.drums?.rootElement.classList.toggle( "selected", focStr === "drums" );
 		this.#gsCmp.slicer?.rootElement.classList.toggle( "selected", focStr === "slices" );
 		this.#gsCmp.main?.rootElement.classList.toggle( "selected", onCmp );
-		grid?.focus();
+		grid?.focus( { preventScroll: true } );
 	}
 	#controlsGetFocusedGrid( focStr = this.#dawcore.$getFocusedName() ) {
 		switch ( focStr ) {
