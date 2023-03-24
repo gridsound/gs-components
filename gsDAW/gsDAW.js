@@ -47,8 +47,6 @@ class GSDAW {
 		this.#initHTML();
 		this.#initWindowsHTML();
 		this.#initWindows();
-		// this.#midiControllersManager.$setDAWCore( this.#dawcore );
-		// this.#midiControllersManager.$setPianorollKeys( this.#gsCmp.piano.getUIKeys() );
 		this.#initMIDIAccess();
 		this.#initComponents();
 		this.#initEvents();
@@ -346,6 +344,7 @@ class GSDAW {
 		} else if ( id === "piano" ) {
 			winCnt.rootElement.onfocus = () => this.#dawcore.$focusOn( "keys" );
 			winCnt.rootElement.octaves( 1, 7 );
+			this.#linkMidiToPianoroll();
 		} else if ( id === "drums" ) {
 			winCnt.rootElement.onfocus = () => this.#dawcore.$focusOn( "drums" );
 			winCnt.setWaveforms( this.#patterns.svgForms.bufferHD );
@@ -769,6 +768,14 @@ class GSDAW {
 			}
 		} );
 	}
+	#initMIDIAccess() {
+		navigator.requestMIDIAccess( { sysex: true } )
+			.then( midiAccess => this.#onMIDISuccess( midiAccess, true ),
+				msg => this.#onMIDIFailure( msg, true ) );
+	}
+	#linkMidiToPianoroll() {
+		this.#midiControllersManager.$setPianorollKeys( this.#gsCmp.piano.getUIKeys() );
+	}
 	#onMIDISuccess( midiAccess, sysex = false ) {
 		if ( sysex === false ) {
 			console.log( "GSLogs: Sysex is not allowed. Some features of your devices may be disabled." );
@@ -782,11 +789,6 @@ class GSDAW {
 			console.log( "GSLogs: Failed to get MIDI access - " + msg );
 			console.log( "GSLogs: MIDI devices are disabled" );
 		}
-	}
-	#initMIDIAccess() {
-		navigator.requestMIDIAccess({ sysex: true })
-				 .then( midiAccess => this.#onMIDISuccess( midiAccess, true ),
-						msg => this.#onMIDIFailure( msg, true ));
 	}
 }
 
