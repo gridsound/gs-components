@@ -44,12 +44,12 @@ class GSDAW {
 
 	constructor() {
 		Object.seal( this );
+		this.#initEvents();
 		this.#initHTML();
 		this.#initWindowsHTML();
 		this.#initWindows();
 		this.#initMIDIAccess();
 		this.#initComponents();
-		this.#initEvents();
 		this.#authGetMe();
 	}
 
@@ -66,7 +66,10 @@ class GSDAW {
 		);
 		this.#windows = this.rootElement.querySelector( "gsui-windows" );
 		this.#dawcore.$setLoopRate( +localStorage.getItem( "uiRefreshRate" ) || 60 );
-		this.#windows.$setLowGraphics( !!+( localStorage.getItem( "gsuiWindows.lowGraphics" ) || "0" ) );
+		GSUI.$setAttribute( this.#windows, {
+			nominimize: true,
+			lowgraphics: !!+( localStorage.getItem( "gsuiWindows.lowGraphics" ) || "0" ),
+		} );
 		GSUI.$setAttribute( this.rootElement.clock, "mode", localStorage.getItem( "gsuiClock.display" ) || "second" );
 		gsuiClock.numbering( localStorage.getItem( "uiTimeNumbering" ) || "1" );
 		gsuiTimeline.numbering( localStorage.getItem( "uiTimeNumbering" ) || "1" );
@@ -172,6 +175,10 @@ class GSDAW {
 		this.rootElement.onExportJSON = ( saveMode, id ) => this.#dawcore.$compositionExportJSON( saveMode, id );
 
 		GSUI.$listenEvents( this.rootElement, {
+			gsuiWindows: {
+				open: d => this.#onopenWindow( d.args[ 0 ] ),
+				close: d => this.#oncloseWindow( d.args[ 0 ] ),
+			},
 			gsuiDAW: {
 				switchCompositionLocation: d => {
 					const [ saveMode, id ] = d.args;
@@ -185,7 +192,7 @@ class GSDAW {
 
 					this.#dawcore.$setLoopRate( data.uiRate === "auto" ? 60 : data.uiRate );
 					this.#dawcore.$setSampleRate( data.sampleRate );
-					this.#windows.$setLowGraphics( data.windowsLowGraphics );
+					GSUI.$setAttribute( this.#windows, "lowgraphics", data.windowsLowGraphics );
 					gsuiClock.numbering( data.timelineNumbering );
 					gsuiTimeline.numbering( data.timelineNumbering );
 					localStorage.setItem( "uiRefreshRate", data.uiRate );
@@ -298,8 +305,6 @@ class GSDAW {
 		} );
 	}
 	#initWindows() {
-		this.#windows.onopen = this.#onopenWindow.bind( this );
-		this.#windows.onclose = this.#oncloseWindow.bind( this );
 		this.#initWindowsPos( "mixer",   20,  20, 266, 200, 460, 300, "mixer",      "mixer" );
 		this.#initWindowsPos( "main",   500,  20, 380, 180, 600, 360, "music",      "composition" );
 		this.#initWindowsPos( "synth",   20, 340, 340, 220, 460, 460, "oscillator", "synth" );
