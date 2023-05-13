@@ -2,7 +2,6 @@
 
 class GSPatternroll {
 	#dawcore = null;
-	#svgForms = null;
 	rootElement = GSUI.$createElement( "gsui-patternroll" );
 	timeline = this.rootElement.timeline;
 	#dataTracks = new DAWCoreControllers.tracks( {
@@ -45,9 +44,6 @@ class GSPatternroll {
 	// .........................................................................
 	setDAWCore( core ) {
 		this.#dawcore = core;
-	}
-	setSVGForms( svgForms ) {
-		this.#svgForms = svgForms;
 	}
 	change( obj ) {
 		this.#dataTracks.change( obj );
@@ -121,17 +117,16 @@ class GSPatternroll {
 			const pat = this.#dawcore.$getPattern( obj.pattern );
 			const bpm = pat.bufferBpm || this.#dawcore.$getBPM();
 
-			this.#svgForms[ pat.type ].setSVGViewbox( blc._gsuiSVGform, obj.offset, obj.duration, bpm / 60 );
+			gsuiSVGPatterns.$setSVGViewbox( pat.type, blc._gsuiSVGform, obj.offset, obj.duration, bpm / 60 );
 		}
 	}
 	#onaddBlock( id, obj, blc ) {
 		const pat = this.#dawcore.$getPattern( obj.pattern );
-		const SVGs = this.#svgForms[ pat.type ];
-		const svg = SVGs.createSVG( obj.pattern );
+		const svg = gsuiSVGPatterns.$createSVG( pat.type, obj.pattern );
 
 		blc._gsuiSVGform = svg;
 		blc.children[ 3 ].append( svg );
-		SVGs.setSVGViewbox( svg, obj.offset, obj.duration, this.#dawcore.$getBPS() );
+		gsuiSVGPatterns.$setSVGViewbox( pat.type, svg, obj.offset, obj.duration, this.#dawcore.$getBPS() );
 		blc.ondblclick = () => this.#dawcore.$callAction( "openPattern", obj.pattern );
 		blc.querySelector( ".gsuiPatternroll-block-name" ).textContent = pat.name;
 	}

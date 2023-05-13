@@ -10,13 +10,6 @@ class GSPatterns {
 
 	constructor() {
 		const uiPatterns = GSUI.$createElement( "gsui-patterns" );
-		const svgForms = Object.freeze( {
-			keys: new gsuiKeysforms(),
-			drums: new gsuiDrumsforms(),
-			buffer: new gsuiWaveforms(),
-			bufferHD: new gsuiWaveforms(),
-			slices: new gsuiSlicesforms(),
-		} );
 
 		uiPatterns.onpatternDataTransfer = elPat => elPat.dataset.id;
 		uiPatterns.onchange = ( act, ...args ) => {
@@ -60,7 +53,6 @@ class GSPatterns {
 			channels: {},
 		} );
 		this.rootElement = uiPatterns;
-		this.svgForms = svgForms;
 		this.#uiPatterns = uiPatterns;
 		this.#synthsCrud = DAWCoreUtils.$createUpdateDelete.bind( null, this.data.synths,
 			this.#createSynth.bind( this ),
@@ -75,9 +67,6 @@ class GSPatterns {
 			this.#updateChannel.bind( this ),
 			this.#deleteChannel.bind( this ) );
 		Object.seal( this );
-
-		svgForms.bufferHD.hdMode( true );
-		svgForms.bufferHD.setDefaultViewbox( 260, 48 );
 	}
 
 	// .........................................................................
@@ -90,11 +79,6 @@ class GSPatterns {
 	clear() {
 		Object.keys( this.data.patterns ).forEach( this.#deletePattern, this );
 		Object.keys( this.data.synths ).forEach( this.#deleteSynth, this );
-		this.svgForms.keys.empty();
-		this.svgForms.drums.empty();
-		this.svgForms.slices.empty();
-		this.svgForms.buffer.empty();
-		this.svgForms.bufferHD.empty();
 	}
 	bufferLoaded( id, buf ) {
 		const pats = Object.entries( this.#dawcore.$getPatterns() );
@@ -103,8 +87,7 @@ class GSPatterns {
 			return map;
 		}, {} );
 
-		this.svgForms.buffer.update( bufToPat[ id ], buf );
-		this.svgForms.bufferHD.update( bufToPat[ id ], buf );
+		gsuiSVGPatterns.$update( "buffer", bufToPat[ id ], buf );
 		this.#uiPatterns.changePattern( bufToPat[ id ], "data-missing", false );
 	}
 	change( obj ) {
@@ -148,31 +131,25 @@ class GSPatterns {
 		const elPat = this.#uiPatterns.getPattern( id );
 
 		if ( elPat ) {
-			const type = pat.type;
-			const dur = daw.$getPatternDuration( id );
+			gsuiSVGPatterns.$update( pat.type, id,
+				this.#getPatternContent( id ),
+				daw.$getPatternDuration( id ),
+				elPat.querySelector( "svg" ) );
+		}
+	}
+	#getPatternContent( id ) {
+		const daw = this.#dawcore;
+		const pat = daw.$getPattern( id );
 
-			switch ( type ) {
-				case "keys":
-					this.svgForms.keys.update( id, daw.$getKeys( pat.keys ), dur );
-					break;
-				case "slices":
-					this.svgForms.slices.update( id, daw.$getSlices( pat.slices ), dur );
-					break;
-				case "drums":
-					this.svgForms.drums.update( id, daw.$getDrums( pat.drums ), daw.$getDrumrows(), dur, daw.$getStepsPerBeat() );
-					break;
-				case "buffer": {
-					const buf = this.#dawcore.$getAudioBuffer( pat.buffer );
-
-					if ( buf ) {
-						this.svgForms.buffer.update( id, buf );
-						this.svgForms.bufferHD.update( id, buf );
-					}
-				} break;
-			}
-			if ( type !== "buffer" ) {
-				this.svgForms[ type ].setSVGViewbox( elPat.querySelector( "svg" ), 0, dur );
-			}
+		switch ( pat.type ) {
+			case "keys": return daw.$getKeys( pat.keys );
+			case "slices": return daw.$getSlices( pat.slices );
+			case "buffer": return daw.$getAudioBuffer( pat.buffer );
+			case "drums": return [
+				daw.$getDrums( pat.drums ),
+				daw.$getDrumrows(),
+				daw.$getStepsPerBeat(),
+			];
 		}
 	}
 
@@ -201,26 +178,25 @@ class GSPatterns {
 	// .........................................................................
 	#createPattern( id, obj ) {
 		const isBuf = obj.type === "buffer";
+		const type = isBuf ? "bufferHD" : obj.type;
 		const buf = isBuf && this.#dawcore.$getAudioBuffer( obj.buffer );
-		const SVG = this.svgForms[ isBuf ? "bufferHD" : obj.type ];
 
 		this.data.patterns[ id ] = DAWCoreUtils.$jsonCopy( obj );
-		SVG.add( id );
+		gsuiSVGPatterns.$add( type, id );
 		if ( isBuf ) {
 			const objBuf = this.#dawcore.$getBuffer( obj.buffer );
 			const bufHash = objBuf.url || objBuf.hash;
 
-			this.svgForms.buffer.add( id );
+			gsuiSVGPatterns.$add( "buffer", id );
 			if ( buf ) {
-				this.svgForms.buffer.update( id, buf );
-				SVG.update( id, buf );
+				gsuiSVGPatterns.$update( "buffer", id, buf );
 			}
 			this.data.patterns[ id ].bufferHash = bufHash;
 			this.#gsLibraries.$bookmarkBuffer( bufHash, true );
 		}
 		this.#uiPatterns.addPattern( id, obj );
 		this.#updatePattern( id, obj );
-		this.#uiPatterns.appendPatternSVG( id, SVG.createSVG( id ) );
+		this.#uiPatterns.appendPatternSVG( id, gsuiSVGPatterns.$createSVG( type, id ) );
 		if ( isBuf && !buf ) {
 			this.#uiPatterns.changePattern( id, "data-missing", true );
 		}
@@ -240,9 +216,9 @@ class GSPatterns {
 		const pat = this.data.patterns[ id ];
 
 		delete this.data.patterns[ id ];
-		this.svgForms[ pat.type ].delete( id );
+		gsuiSVGPatterns.$delete( pat.type, id );
 		if ( pat.type === "buffer" ) {
-			this.svgForms.bufferHD.delete( id );
+			gsuiSVGPatterns.$delete( "bufferHD", id );
 			this.#gsLibraries.$bookmarkBuffer( pat.bufferHash, false );
 		}
 		this.#uiPatterns.deletePattern( id );

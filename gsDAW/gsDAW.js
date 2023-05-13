@@ -345,14 +345,12 @@ class GSDAW {
 		win.$contentAppend( winCnt.rootElement );
 		if ( id === "main" ) {
 			winCnt.rootElement.onfocus = () => this.#dawcore.$focusOn( "composition" );
-			winCnt.setSVGForms( this.#patterns.svgForms );
 		} else if ( id === "piano" ) {
 			winCnt.rootElement.onfocus = () => this.#dawcore.$focusOn( "keys" );
 			winCnt.rootElement.octaves( 1, 7 );
 			this.#linkMidiToPianoroll();
 		} else if ( id === "drums" ) {
 			winCnt.rootElement.onfocus = () => this.#dawcore.$focusOn( "drums" );
-			winCnt.setWaveforms( this.#patterns.svgForms.bufferHD );
 		} else if ( id === "slicer" ) {
 			winCnt.rootElement.onfocus = () => this.#dawcore.$focusOn( "slices" );
 		}
@@ -615,6 +613,7 @@ class GSDAW {
 		this.#elements.pianorollName.textContent = "";
 		this.#patterns.clear();
 		this.#libraries.clear();
+		gsuiSVGPatterns.$clear();
 	}
 	#oncmpChanged( obj ) {
 		console.log( "change", obj );
@@ -769,7 +768,7 @@ class GSDAW {
 				const bpm = pat.bufferBpm || this.#dawcore.$getBPM();
 
 				GSUI.$setAttribute( elBlc, "data-missing", false );
-				this.#patterns.svgForms.buffer.setSVGViewbox( elBlc._gsuiSVGform, blc.offset, blc.duration, bpm / 60 );
+				gsuiSVGPatterns.$setSVGViewbox( "buffer", elBlc._gsuiSVGform, blc.offset, blc.duration, bpm / 60 );
 			}
 		} );
 	}

@@ -4,7 +4,6 @@ class GSDrums {
 	#dawcore = null;
 	#drumsId = null;
 	#patternId = null;
-	#svgManager = null;
 	rootElement = GSUI.$createElement( "gsui-drums" );
 	timeline = this.rootElement.timeline;
 	#uiDrumrows = this.rootElement.drumrows;
@@ -30,7 +29,7 @@ class GSDrums {
 						this.#uiDrumrows.change( id, prop, val );
 						break;
 					case "pattern":
-						this.#uiDrumrows.change( id, prop, this.#svgManager.createSVG( val ) );
+						this.#uiDrumrows.change( id, prop, gsuiSVGPatterns.$createSVG( "bufferHD", val ) );
 						break;
 					case "duration": {
 						const patId = this.#dawcore.$getDrumrow( id ).pattern;
@@ -107,9 +106,6 @@ class GSDrums {
 				this.#dataDrums.change( drums );
 			}
 		}
-	}
-	setWaveforms( svgManager ) {
-		this.#svgManager = svgManager;
 	}
 	onstartdrum( rowId ) {
 		this.#uiDrumrows.playRow( rowId );
