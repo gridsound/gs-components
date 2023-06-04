@@ -6,7 +6,6 @@ class GSDrums {
 	#patternId = null;
 	rootElement = GSUI.$createElement( "gsui-drums" );
 	timeline = this.rootElement.timeline;
-	#uiDrumrows = this.rootElement.drumrows;
 	#dataDrums = new DAWCoreControllers.drums( {
 		dataCallbacks: {
 			addDrum: ( id, drum ) => this.rootElement.addDrum( id, drum ),
@@ -18,24 +17,21 @@ class GSDrums {
 	} );
 	#dataDrumrows = new DAWCoreControllers.drumrows( {
 		dataCallbacks: {
-			addDrumrow: id => {
-				this.#uiDrumrows.add( id, this.rootElement.createDrumrow( id ) );
-				this.#setPropFilter( id, "gain" );
-			},
-			removeDrumrow: id => this.#uiDrumrows.remove( id ),
+			addDrumrow: id => this.rootElement.$addDrumrow( id ),
+			removeDrumrow: id => this.rootElement.$removeDrumrow( id ),
 			changeDrumrow: ( id, prop, val ) => {
 				switch ( prop ) {
 					default:
-						this.#uiDrumrows.change( id, prop, val );
+						this.rootElement.$changeDrumrow( id, prop, val );
 						break;
 					case "pattern":
-						this.#uiDrumrows.change( id, prop, gsuiSVGPatterns.$createSVG( "bufferHD", val ) );
+						this.rootElement.$changeDrumrow( id, prop, gsuiSVGPatterns.$createSVG( "bufferHD", val ) );
 						break;
 					case "duration": {
 						const patId = this.#dawcore.$getDrumrow( id ).pattern;
 						const bufId = this.#dawcore.$getPattern( patId ).buffer;
 
-						this.#uiDrumrows.change( id, prop, this.#dawcore.$getBuffer( bufId ).duration );
+						this.rootElement.$changeDrumrow( id, prop, this.#dawcore.$getBuffer( bufId ).duration );
 					} break;
 				}
 			},
@@ -47,14 +43,14 @@ class GSDrums {
 
 		GSUI.$listenEvents( this.rootElement, {
 			gsuiDrumrows: {
+				remove: d => { this.#dawcore.$callAction( "removeDrumrow", d.args[ 0 ] ); },
 				change: d => { this.#dawcore.$callAction( ...d.args ); },
-				propFilter: d => { this.#setPropFilter( ...d.args ); },
-				propFilters: d => { this.#setAllPropFilters( ...d.args ); },
 				liveStopDrum: d => { this.#dawcore.$liveDrumStop( ...d.args ); },
 				liveStartDrum: d => { this.#dawcore.$liveDrumStart( ...d.args ); },
 				liveChangeDrumrow: d => { this.#dawcore.$liveDrumrowChange( ...d.args ); },
 			},
 			gsuiDrums: {
+				reorderDrumrow: d => this.#dawcore.$callAction( "reorderDrumrow", ...d.args ),
 				change: d => {
 					const [ act, ...args ] = d.args;
 
@@ -76,12 +72,6 @@ class GSDrums {
 			gsuiSliderGroup: {
 				change: d => {
 					this.#dawcore.$callAction( "changeDrumsProps", this.#patternId, ...d.args );
-				},
-				input: d => {
-					this.#uiDrumrows.setDrumPropValue( d.args[ 0 ], d.args[ 2 ], d.args[ 3 ] );
-				},
-				inputEnd: d => {
-					this.#uiDrumrows.removeDrumPropValue( ...d.args );
 				},
 			},
 		} );
@@ -108,20 +98,20 @@ class GSDrums {
 		}
 	}
 	onstartdrum( rowId ) {
-		this.#uiDrumrows.playRow( rowId );
+		this.rootElement.$startDrumrow( rowId );
 	}
 	onstopdrumrow( rowId ) {
-		this.#uiDrumrows.stopRow( rowId );
+		this.rootElement.$stopDrumrow( rowId );
 	}
 	change( obj ) {
-		const drmObj = obj.drums && obj.drums[ this.#drumsId ];
+		const drmObj = obj.drums?.[ this.#drumsId ];
 
 		this.#dataDrumrows.change( obj );
 		if ( obj.drumrows ) {
-			this.rootElement.drumrows.reorderDrumrows( obj.drumrows );
+			this.rootElement.$reorderDrumrows( obj.drumrows );
 		}
 		if ( "timedivision" in obj ) {
-			this.rootElement.timedivision( obj.timedivision );
+			GSUI.$setAttribute( this.rootElement, "timedivision", obj.timedivision );
 		}
 		if ( drmObj ) {
 			this.#dataDrums.change( drmObj );
@@ -134,20 +124,6 @@ class GSDrums {
 		this.selectPattern( null );
 		this.#dataDrumrows.clear();
 		this.#dawcore.$drumsClearLoop();
-	}
-
-	// .........................................................................
-	#setPropFilter( rowId, prop ) {
-		const propValues = Object.entries( this.#dawcore.$getDrums( this.#drumsId ) )
-			.filter( ( [ , drm ] ) => drm.row === rowId && "gain" in drm )
-			.map( ( [ id, drm ] ) => [ id, drm[ prop ] ] );
-
-		this.#uiDrumrows.setPropFilter( rowId, prop );
-		this.rootElement.setPropValues( rowId, prop, propValues );
-	}
-	#setAllPropFilters( prop ) {
-		Object.keys( this.#dawcore.$getDrumrows() )
-			.forEach( id => this.#setPropFilter( id, prop ) );
 	}
 }
 
