@@ -45,6 +45,8 @@ class GSDrums {
 			gsuiDrumrows: {
 				remove: d => { this.#dawcore.$callAction( "removeDrumrow", d.args[ 0 ] ); },
 				change: d => { this.#dawcore.$callAction( ...d.args ); },
+				toggle: d => { this.#dawcore.$callAction( "toggleDrumrow", d.args[ 0 ] ); },
+				toggleSolo: d => { this.#dawcore.$callAction( "toggleSoloDrumrow", d.args[ 0 ] ); },
 				liveStopDrum: d => { this.#dawcore.$liveDrumStop( ...d.args ); },
 				liveStartDrum: d => { this.#dawcore.$liveDrumStart( ...d.args ); },
 				liveChangeDrumrow: d => { this.#dawcore.$liveDrumrowChange( ...d.args ); },
