@@ -22,6 +22,9 @@ class GSPianoroll {
 				changeKeysProps: d => {
 					this.#dawcore.$callAction( "changeKeysProps", this.#patternId, ...d.args );
 				},
+				midiDropped: d => {
+					this.#dawcore.$callAction( "dropMidiOnKeys", this.#patternId, ...d.args );
+				},
 			},
 			gsuiTimeline: {
 				changeCurrentTime: d => {
