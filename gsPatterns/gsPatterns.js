@@ -29,6 +29,7 @@ class GSPatterns {
 				console.log( "GSPatterns.onchange", act, ...args );
 			}
 		};
+		uiPatterns.$getChannels = () => this.#dawcore.$getChannels();
 		GSUI.$listenEvents( uiPatterns, {
 			gsuiPatterns: {
 				libraryBufferDropped: d => {

@@ -511,8 +511,10 @@ class GSDAW {
 		const id = this.#dawcore.$getOpened( "synth" );
 
 		if ( id ) {
-			gsuiChannels.openSelectChannelPopup( this.#dawcore.$getSynth( id ).dest )
-				.then( chanId => chanId && this.#dawcore.$callAction( "redirectSynth", id, chanId ) );
+			gsuiChannels.openSelectChannelPopup(
+				this.#dawcore.$getChannels(),
+				this.#dawcore.$getSynth( id ).dest
+			).then( chanId => chanId && this.#dawcore.$callAction( "redirectSynth", id, chanId ) );
 		}
 	}
 	#ondrop( e ) {
