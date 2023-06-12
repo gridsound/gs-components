@@ -312,10 +312,10 @@ class GSDAW {
 		this.#initWindowsPos( "drums",   70, 450, 380, 180, 600, 400, "drums",      "drums" );
 		this.#initWindowsPos( "slicer", 160, 140, 306, 250, 420, 360, "slices",     "slicer" );
 	}
-	#initWindowsPos( winId, x, y, wmin, hmin, w, h, icon, title ) {
+	#initWindowsPos( winId, x, y, wmin, hmin, w, h, icon, name ) {
 		const win = this.#windows.$window( winId );
 
-		GSUI.$setAttribute( win, { x, y, w, h, wmin, hmin, icon, title } );
+		GSUI.$setAttribute( win, { x, y, w, h, wmin, hmin, icon, name } );
 	}
 	#initWindowsHTML() {
 		document.querySelectorAll( "div[data-window]" ).forEach( winCnt => {
