@@ -4,7 +4,7 @@ class GSDrums {
 	#dawcore = null;
 	#drumsId = null;
 	#patternId = null;
-	rootElement = GSUI.$createElement( "gsui-drums" );
+	rootElement = GSUcreateElement( "gsui-drums" );
 	timeline = this.rootElement.timeline;
 	#dataDrums = new DAWCoreControllers.drums( {
 		dataCallbacks: {
@@ -41,7 +41,7 @@ class GSDrums {
 	constructor() {
 		Object.seal( this );
 
-		GSUI.$listenEvents( this.rootElement, {
+		GSUlistenEvents( this.rootElement, {
 			gsuiDrumrows: {
 				remove: d => { this.#dawcore.$callAction( "removeDrumrow", d.args[ 0 ] ); },
 				change: d => { this.#dawcore.$callAction( ...d.args ); },
@@ -77,7 +77,7 @@ class GSDrums {
 				},
 			},
 		} );
-		GSUI.$setAttribute( this.rootElement, "disabled", true );
+		GSUsetAttribute( this.rootElement, "disabled", true );
 	}
 
 	// .........................................................................
@@ -89,7 +89,7 @@ class GSDrums {
 			this.#patternId = id;
 			this.#drumsId = null;
 			this.#dataDrums.clear();
-			GSUI.$setAttribute( this.rootElement, "disabled", !id );
+			GSUsetAttribute( this.rootElement, "disabled", !id );
 			if ( id ) {
 				const pat = this.#dawcore.$getPattern( id );
 				const drums = this.#dawcore.$getDrums( pat.drums );
@@ -113,7 +113,7 @@ class GSDrums {
 			this.rootElement.$reorderDrumrows( obj.drumrows );
 		}
 		if ( "timedivision" in obj ) {
-			GSUI.$setAttribute( this.rootElement, "timedivision", obj.timedivision );
+			GSUsetAttribute( this.rootElement, "timedivision", obj.timedivision );
 		}
 		if ( drmObj ) {
 			this.#dataDrums.change( drmObj );

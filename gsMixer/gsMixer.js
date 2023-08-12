@@ -2,7 +2,7 @@
 
 class GSMixer {
 	#dawcore = null;
-	rootElement = GSUI.$createElement( "gsui-mixer" );
+	rootElement = GSUcreateElement( "gsui-mixer" );
 	#channels = this.rootElement.getChannels();
 	#effects = this.rootElement.getEffects();
 	#destFilter = "main";
@@ -23,7 +23,7 @@ class GSMixer {
 	} );
 	#ctrlEffects = new DAWCoreControllers.effects( {
 		dataCallbacks: {
-			changeTimedivision: timediv => GSUI.$setAttribute( this.#effects, "timedivision", timediv ),
+			changeTimedivision: timediv => GSUsetAttribute( this.#effects, "timedivision", timediv ),
 			addEffect: ( id, obj ) => this.#effects.$addEffect( id, obj ),
 			removeEffect: id => this.#effects.$removeEffect( id ),
 			changeEffect: ( id, prop, val ) => this.#effects.$changeEffect( id, prop, val ),
@@ -43,7 +43,7 @@ class GSMixer {
 				return this.#dawcore.$getAudioEffect( fxId )?.$updateResponse?.( args[ 0 ] );
 			}
 		};
-		GSUI.$listenEvents( this.rootElement, {
+		GSUlistenEvents( this.rootElement, {
 			gsuiEffects: {
 				liveChangeEffect: d => {
 					this.#dawcore.$liveChangeEffect( ...d.args );
@@ -100,7 +100,7 @@ class GSMixer {
 	#changeEffectData( id, obj ) {
 		const uiFx = this.#effects.$getFxHTML( id ).uiFx;
 
-		Object.entries( obj ).forEach( kv => GSUI.$setAttribute( uiFx, ...kv ) );
+		Object.entries( obj ).forEach( kv => GSUsetAttribute( uiFx, ...kv ) );
 		uiFx.$updateWave?.();
 	}
 }

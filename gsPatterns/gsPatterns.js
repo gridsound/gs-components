@@ -9,7 +9,7 @@ class GSPatterns {
 	#channelsCrud = null;
 
 	constructor() {
-		const uiPatterns = GSUI.$createElement( "gsui-patterns" );
+		const uiPatterns = GSUcreateElement( "gsui-patterns" );
 
 		uiPatterns.onpatternDataTransfer = elPat => elPat.dataset.id;
 		uiPatterns.onchange = ( act, ...args ) => {
@@ -30,7 +30,7 @@ class GSPatterns {
 			}
 		};
 		uiPatterns.$getChannels = () => this.#dawcore.$getChannels();
-		GSUI.$listenEvents( uiPatterns, {
+		GSUlistenEvents( uiPatterns, {
 			gsuiPatterns: {
 				libraryBufferDropped: d => {
 					const [ lib, bufURL ] = d.args;
@@ -55,15 +55,15 @@ class GSPatterns {
 		} );
 		this.rootElement = uiPatterns;
 		this.#uiPatterns = uiPatterns;
-		this.#synthsCrud = DAWCoreUtils.$createUpdateDelete.bind( null, this.data.synths,
+		this.#synthsCrud = GSUcreateUpdateDelete.bind( null, this.data.synths,
 			this.#createSynth.bind( this ),
 			this.#updateSynth.bind( this ),
 			this.#deleteSynth.bind( this ) );
-		this.#patternsCrud = DAWCoreUtils.$createUpdateDelete.bind( null, this.data.patterns,
+		this.#patternsCrud = GSUcreateUpdateDelete.bind( null, this.data.patterns,
 			this.#createPattern.bind( this ),
 			this.#updatePattern.bind( this ),
 			this.#deletePattern.bind( this ) );
-		this.#channelsCrud = DAWCoreUtils.$createUpdateDelete.bind( null, this.data.channels,
+		this.#channelsCrud = GSUcreateUpdateDelete.bind( null, this.data.channels,
 			this.#createChannel.bind( this ),
 			this.#updateChannel.bind( this ),
 			this.#deleteChannel.bind( this ) );
@@ -156,7 +156,7 @@ class GSPatterns {
 
 	// .........................................................................
 	#createSynth( id, obj ) {
-		this.data.synths[ id ] = DAWCoreUtils.$jsonCopy( obj );
+		this.data.synths[ id ] = GSUjsonCopy( obj );
 		this.#uiPatterns.addSynth( id );
 		this.#updateSynth( id, obj );
 	}
@@ -182,7 +182,7 @@ class GSPatterns {
 		const type = isBuf ? "bufferHD" : obj.type;
 		const buf = isBuf && this.#dawcore.$getAudioBuffer( obj.buffer );
 
-		this.data.patterns[ id ] = DAWCoreUtils.$jsonCopy( obj );
+		this.data.patterns[ id ] = GSUjsonCopy( obj );
 		gsuiSVGPatterns.$add( type, id );
 		if ( isBuf ) {
 			const objBuf = this.#dawcore.$getBuffer( obj.buffer );

@@ -5,20 +5,20 @@ class GSLibraries {
 	#dawcore = null;
 
 	constructor() {
-		this.rootElement = GSUI.$createElement( "gsui-libraries" );
+		this.rootElement = GSUcreateElement( "gsui-libraries" );
 		this.rootElement.getLibrary( "default" ).setLibrary( gsuiLibrarySamples );
-		GSUI.$setAttribute( this.rootElement.getLibrary( "local" ), "name", "local" );
-		GSUI.$setAttribute( this.rootElement.getLibrary( "default" ), "name", "default" );
-		GSUI.$listenEvents( this.rootElement, {
+		GSUsetAttribute( this.rootElement.getLibrary( "local" ), "name", "local" );
+		GSUsetAttribute( this.rootElement.getLibrary( "default" ), "name", "default" );
+		GSUlistenEvents( this.rootElement, {
 			gsuiLibrary: {
 				loadSample: ( d, tar ) => {
-					const lib = GSUI.$getAttribute( tar, "name" );
+					const lib = GSUgetAttribute( tar, "name" );
 
 					this.#loadSample( lib, d.args[ 0 ] )
 						.then( () => this.#playSample( lib, d.args[ 0 ] ) );
 				},
 				playSample: ( d, tar ) => {
-					this.#playSample( GSUI.$getAttribute( tar, "name" ), d.args[ 0 ] );
+					this.#playSample( GSUgetAttribute( tar, "name" ), d.args[ 0 ] );
 				},
 				stopSample: () => {
 					this.#dawcore.$buffersStopBuffer();
@@ -39,7 +39,7 @@ class GSLibraries {
 					? [ smp[ 0 ], gsuiWaveform.getPointsFromBuffer( 40, 10, smp[ 1 ] ), smp[ 2 ] ]
 					: smp
 			) );
-			GSUI.$setAttribute( this.rootElement, "lib", "local" );
+			GSUsetAttribute( this.rootElement, "lib", "local" );
 		}
 	}
 	stop() {

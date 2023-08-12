@@ -6,7 +6,7 @@ class GSDAW {
 	#patterns = new GSPatterns();
 	#midiControllersManager = new gswaMIDIControllersManager();
 	#windows = null;
-	rootElement = GSUI.$createElement( "gsui-daw", {
+	rootElement = GSUcreateElement( "gsui-daw", {
 		version: "0.0.0",
 		volume: this.#dawcore.$getAudioDestinationGain(),
 		uirate: +localStorage.getItem( "uiRefreshRate" ) || "auto",
@@ -57,23 +57,23 @@ class GSDAW {
 	#initHTML() {
 		document.body.append(
 			this.rootElement,
-			GSUI.$getTemplate( "gsui-daw-window-main" ),
-			GSUI.$getTemplate( "gsui-daw-window-piano" ),
-			GSUI.$getTemplate( "gsui-daw-window-drums" ),
-			GSUI.$getTemplate( "gsui-daw-window-synth" ),
-			GSUI.$getTemplate( "gsui-daw-window-mixer" ),
-			GSUI.$getTemplate( "gsui-daw-window-slicer" ),
+			GSUgetTemplate( "gsui-daw-window-main" ),
+			GSUgetTemplate( "gsui-daw-window-piano" ),
+			GSUgetTemplate( "gsui-daw-window-drums" ),
+			GSUgetTemplate( "gsui-daw-window-synth" ),
+			GSUgetTemplate( "gsui-daw-window-mixer" ),
+			GSUgetTemplate( "gsui-daw-window-slicer" ),
 		);
 		this.#windows = this.rootElement.querySelector( "gsui-windows" );
 		this.#dawcore.$setLoopRate( +localStorage.getItem( "uiRefreshRate" ) || 60 );
-		GSUI.$setAttribute( this.#windows, {
+		GSUsetAttribute( this.#windows, {
 			nominimize: true,
 			lowgraphics: !!+( localStorage.getItem( "gsuiWindows.lowGraphics" ) || "0" ),
 		} );
-		GSUI.$setAttribute( this.rootElement.clock, "mode", localStorage.getItem( "gsuiClock.display" ) || "second" );
+		GSUsetAttribute( this.rootElement.clock, "mode", localStorage.getItem( "gsuiClock.display" ) || "second" );
 		gsuiClock.numbering( localStorage.getItem( "uiTimeNumbering" ) || "1" );
 		gsuiTimeline.numbering( localStorage.getItem( "uiTimeNumbering" ) || "1" );
-		this.#elements = GSUI.$findElements( document.body, {
+		this.#elements = GSUfindElements( document.body, {
 			drumsName: "[data-target=drums]",
 			synthName: "[data-target=synth]",
 			slicesName: "[data-target=slices]",
@@ -112,25 +112,25 @@ class GSDAW {
 		this.#dawcore.cb.currentTime = ( beat, focused ) => {
 			const win = this.#controlsGetFocusedGrid( focused );
 
-			GSUI.$setAttribute( this.rootElement, "currenttime", beat );
+			GSUsetAttribute( this.rootElement, "currenttime", beat );
 			if ( win ) {
-				GSUI.$setAttribute( win, "currenttime", beat );
+				GSUsetAttribute( win, "currenttime", beat );
 			}
 		};
 		this.#dawcore.cb.buffersLoaded = ( id, objBuf ) => this.#onpatternsBuffersLoaded( id, objBuf );
 		this.#dawcore.cb.buffersDropped = files => this.#libraries.addLocalSamples( files );
 		this.#dawcore.cb.compositionAdded = cmp => this.rootElement.addComposition( cmp );
 		this.#dawcore.cb.compositionOpened = cmp => {
-			GSUI.$setAttribute( this.rootElement, "currentcomposition", `${ cmp.options.saveMode }:${ cmp.id }` );
+			GSUsetAttribute( this.rootElement, "currentcomposition", `${ cmp.options.saveMode }:${ cmp.id }` );
 			this.#patterns.rootElement.expandSynth( cmp.synthOpened, true );
 			this.#setTitle( cmp.name );
 		};
 		this.#dawcore.cb.compositionClosed = this.#oncmpClosed.bind( this );
 		this.#dawcore.cb.compositionChanged = this.#oncmpChanged.bind( this );
 		this.#dawcore.cb.compositionDeleted = cmp => this.rootElement.deleteComposition( cmp );
-		this.#dawcore.cb.compositionLoading = ( cmp, loading ) => GSUI.$setAttribute( this.rootElement, "saving", loading );
+		this.#dawcore.cb.compositionLoading = ( cmp, loading ) => GSUsetAttribute( this.rootElement, "saving", loading );
 		this.#dawcore.cb.compositionSavedStatus = ( cmp, saved ) => {
-			GSUI.$setAttribute( this.rootElement, "saved", saved );
+			GSUsetAttribute( this.rootElement, "saved", saved );
 			this.#setTitle( cmp.name );
 		};
 		this.#dawcore.cb.compositionSavingPromise = this.#authSaveComposition.bind( this );
@@ -142,12 +142,12 @@ class GSDAW {
 		this.#dawcore.cb.analyserFilled = data => this.rootElement.updateSpectrum( data );
 		this.#dawcore.cb.channelAnalyserFilled = ( chanId, ldata, rdata ) => this.#gsCmp.mixer?.updateAudioData( chanId, ldata, rdata );
 		this.#dawcore.cb.pause =
-		this.#dawcore.cb.stop = () => GSUI.$setAttribute( this.rootElement, "playing", false );
-		this.#dawcore.cb.play = () => GSUI.$setAttribute( this.rootElement, "playing", true );
+		this.#dawcore.cb.stop = () => GSUsetAttribute( this.rootElement, "playing", false );
+		this.#dawcore.cb.play = () => GSUsetAttribute( this.rootElement, "playing", true );
 
 		this.rootElement.onSubmitLogin = ( email, pass ) => {
-			GSUI.$setAttribute( this.rootElement, "logging", true );
-			GSUI.$setAttribute( this.rootElement, "errauth", false );
+			GSUsetAttribute( this.rootElement, "logging", true );
+			GSUsetAttribute( this.rootElement, "errauth", false );
 			return gsapiClient.login( email, pass )
 				.then( me => {
 					this.#authLoginThen( me );
@@ -159,10 +159,10 @@ class GSDAW {
 					cmps.forEach( cmp => this.#dawcore.$addCompositionByJSObject( cmp.data, opt ) );
 				} )
 				.catch( res => {
-					GSUI.$setAttribute( this.rootElement, "errauth", res.msg );
+					GSUsetAttribute( this.rootElement, "errauth", res.msg );
 					throw res;
 				} )
-				.finally( () => GSUI.$setAttribute( this.rootElement, "logging", false ) );
+				.finally( () => GSUsetAttribute( this.rootElement, "logging", false ) );
 		};
 		this.rootElement.onSubmitOpen = ( url, file ) => {
 			if ( url || file[ 0 ] ) {
@@ -174,7 +174,7 @@ class GSDAW {
 		};
 		this.rootElement.onExportJSON = ( saveMode, id ) => this.#dawcore.$compositionExportJSON( saveMode, id );
 
-		GSUI.$listenEvents( this.rootElement, {
+		GSUlistenEvents( this.rootElement, {
 			gsuiWindows: {
 				open: d => this.#onopenWindow( d.args[ 0 ] ),
 				close: d => this.#oncloseWindow( d.args[ 0 ] ),
@@ -192,16 +192,16 @@ class GSDAW {
 
 					this.#dawcore.$setLoopRate( data.uiRate === "auto" ? 60 : data.uiRate );
 					this.#dawcore.$setSampleRate( data.sampleRate );
-					GSUI.$setAttribute( this.#windows, "lowgraphics", data.windowsLowGraphics );
+					GSUsetAttribute( this.#windows, "lowgraphics", data.windowsLowGraphics );
 					gsuiClock.numbering( data.timelineNumbering );
 					gsuiTimeline.numbering( data.timelineNumbering );
 					localStorage.setItem( "uiRefreshRate", data.uiRate );
 					localStorage.setItem( "gsuiWindows.lowGraphics", +data.windowsLowGraphics );
 					localStorage.setItem( "uiTimeNumbering", data.timelineNumbering );
-					GSUI.$setAttribute( this.rootElement, "uirate", data.uiRate );
-					GSUI.$setAttribute( this.rootElement, "samplerate", data.sampleRate );
-					GSUI.$setAttribute( this.rootElement, "timelinenumbering", data.timelineNumbering );
-					GSUI.$setAttribute( this.rootElement, "windowslowgraphics", data.windowsLowGraphics );
+					GSUsetAttribute( this.rootElement, "uirate", data.uiRate );
+					GSUsetAttribute( this.rootElement, "samplerate", data.sampleRate );
+					GSUsetAttribute( this.rootElement, "timelinenumbering", data.timelineNumbering );
+					GSUsetAttribute( this.rootElement, "windowslowgraphics", data.windowsLowGraphics );
 				},
 				changeDisplayClock( d ) {
 					const display = d.args[ 0 ];
@@ -211,12 +211,12 @@ class GSDAW {
 				export: () => {
 					const dur = this.#dawcore.$getDuration() * 60 / this.#dawcore.$getBPM();
 					const intervalId = setInterval( () => {
-						GSUI.$setAttribute( this.rootElement, "exporting", this.#dawcore.$getCtx().currentTime / dur );
+						GSUsetAttribute( this.rootElement, "exporting", this.#dawcore.$getCtx().currentTime / dur );
 					}, 100 );
 
 					this.#dawcore.$compositionExportWAV().then( obj => {
 						clearInterval( intervalId );
-						GSUI.$setAttribute( this.rootElement, "exporting", 1 );
+						GSUsetAttribute( this.rootElement, "exporting", 1 );
 						this.rootElement.readyToDownload( obj.url, obj.name );
 					} );
 				},
@@ -230,13 +230,13 @@ class GSDAW {
 					this.#dawcore.$callAction( "changeTempo", o.bpm, o.timedivision );
 				},
 				logout: () => {
-					GSUI.$setAttribute( this.rootElement, "logging", true );
+					GSUsetAttribute( this.rootElement, "logging", true );
 					gsapiClient.logout()
-						.finally( () => GSUI.$setAttribute( this.rootElement, "logging", false ) )
+						.finally( () => GSUsetAttribute( this.rootElement, "logging", false ) )
 						.then( () => {
-							GSUI.$setAttribute( this.rootElement, "logged", false );
-							GSUI.$setAttribute( this.rootElement, "useravatar", false );
-							GSUI.$setAttribute( this.rootElement, "username", false );
+							GSUsetAttribute( this.rootElement, "logged", false );
+							GSUsetAttribute( this.rootElement, "useravatar", false );
+							GSUsetAttribute( this.rootElement, "username", false );
 							this.#dawcore.$getCompositions( "cloud" )
 								.forEach( cmp => this.#dawcore.$deleteComposition( "cloud", cmp.id ) );
 							if ( !this.#dawcore.$getCmp() ) {
@@ -255,7 +255,7 @@ class GSDAW {
 					const win = this.#controlsGetFocusedGrid();
 
 					if ( win ) {
-						GSUI.$setAttribute( win.timeline, "currenttime-preview", d.args[ 0 ] );
+						GSUsetAttribute( win.timeline, "currenttime-preview", d.args[ 0 ] );
 					}
 				},
 				currentTime: d => {
@@ -263,8 +263,8 @@ class GSDAW {
 					let tpreview;
 
 					if ( win ) {
-						tpreview = GSUI.$getAttribute( win.timeline, "currenttime-preview" );
-						GSUI.$setAttribute( win.timeline, "currenttime-preview", null );
+						tpreview = GSUgetAttribute( win.timeline, "currenttime-preview" );
+						GSUsetAttribute( win.timeline, "currenttime-preview", null );
 					}
 					this.#dawcore.$setCurrentTime( +( tpreview || d.args[ 0 ] ) );
 				},
@@ -315,7 +315,7 @@ class GSDAW {
 	#initWindowsPos( winId, x, y, wmin, hmin, w, h, icon, name ) {
 		const win = this.#windows.$window( winId );
 
-		GSUI.$setAttribute( win, { x, y, w, h, wmin, hmin, icon, name } );
+		GSUsetAttribute( win, { x, y, w, h, wmin, hmin, icon, name } );
 	}
 	#initWindowsHTML() {
 		document.querySelectorAll( "div[data-window]" ).forEach( winCnt => {
@@ -380,9 +380,9 @@ class GSDAW {
 		const grid = this.#controlsGetFocusedGrid( focStr );
 		const onCmp = focStr === "composition";
 
-		GSUI.$setAttribute( this.rootElement, "focus", onCmp ? "up" : "down" );
-		GSUI.$setAttribute( this.rootElement, "duration", this.#dawcore.$getFocusedDuration() );
-		GSUI.$setAttribute( this.rootElement, "currenttime", beat );
+		GSUsetAttribute( this.rootElement, "focus", onCmp ? "up" : "down" );
+		GSUsetAttribute( this.rootElement, "duration", this.#dawcore.$getFocusedDuration() );
+		GSUsetAttribute( this.rootElement, "currenttime", beat );
 		this.#gsCmp.piano?.rootElement.classList.toggle( "selected", focStr === "keys" );
 		this.#gsCmp.drums?.rootElement.classList.toggle( "selected", focStr === "drums" );
 		this.#gsCmp.slicer?.rootElement.classList.toggle( "selected", focStr === "slices" );
@@ -435,18 +435,18 @@ class GSDAW {
 	#oncmpClickNewLocal() {
 		( !this.#dawcore.$compositionNeedSave()
 			? this.#dawcore.$newComposition()
-			: GSUI.$popup.confirm( "Warning", "Are you sure you want to discard unsaved works" )
+			: GSUpopup.confirm( "Warning", "Are you sure you want to discard unsaved works" )
 				.then( b => b && this.#dawcore.$newComposition() )
 		).then( cmp => cmp && this.#dawcore.$openComposition( "local", cmp.id ) );
 	}
 	#oncmpClickNewCloud() {
 		if ( !gsapiClient.user.id ) {
-			GSUI.$popup.alert( "Error",
+			GSUpopup.alert( "Error",
 				"You can not create a new composition in the <b>cloud</b><br/>without being connected" );
 		} else {
 			( !this.#dawcore.$compositionNeedSave()
 				? this.#dawcore.$newComposition( { saveMode: "cloud" } )
-				: GSUI.$popup.confirm( "Warning", "Are you sure you want to discard unsaved works" )
+				: GSUpopup.confirm( "Warning", "Are you sure you want to discard unsaved works" )
 					.then( b => b && this.#dawcore.$newComposition( { saveMode: "cloud" } ) )
 			).then( cmp => cmp && this.#dawcore.$openComposition( "cloud", cmp.id ) );
 		}
@@ -458,7 +458,7 @@ class GSDAW {
 	}
 	#oncmpClickOpen( saveMode, id ) {
 		if ( this.#dawcore.$compositionNeedSave() ) {
-			GSUI.$popup.confirm( "Warning",
+			GSUpopup.confirm( "Warning",
 				"Are you sure you want to discard unsaved works"
 			).then( ok => ok && this.#dawcore.$openComposition( saveMode, id ) );
 		} else {
@@ -468,7 +468,7 @@ class GSDAW {
 	#oncmpClickDelete( saveMode, id ) {
 		const cmp = this.#dawcore.$getComposition( saveMode, id );
 
-		GSUI.$popup.confirm( "Warning",
+		GSUpopup.confirm( "Warning",
 			`Are you sure you want to delete "${ cmp.name }" ? (no undo possible)`,
 			"Delete"
 		).then( b => {
@@ -478,7 +478,7 @@ class GSDAW {
 					: Promise.resolve() )
 					.catch( err => {
 						if ( err.code !== 404 ) {
-							GSUI.$popup.alert( `Error ${ err.code }`,
+							GSUpopup.alert( `Error ${ err.code }`,
 								"An error happened while deleting " +
 								"your composition&nbsp;:<br/>" +
 								`<code>${ err.msg || err }</code>` );
@@ -503,7 +503,7 @@ class GSDAW {
 		const id = this.#dawcore.$getOpened( area );
 
 		if ( id ) {
-			GSUI.$popup.prompt( title, "", e.currentTarget.textContent, "Rename" )
+			GSUpopup.prompt( title, "", e.currentTarget.textContent, "Rename" )
 				.then( name => this.#dawcore.$callAction( action, id, name ) );
 		}
 	}
@@ -519,7 +519,7 @@ class GSDAW {
 	}
 	#ondrop( e ) {
 		e.preventDefault();
-		this.#dawcore.$dropFiles( GSUI.$getFilesDataTransfert( e.dataTransfer.items ) );
+		this.#dawcore.$dropFiles( GSUgetFilesDataTransfert( e.dataTransfer.items ) );
 	}
 	#oncmpDrop( saveMode, id ) {
 		const to = saveMode === "local" ? "cloud" : "local";
@@ -528,7 +528,7 @@ class GSDAW {
 
 		return !cmpTo
 			? Promise.resolve( cmpFrom )
-			: GSUI.$popup.confirm( "Warning",
+			: GSUpopup.confirm( "Warning",
 				"Are you sure you want to overwrite " +
 				`the <b>${ to }</b> composition <i>${ cmpTo.name || "Untitled" }</i>&nbsp;?` )
 				.then( b => {
@@ -549,14 +549,14 @@ class GSDAW {
 				.then( cmp => this.#authSaveComposition( cmp ) )
 				.then( cmp => this.#dawcore.$addCompositionByJSObject( cmp, { saveMode: "cloud" } ) );
 		} else {
-			GSUI.$popup.alert( "Error",
+			GSUpopup.alert( "Error",
 				"You need to be connected to your account before uploading your composition" );
 		}
 	}
 	#authSaveComposition( cmp ) {
 		return gsapiClient.saveComposition( cmp )
 			.then( () => cmp, err => {
-				GSUI.$popup.alert( `Error ${ err.code }`,
+				GSUpopup.alert( `Error ${ err.code }`,
 					"An error happened while saving your composition&nbsp;:<br/>" +
 					`<code>${ err.msg || err }</code>`
 				);
@@ -564,7 +564,7 @@ class GSDAW {
 			} );
 	}
 	#authGetMe() {
-		GSUI.$setAttribute( this.rootElement, "logging", true );
+		GSUsetAttribute( this.rootElement, "logging", true );
 		return gsapiClient.getMe()
 			.then( me => {
 				this.#authLoginThen( me );
@@ -580,12 +580,12 @@ class GSDAW {
 					throw res;
 				}
 			} )
-			.finally( () => GSUI.$setAttribute( this.rootElement, "logging", false ) );
+			.finally( () => GSUsetAttribute( this.rootElement, "logging", false ) );
 	}
 	#authLoginThen( me ) {
-		GSUI.$setAttribute( this.rootElement, "useravatar", me.avatar );
-		GSUI.$setAttribute( this.rootElement, "username", me.username );
-		GSUI.$setAttribute( this.rootElement, "logged", true );
+		GSUsetAttribute( this.rootElement, "useravatar", me.avatar );
+		GSUsetAttribute( this.rootElement, "username", me.username );
+		GSUsetAttribute( this.rootElement, "logged", true );
 		return me;
 	}
 
@@ -603,8 +603,8 @@ class GSDAW {
 			name: cmp.name,
 			duration: cmp.duration,
 		}, {} );
-		GSUI.$setAttribute( this.rootElement, "currentcomposition", false );
-		GSUI.$setAttribute( this.#libraries.rootElement, "lib", "default" );
+		GSUsetAttribute( this.rootElement, "currentcomposition", false );
+		GSUsetAttribute( this.#libraries.rootElement, "lib", "default" );
 		this.#gsCmp.synth?.clear();
 		this.#gsCmp.mixer?.clear();
 		this.#gsCmp.drums?.clear();
@@ -656,20 +656,20 @@ class GSDAW {
 			Object.entries( obj.patterns ).forEach( kv => this.#onupdatePattern( ...kv ) );
 		} ],
 		[ "timedivision", function( obj ) {
-			GSUI.$setAttribute( this.rootElement, "timedivision", obj.timedivision );
+			GSUsetAttribute( this.rootElement, "timedivision", obj.timedivision );
 		} ],
 		[ "bpm", function( { bpm } ) {
-			GSUI.$setAttribute( this.rootElement, "bpm", bpm );
+			GSUsetAttribute( this.rootElement, "bpm", bpm );
 			this.rootElement.updateComposition( this.#dawcore.$getCmp() );
 		} ],
 		[ "name", function( { name } ) {
 			this.#setTitle( name );
 			this.rootElement.updateComposition( this.#dawcore.$getCmp() );
-			GSUI.$setAttribute( this.rootElement, "name", name );
+			GSUsetAttribute( this.rootElement, "name", name );
 		} ],
 		[ "duration", function( { duration } ) {
 			if ( this.#dawcore.$getFocusedName() === "composition" ) {
-				GSUI.$setAttribute( this.rootElement, "duration", duration );
+				GSUsetAttribute( this.rootElement, "duration", duration );
 			}
 			this.rootElement.updateComposition( this.#dawcore.$getCmp() );
 		} ],
@@ -680,7 +680,7 @@ class GSDAW {
 				this.#elements.slicesName.textContent = pat.name;
 				this.#windows.$window( "slicer" ).$open();
 				if ( this.#dawcore.$getFocusedName() === "slices" ) {
-					GSUI.$setAttribute( this.rootElement, "duration", this.#dawcore.$getPattern( pat.source )?.duration ?? this.#dawcore.$getBeatsPerMeasure() );
+					GSUsetAttribute( this.rootElement, "duration", this.#dawcore.$getPattern( pat.source )?.duration ?? this.#dawcore.$getBeatsPerMeasure() );
 				}
 			} else {
 				this.#elements.slicesName.textContent = "";
@@ -693,7 +693,7 @@ class GSDAW {
 				this.#elements.drumsName.textContent = pat.name;
 				this.#windows.$window( "drums" ).$open();
 				if ( this.#dawcore.$getFocusedName() === "drums" ) {
-					GSUI.$setAttribute( this.rootElement, "duration", pat.duration );
+					GSUsetAttribute( this.rootElement, "duration", pat.duration );
 				}
 			} else {
 				this.#elements.drumsName.textContent = "";
@@ -717,7 +717,7 @@ class GSDAW {
 
 				this.#elements.pianorollName.textContent = pat.name;
 				if ( this.#dawcore.$getFocusedName() === "keys" ) {
-					GSUI.$setAttribute( this.rootElement, "duration", pat.duration );
+					GSUsetAttribute( this.rootElement, "duration", pat.duration );
 				}
 				this.#windows.$window( "piano" ).$open();
 			} else {
@@ -731,7 +731,7 @@ class GSDAW {
 				const foc = this.#dawcore.$getFocusedName();
 
 				if ( foc !== "composition" && id === this.#dawcore.$getOpened( foc ) ) {
-					GSUI.$setAttribute( this.rootElement, "duration", obj.duration );
+					GSUsetAttribute( this.rootElement, "duration", obj.duration );
 				}
 			}
 			if ( "name" in obj ) {
@@ -769,7 +769,7 @@ class GSDAW {
 			if ( pat.type === "buffer" && pat.buffer === id ) {
 				const bpm = pat.bufferBpm || this.#dawcore.$getBPM();
 
-				GSUI.$setAttribute( elBlc, "data-missing", false );
+				GSUsetAttribute( elBlc, "data-missing", false );
 				gsuiSVGPatterns.$setSVGViewbox( "buffer", elBlc._gsuiSVGform, blc.offset, blc.duration, bpm / 60 );
 			}
 		} );

@@ -3,14 +3,14 @@
 class GSSynth {
 	#dawcore = null;
 	#synthId = null;
-	rootElement = GSUI.$createElement( "gsui-synthesizer" );
+	rootElement = GSUcreateElement( "gsui-synthesizer" );
 	#dataSynth = new DAWCoreControllers.synth( {
 		dataCallbacks: {
 			addOsc: ( id, osc ) => this.rootElement.addOscillator( id, osc ),
 			removeOsc: id => this.rootElement.removeOscillator( id ),
 			changeEnvProp: ( k, v ) => this.rootElement.changeEnvProp( k, v ),
 			changeLFOProp: ( k, v ) => this.rootElement.changeLFOProp( k, v ),
-			changeOscProp: ( id, k, v ) => GSUI.$setAttribute( this.rootElement.getOscillator( id ), k, v ),
+			changeOscProp: ( id, k, v ) => GSUsetAttribute( this.rootElement.getOscillator( id ), k, v ),
 			updateEnvWave: () => this.rootElement.env.updateWave(),
 			updateLFOWave: () => this.rootElement.lfo.updateWave(),
 			updateOscWave: id => this.rootElement.getOscillator( id ).updateWave(),
@@ -80,8 +80,8 @@ class GSSynth {
 		const synObj = obj.synths && obj.synths[ this.#synthId ];
 
 		if ( obj.timedivision ) {
-			GSUI.$setAttribute( this.rootElement.env, "timedivision", obj.timedivision );
-			GSUI.$setAttribute( this.rootElement.lfo, "timedivision", obj.timedivision );
+			GSUsetAttribute( this.rootElement.env, "timedivision", obj.timedivision );
+			GSUsetAttribute( this.rootElement.lfo, "timedivision", obj.timedivision );
 		}
 		if ( synObj ) {
 			this.#dataSynth.change( synObj );
