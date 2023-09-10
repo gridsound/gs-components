@@ -96,7 +96,7 @@ class GSDAW {
 		this.#windows.$window( "main" ).$open();
 		this.#windows.$window( "mixer" ).$open();
 		gswaPeriodicWaves.$loadWaves( gswaPeriodicWavesList )
-			.forEach( ( w, name ) => gsuiPeriodicWave.addWave( name, w.real, w.imag ) );
+			.forEach( ( w, name ) => gsuiPeriodicWave.$addWave( name, w.real, w.imag ) );
 	}
 	#initEvents() {
 		window.onblur = () => this.#gsCmp.piano?.getUIKeys().midiReleaseAllKeys();
