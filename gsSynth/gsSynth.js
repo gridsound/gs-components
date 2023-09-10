@@ -13,7 +13,6 @@ class GSSynth {
 			changeOscProp: ( id, k, v ) => GSUsetAttribute( this.rootElement.getOscillator( id ), k, v ),
 			updateEnvWave: () => this.rootElement.env.updateWave(),
 			updateLFOWave: () => this.rootElement.lfo.updateWave(),
-			updateOscWave: id => this.rootElement.getOscillator( id ).updateWave(),
 		},
 	} );
 
