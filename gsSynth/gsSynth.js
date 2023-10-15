@@ -10,9 +10,18 @@ class GSSynth {
 			removeOsc: id => this.rootElement.removeOscillator( id ),
 			changeEnvProp: ( k, v ) => this.rootElement.changeEnvProp( k, v ),
 			changeLFOProp: ( k, v ) => this.rootElement.changeLFOProp( k, v ),
-			changeOscProp: ( id, k, v ) => GSUsetAttribute( this.rootElement.getOscillator( id ), k, v ),
 			updateEnvWave: () => this.rootElement.env.updateWave(),
 			updateLFOWave: () => this.rootElement.lfo.updateWave(),
+			changeOscProp: ( id, k, v ) => {
+				const osc = this.rootElement.getOscillator( id );
+
+				if ( k !== "source" ) {
+					GSUsetAttribute( osc, k, v );
+				} else {
+					GSUsetAttribute( osc, k, v && this.#dawcore.$getPattern( v ).name );
+					osc.$updateSourceWave( gsuiSVGPatterns.$createSVG( "bufferHD", v ) );
+				}
+			},
 		},
 	} );
 
@@ -54,6 +63,8 @@ class GSSynth {
 						case "remove": dc.$callAction( "removeOscillator", id, oscId ); break;
 						case "change": dc.$callAction( "changeOscillator", id, oscId, ...a ); break;
 						case "liveChange": dc.$liveChangeSynth( id, { oscillators: { [ oscId ]: { [ a[ 0 ] ]: a[ 1 ] } } } ); break;
+						case "wavedrop":
+						case "drop": dc.$callAction( "changeOscillatorSource", id, oscId, a[ 0 ], d.eventName === "drop" ); break;
 					}
 				} break;
 			}
