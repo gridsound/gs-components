@@ -6,22 +6,36 @@ class GSSynth {
 	rootElement = GSUcreateElement( "gsui-synthesizer" );
 	#dataSynth = new DAWCoreControllers.synth( {
 		dataCallbacks: {
-			addOsc: ( id, osc ) => this.rootElement.addOscillator( id, osc ),
+			addOsc: ( id, osc ) => {
+				const osc2 = { ...osc };
+
+				if ( osc.source ) {
+					osc2.source = this.#dawcore.$getPattern( osc.source ).name;
+				}
+
+				const uiOsc = this.rootElement.addOscillator( id, osc2 );
+
+				if ( osc.source ) {
+					uiOsc.$updateSourceWaveform( gsuiSVGPatterns.$createSVG( "bufferHD", osc.source ) );
+				}
+			},
 			removeOsc: id => this.rootElement.removeOscillator( id ),
+			changeOscProp: ( id, k, v ) => {
+				const uiOsc = this.rootElement.getOscillator( id );
+
+				if ( k === 'source' && v ) {
+					const v2 = this.#dawcore.$getPattern( v ).name;
+
+					uiOsc.$updateSourceWaveform( gsuiSVGPatterns.$createSVG( "bufferHD", v ) );
+					GSUsetAttribute( uiOsc, k, v2 );
+				} else {
+					GSUsetAttribute( uiOsc, k, v );
+				}
+			},
 			changeEnvProp: ( k, v ) => this.rootElement.changeEnvProp( k, v ),
 			changeLFOProp: ( k, v ) => this.rootElement.changeLFOProp( k, v ),
 			updateEnvWave: () => this.rootElement.env.updateWave(),
 			updateLFOWave: () => this.rootElement.lfo.updateWave(),
-			changeOscProp: ( id, k, v ) => {
-				const osc = this.rootElement.getOscillator( id );
-
-				if ( k !== "source" ) {
-					GSUsetAttribute( osc, k, v );
-				} else {
-					GSUsetAttribute( osc, k, v && this.#dawcore.$getPattern( v ).name );
-					osc.$updateSourceWave( gsuiSVGPatterns.$createSVG( "bufferHD", v ) );
-				}
-			},
 		},
 	} );
 
@@ -50,6 +64,7 @@ class GSSynth {
 					break;
 				case "gsuiSynthesizer":
 					switch ( d.eventName ) {
+						case "addNewBuffer": dc.$callAction( "addOscillatorSource", id, a[ 0 ] ); break;
 						case "toggleEnv": dc.$callAction( "toggleEnv", id ); break;
 						case "toggleLFO": dc.$callAction( "toggleLFO", id ); break;
 						case "addOscillator": dc.$callAction( "addOscillator", id ); break;
@@ -86,13 +101,21 @@ class GSSynth {
 		}
 	}
 	change( obj ) {
-		const daw = this.#dawcore;
 		const synObj = obj.synths && obj.synths[ this.#synthId ];
 
 		if ( obj.timedivision ) {
 			GSUsetAttribute( this.rootElement.env, "timedivision", obj.timedivision );
 			GSUsetAttribute( this.rootElement.lfo, "timedivision", obj.timedivision );
 		}
+		GSUforEach( obj.patterns, ( patId, patObj ) => {
+			if ( "name" in patObj ) {
+				GSUforEach( this.#dataSynth.data.oscillators, ( idOsc, osc ) => {
+					if ( osc.source === patId ) {
+						GSUsetAttribute( this.rootElement.getOscillator( idOsc ), "source", patObj.name );
+					}
+				} );
+			}
+		} );
 		if ( synObj ) {
 			this.#dataSynth.change( synObj );
 			if ( synObj.oscillators ) {
