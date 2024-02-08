@@ -148,10 +148,10 @@ class GSDAW {
 		this.rootElement.onSubmitLogin = ( email, pass ) => {
 			GSUsetAttribute( this.rootElement, "logging", true );
 			GSUsetAttribute( this.rootElement, "errauth", false );
-			return gsapiClient.login( email, pass )
+			return gsapiClient.$login( email, pass )
 				.then( me => {
 					this.#authLoginThen( me );
-					return gsapiClient.getUserCompositions( me.id );
+					return gsapiClient.$getUserCompositions( me.id );
 				} )
 				.then( cmps => {
 					const opt = { saveMode: "cloud" };
@@ -231,7 +231,7 @@ class GSDAW {
 				},
 				logout: () => {
 					GSUsetAttribute( this.rootElement, "logging", true );
-					gsapiClient.logout()
+					gsapiClient.$logout()
 						.finally( () => GSUsetAttribute( this.rootElement, "logging", false ) )
 						.then( () => {
 							GSUsetAttribute( this.rootElement, "logged", false );
@@ -440,7 +440,7 @@ class GSDAW {
 		).then( cmp => cmp && this.#dawcore.$openComposition( "local", cmp.id ) );
 	}
 	#oncmpClickNewCloud() {
-		if ( !gsapiClient.user.id ) {
+		if ( !gsapiClient.$user.id ) {
 			GSUpopup.alert( "Error",
 				"You can not create a new composition in the <b>cloud</b><br/>without being connected" );
 		} else {
@@ -474,7 +474,7 @@ class GSDAW {
 		).then( b => {
 			if ( b ) {
 				( saveMode === "cloud"
-					? gsapiClient.deleteComposition( id )
+					? gsapiClient.$deleteComposition( id )
 					: Promise.resolve() )
 					.catch( err => {
 						if ( err.code !== 404 ) {
@@ -544,7 +544,7 @@ class GSDAW {
 			.then( cmp => DAWCoreLocalStorage.$put( cmp.id, cmp ) );
 	}
 	#oncmpCloudDrop( saveMode, id ) {
-		if ( gsapiClient.user.id ) {
+		if ( gsapiClient.$user.id ) {
 			this.#oncmpDrop( saveMode, id )
 				.then( cmp => this.#authSaveComposition( cmp ) )
 				.then( cmp => this.#dawcore.$addCompositionByJSObject( cmp, { saveMode: "cloud" } ) );
@@ -554,7 +554,7 @@ class GSDAW {
 		}
 	}
 	#authSaveComposition( cmp ) {
-		return gsapiClient.saveComposition( cmp )
+		return gsapiClient.$saveComposition( cmp )
 			.then( () => cmp, err => {
 				GSUpopup.alert( `Error ${ err.code }`,
 					"An error happened while saving your composition&nbsp;:<br/>" +
@@ -565,10 +565,10 @@ class GSDAW {
 	}
 	#authGetMe() {
 		GSUsetAttribute( this.rootElement, "logging", true );
-		return gsapiClient.getMe()
+		return gsapiClient.$getMe()
 			.then( me => {
 				this.#authLoginThen( me );
-				return gsapiClient.getUserCompositions( me.id );
+				return gsapiClient.$getUserCompositions( me.id );
 			} )
 			.then( cmps => {
 				const opt = { saveMode: "cloud" };
