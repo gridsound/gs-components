@@ -13,15 +13,15 @@ class GSSynth {
 					osc2.source = this.#dawcore.$getPattern( osc.source ).name;
 				}
 
-				const uiOsc = this.rootElement.addOscillator( id, osc2 );
+				const uiOsc = this.rootElement.$addOscillator( id, osc2 );
 
 				if ( osc.source ) {
 					uiOsc.$updateSourceWaveform( gsuiSVGPatterns.$createSVG( "bufferHD", osc.source ) );
 				}
 			},
-			removeOsc: id => this.rootElement.removeOscillator( id ),
+			removeOsc: id => this.rootElement.$removeOscillator( id ),
 			changeOscProp: ( id, k, v ) => {
-				const uiOsc = this.rootElement.getOscillator( id );
+				const uiOsc = this.rootElement.$getOscillator( id );
 
 				if ( k === 'source' && v ) {
 					const v2 = this.#dawcore.$getPattern( v ).name;
@@ -32,8 +32,8 @@ class GSSynth {
 					GSUsetAttribute( uiOsc, k, v );
 				}
 			},
-			changeEnvProp: ( k, v ) => this.rootElement.changeEnvProp( k, v ),
-			changeLFOProp: ( k, v ) => this.rootElement.changeLFOProp( k, v ),
+			changeEnvProp: ( k, v ) => this.rootElement.$changeEnvProp( k, v ),
+			changeLFOProp: ( k, v ) => this.rootElement.$changeLFOProp( k, v ),
 			updateEnvWave: () => this.rootElement.env.updateWave(),
 			updateLFOWave: () => this.rootElement.lfo.updateWave(),
 		},
@@ -42,7 +42,7 @@ class GSSynth {
 	constructor() {
 		Object.seal( this );
 
-		this.rootElement.setWaveList( gswaPeriodicWavesList.map( arr => arr[ 0 ] ) );
+		this.rootElement.$setWaveList( gswaPeriodicWavesList.map( arr => arr[ 0 ] ) );
 		this.rootElement.addEventListener( "gsuiEvents", e => {
 			const d = e.detail;
 			const a = d.args;
@@ -64,7 +64,7 @@ class GSSynth {
 					break;
 				case "gsuiSynthesizer":
 					switch ( d.eventName ) {
-						case "addNewBuffer": dc.$callAction( "addOscillatorSource", id, a[ 0 ] ); break;
+						case "addNewBuffer": dc.$callAction( "addOscillatorSource", id, ...a ); break;
 						case "toggleEnv": dc.$callAction( "toggleEnv", id ); break;
 						case "toggleLFO": dc.$callAction( "toggleLFO", id ); break;
 						case "addOscillator": dc.$callAction( "addOscillator", id ); break;
@@ -79,7 +79,7 @@ class GSSynth {
 						case "change": dc.$callAction( "changeOscillator", id, oscId, ...a ); break;
 						case "liveChange": dc.$liveChangeSynth( id, { oscillators: { [ oscId ]: { [ a[ 0 ] ]: a[ 1 ] } } } ); break;
 						case "wavedrop":
-						case "drop": dc.$callAction( "changeOscillatorSource", id, oscId, a[ 0 ], d.eventName === "drop" ); break;
+						case "drop": dc.$callAction( "changeOscillatorSource", id, oscId, ...a, d.eventName === "drop" ); break;
 					}
 				} break;
 			}
@@ -108,10 +108,10 @@ class GSSynth {
 			GSUsetAttribute( this.rootElement.lfo, "timedivision", obj.timedivision );
 		}
 		GSUforEach( obj.patterns, ( patId, patObj ) => {
-			if ( "name" in patObj ) {
+			if ( patObj && "name" in patObj ) {
 				GSUforEach( this.#dataSynth.data.oscillators, ( idOsc, osc ) => {
 					if ( osc.source === patId ) {
-						GSUsetAttribute( this.rootElement.getOscillator( idOsc ), "source", patObj.name );
+						GSUsetAttribute( this.rootElement.$getOscillator( idOsc ), "source", patObj.name );
 					}
 				} );
 			}
@@ -119,7 +119,7 @@ class GSSynth {
 		if ( synObj ) {
 			this.#dataSynth.change( synObj );
 			if ( synObj.oscillators ) {
-				this.rootElement.reorderOscillators( synObj.oscillators );
+				this.rootElement.$reorderOscillators( synObj.oscillators );
 			}
 		}
 		if ( "synthOpened" in obj ) {
