@@ -32,20 +32,7 @@ class GSPatterns {
 		uiPatterns.$getChannels = () => this.#dawcore.$getChannels();
 		GSUlistenEvents( uiPatterns, {
 			gsuiPatterns: {
-				libraryBufferDropped: d => {
-					const [ lib, bufURL ] = d.args;
-					const [ hash, name ] = bufURL.split( ":" );
-
-					this.#dawcore.$buffersGetAudioBuffer( hash )
-						.then( buf => {
-							const obj = this.#dawcore.$callAction( "addPatternBuffer", lib, bufURL, buf );
-							const buf2 = obj && Object.entries( obj.buffers )[ 0 ];
-
-							if ( buf2 ) {
-								this.#dawcore.$callCallback( "buffersLoaded", buf2[ 0 ], { ...buf2[ 1 ], buffer: buf } );
-							}
-						} );
-				},
+				libraryBufferDropped: d => this.#dawcore.$callAction( "addPatternBuffer", ...d.args ),
 			},
 		} );
 		this.data = Object.freeze( {
