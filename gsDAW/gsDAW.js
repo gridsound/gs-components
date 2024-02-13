@@ -71,7 +71,7 @@ class GSDAW {
 			lowgraphics: !!+( localStorage.getItem( "gsuiWindows.lowGraphics" ) || "0" ),
 		} );
 		GSUsetAttribute( this.rootElement.clock, "mode", localStorage.getItem( "gsuiClock.display" ) || "second" );
-		gsuiClock.numbering( localStorage.getItem( "uiTimeNumbering" ) || "1" );
+		gsuiClock.$numbering( localStorage.getItem( "uiTimeNumbering" ) || "1" );
 		gsuiTimeline.numbering( localStorage.getItem( "uiTimeNumbering" ) || "1" );
 		this.#elements = GSUfindElements( document.body, {
 			drumsName: "[data-target=drums]",
@@ -193,7 +193,7 @@ class GSDAW {
 					this.#dawcore.$setLoopRate( data.uiRate === "auto" ? 60 : data.uiRate );
 					this.#dawcore.$setSampleRate( data.sampleRate );
 					GSUsetAttribute( this.#windows, "lowgraphics", data.windowsLowGraphics );
-					gsuiClock.numbering( data.timelineNumbering );
+					gsuiClock.$numbering( data.timelineNumbering );
 					gsuiTimeline.numbering( data.timelineNumbering );
 					localStorage.setItem( "uiRefreshRate", data.uiRate );
 					localStorage.setItem( "gsuiWindows.lowGraphics", +data.windowsLowGraphics );
@@ -511,7 +511,7 @@ class GSDAW {
 		const id = this.#dawcore.$getOpened( "synth" );
 
 		if ( id ) {
-			gsuiChannels.openSelectChannelPopup(
+			gsuiChannels.$openSelectChannelPopup(
 				this.#dawcore.$getChannels(),
 				this.#dawcore.$getSynth( id ).dest
 			).then( chanId => chanId && this.#dawcore.$callAction( "redirectSynth", id, chanId ) );
