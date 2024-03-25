@@ -3,8 +3,8 @@
 class GSMixer {
 	#dawcore = null;
 	rootElement = GSUcreateElement( "gsui-mixer" );
-	#channels = this.rootElement.getChannels();
-	#effects = this.rootElement.getEffects();
+	#channels = this.rootElement.$getChannels();
+	#effects = this.rootElement.$getEffects();
 	#destFilter = "main";
 	#ctrlChannels = new DAWCoreControllers.mixer( {
 		dataCallbacks: {

@@ -76,7 +76,7 @@ class GSPatterns {
 		}, {} );
 
 		gsuiSVGPatterns.$update( "buffer", bufToPat[ id ], buf );
-		this.#uiPatterns.changePattern( bufToPat[ id ], "data-missing", false );
+		this.#uiPatterns.$changePattern( bufToPat[ id ], "data-missing", false );
 	}
 	change( obj ) {
 		this.#synthsCrud( obj.synths );
@@ -96,19 +96,19 @@ class GSPatterns {
 			} );
 		}
 		if ( obj.patterns ) {
-			this.#uiPatterns.reorderPatterns( obj.patterns );
+			this.#uiPatterns.$reorderPatterns( obj.patterns );
 		}
 		if ( "patternSlicesOpened" in obj ) {
-			this.#uiPatterns.selectPattern( "slices", obj.patternSlicesOpened );
+			this.#uiPatterns.$selectPattern( "slices", obj.patternSlicesOpened );
 		}
 		if ( "patternDrumsOpened" in obj ) {
-			this.#uiPatterns.selectPattern( "drums", obj.patternDrumsOpened );
+			this.#uiPatterns.$selectPattern( "drums", obj.patternDrumsOpened );
 		}
 		if ( "patternKeysOpened" in obj ) {
-			this.#uiPatterns.selectPattern( "keys", obj.patternKeysOpened );
+			this.#uiPatterns.$selectPattern( "keys", obj.patternKeysOpened );
 		}
 		if ( "synthOpened" in obj ) {
-			this.#uiPatterns.selectSynth( obj.synthOpened );
+			this.#uiPatterns.$selectSynth( obj.synthOpened );
 		}
 	}
 
@@ -116,7 +116,7 @@ class GSPatterns {
 	#updatePatternContent( id ) {
 		const daw = this.#dawcore;
 		const pat = daw.$getPattern( id );
-		const elPat = this.#uiPatterns.getPattern( id );
+		const elPat = this.#uiPatterns.$getPattern( id );
 
 		if ( elPat ) {
 			gsuiSVGPatterns.$update( pat.type, id,
@@ -144,7 +144,7 @@ class GSPatterns {
 	// .........................................................................
 	#createSynth( id, obj ) {
 		this.data.synths[ id ] = GSUjsonCopy( obj );
-		this.#uiPatterns.addSynth( id );
+		this.#uiPatterns.$addSynth( id );
 		this.#updateSynth( id, obj );
 	}
 	#updateSynth( id, obj ) {
@@ -152,15 +152,15 @@ class GSPatterns {
 
 		Object.entries( obj ).forEach( ( [ prop, val ] ) => {
 			dat[ prop ] = val;
-			this.#uiPatterns.changeSynth( id, prop, val );
+			this.#uiPatterns.$changeSynth( id, prop, val );
 		} );
 		if ( "dest" in obj ) {
-			this.#uiPatterns.changeSynth( id, "destName", this.#dawcore.$getChannel( obj.dest ).name );
+			this.#uiPatterns.$changeSynth( id, "destName", this.#dawcore.$getChannel( obj.dest ).name );
 		}
 	}
 	#deleteSynth( id ) {
 		delete this.data.synths[ id ];
-		this.#uiPatterns.deleteSynth( id );
+		this.#uiPatterns.$deleteSynth( id );
 	}
 
 	// .........................................................................
@@ -182,11 +182,11 @@ class GSPatterns {
 			this.data.patterns[ id ].bufferHash = bufHash;
 			this.#gsLibraries.$bookmarkBuffer( bufHash, true );
 		}
-		this.#uiPatterns.addPattern( id, obj );
+		this.#uiPatterns.$addPattern( id, obj );
 		this.#updatePattern( id, obj );
-		this.#uiPatterns.appendPatternSVG( id, gsuiSVGPatterns.$createSVG( type, id ) );
+		this.#uiPatterns.$appendPatternSVG( id, gsuiSVGPatterns.$createSVG( type, id ) );
 		if ( isBuf && !buf ) {
-			this.#uiPatterns.changePattern( id, "data-missing", true );
+			this.#uiPatterns.$changePattern( id, "data-missing", true );
 		}
 	}
 	#updatePattern( id, obj ) {
@@ -194,10 +194,10 @@ class GSPatterns {
 
 		Object.entries( obj ).forEach( ( [ prop, val ] ) => {
 			dat[ prop ] = val;
-			this.#uiPatterns.changePattern( id, prop, val );
+			this.#uiPatterns.$changePattern( id, prop, val );
 		} );
 		if ( "dest" in obj ) {
-			this.#uiPatterns.changePattern( id, "destName", this.#dawcore.$getChannel( obj.dest ).name );
+			this.#uiPatterns.$changePattern( id, "destName", this.#dawcore.$getChannel( obj.dest ).name );
 		}
 	}
 	#deletePattern( id ) {
@@ -209,7 +209,7 @@ class GSPatterns {
 			gsuiSVGPatterns.$delete( "bufferHD", id );
 			this.#gsLibraries.$bookmarkBuffer( pat.bufferHash, false );
 		}
-		this.#uiPatterns.deletePattern( id );
+		this.#uiPatterns.$deletePattern( id );
 	}
 
 	// .........................................................................
@@ -218,7 +218,7 @@ class GSPatterns {
 	}
 	#updateChannel( id, obj ) {
 		if ( "name" in obj ) {
-			this.#uiPatterns.updateChannel( id, obj.name );
+			this.#uiPatterns.$updateChannel( id, obj.name );
 		}
 	}
 	#deleteChannel( id ) {

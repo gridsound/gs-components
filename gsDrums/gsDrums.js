@@ -8,11 +8,11 @@ class GSDrums {
 	timeline = this.rootElement.timeline;
 	#dataDrums = new DAWCoreControllers.drums( {
 		dataCallbacks: {
-			addDrum: ( id, drum ) => this.rootElement.addDrum( id, drum ),
-			addDrumcut: ( id, drumcut ) => this.rootElement.addDrumcut( id, drumcut ),
-			changeDrum: ( id, prop, val ) => this.rootElement.changeDrum( id, prop, val ),
-			removeDrum: id => this.rootElement.removeDrum( id ),
-			removeDrumcut: id => this.rootElement.removeDrumcut( id ),
+			addDrum: ( id, drum ) => this.rootElement.$addDrum( id, drum ),
+			addDrumcut: ( id, drumcut ) => this.rootElement.$addDrumcut( id, drumcut ),
+			changeDrum: ( id, prop, val ) => this.rootElement.$changeDrum( id, prop, val ),
+			removeDrum: id => this.rootElement.$removeDrum( id ),
+			removeDrumcut: id => this.rootElement.$removeDrumcut( id ),
 		},
 	} );
 	#dataDrumrows = new DAWCoreControllers.drumrows( {
@@ -84,7 +84,7 @@ class GSDrums {
 	setDAWCore( core ) {
 		this.#dawcore = core;
 	}
-	selectPattern( id ) {
+	$selectPattern( id ) {
 		if ( id !== this.#patternId ) {
 			this.#patternId = id;
 			this.#drumsId = null;
@@ -119,11 +119,11 @@ class GSDrums {
 			this.#dataDrums.change( drmObj );
 		}
 		if ( "patternDrumsOpened" in obj ) {
-			this.selectPattern( obj.patternDrumsOpened );
+			this.$selectPattern( obj.patternDrumsOpened );
 		}
 	}
 	clear() {
-		this.selectPattern( null );
+		this.$selectPattern( null );
 		this.#dataDrumrows.clear();
 		this.#dawcore.$drumsClearLoop();
 	}

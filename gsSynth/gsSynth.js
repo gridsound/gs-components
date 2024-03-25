@@ -91,7 +91,7 @@ class GSSynth {
 	setDAWCore( core ) {
 		this.#dawcore = core;
 	}
-	selectSynth( id ) {
+	$selectSynth( id ) {
 		if ( id !== this.#synthId ) {
 			this.#synthId = id;
 			this.#dataSynth.clear();
@@ -123,7 +123,7 @@ class GSSynth {
 			}
 		}
 		if ( "synthOpened" in obj ) {
-			this.selectSynth( obj.synthOpened );
+			this.$selectSynth( obj.synthOpened );
 		}
 	}
 	clear() {

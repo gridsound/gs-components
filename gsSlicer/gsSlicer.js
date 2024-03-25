@@ -7,16 +7,16 @@ class GSSlicer {
 		dataCallbacks: {
 			disabled: b => GSUsetAttribute( this.rootElement, "disabled", b ),
 			timedivision: timediv => GSUsetAttribute( this.rootElement, "timedivision", timediv ),
-			setBuffer: buf => this.rootElement.setBuffer( buf ),
-			renameBuffer: name => this.rootElement.setBufferName( name ),
+			setBuffer: buf => this.rootElement.$setBuffer( buf ),
+			renameBuffer: name => this.rootElement.$setBufferName( name ),
 			removeBuffer: () => {
-				this.rootElement.removeBuffer();
+				this.rootElement.$removeBuffer();
 				GSUsetAttribute( this.rootElement, "duration", this.#dawcore.$getBeatsPerMeasure() );
 			},
 			changeDuration: dur => GSUsetAttribute( this.rootElement, "duration", dur ),
-			addSlice: ( id, obj ) => this.rootElement.addSlice( id, obj ),
-			changeSlice: ( id, obj ) => this.rootElement.changeSlice( id, obj ),
-			removeSlice: id => this.rootElement.removeSlice( id ),
+			addSlice: ( id, obj ) => this.rootElement.$addSlice( id, obj ),
+			changeSlice: ( id, obj ) => this.rootElement.$changeSlice( id, obj ),
+			removeSlice: id => this.rootElement.$removeSlice( id ),
 		},
 	} );
 

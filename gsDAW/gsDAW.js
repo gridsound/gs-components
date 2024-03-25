@@ -72,7 +72,7 @@ class GSDAW {
 		} );
 		GSUsetAttribute( this.rootElement.clock, "mode", localStorage.getItem( "gsuiClock.display" ) || "second" );
 		gsuiClock.$numbering( localStorage.getItem( "uiTimeNumbering" ) || "1" );
-		gsuiTimeline.numbering( localStorage.getItem( "uiTimeNumbering" ) || "1" );
+		gsuiTimeline.$numbering( localStorage.getItem( "uiTimeNumbering" ) || "1" );
 		this.#elements = GSUfindElements( document.body, {
 			drumsName: "[data-target=drums]",
 			synthName: "[data-target=synth]",
@@ -103,7 +103,7 @@ class GSDAW {
 		window.onkeyup = this.#onkeyup.bind( this );
 		window.onkeydown = this.#onkeydown.bind( this );
 		window.onbeforeunload = this.#oncmpBeforeUnload.bind( this );
-		this.rootElement.ondragover = () => false;
+		this.rootElement.ondragover = GSUnoopFalse;
 		this.rootElement.oncontextmenu = () => location.host === "localhost" ? undefined : false;
 		this.rootElement.addEventListener( "wheel", GSDAW.#onwheel, { passive: false } );
 		this.rootElement.addEventListener( "drop", this.#ondrop.bind( this ) );
@@ -122,7 +122,7 @@ class GSDAW {
 		this.#dawcore.cb.compositionAdded = cmp => this.rootElement.addComposition( cmp );
 		this.#dawcore.cb.compositionOpened = cmp => {
 			GSUsetAttribute( this.rootElement, "currentcomposition", `${ cmp.options.saveMode }:${ cmp.id }` );
-			this.#patterns.rootElement.expandSynth( cmp.synthOpened, true );
+			this.#patterns.rootElement.$expandSynth( cmp.synthOpened, true );
 			this.#setTitle( cmp.name );
 		};
 		this.#dawcore.cb.compositionClosed = this.#oncmpClosed.bind( this );
@@ -194,7 +194,7 @@ class GSDAW {
 					this.#dawcore.$setSampleRate( data.sampleRate );
 					GSUsetAttribute( this.#windows, "lowgraphics", data.windowsLowGraphics );
 					gsuiClock.$numbering( data.timelineNumbering );
-					gsuiTimeline.numbering( data.timelineNumbering );
+					gsuiTimeline.$numbering( data.timelineNumbering );
 					localStorage.setItem( "uiRefreshRate", data.uiRate );
 					localStorage.setItem( "gsuiWindows.lowGraphics", +data.windowsLowGraphics );
 					localStorage.setItem( "uiTimeNumbering", data.timelineNumbering );
@@ -347,7 +347,7 @@ class GSDAW {
 			winCnt.rootElement.onfocus = () => this.#dawcore.$focusOn( "composition" );
 		} else if ( id === "piano" ) {
 			winCnt.rootElement.onfocus = () => this.#dawcore.$focusOn( "keys" );
-			winCnt.rootElement.octaves( 1, 7 );
+			winCnt.rootElement.$octaves( 1, 7 );
 			this.#linkMidiToPianoroll();
 		} else if ( id === "drums" ) {
 			winCnt.rootElement.onfocus = () => this.#dawcore.$focusOn( "drums" );
@@ -435,18 +435,18 @@ class GSDAW {
 	#oncmpClickNewLocal() {
 		( !this.#dawcore.$compositionNeedSave()
 			? this.#dawcore.$newComposition()
-			: GSUpopup.confirm( "Warning", "Are you sure you want to discard unsaved works" )
+			: GSUpopup.$confirm( "Warning", "Are you sure you want to discard unsaved works" )
 				.then( b => b && this.#dawcore.$newComposition() )
 		).then( cmp => cmp && this.#dawcore.$openComposition( "local", cmp.id ) );
 	}
 	#oncmpClickNewCloud() {
 		if ( !gsapiClient.$user.id ) {
-			GSUpopup.alert( "Error",
+			GSUpopup.$alert( "Error",
 				"You can not create a new composition in the <b>cloud</b><br/>without being connected" );
 		} else {
 			( !this.#dawcore.$compositionNeedSave()
 				? this.#dawcore.$newComposition( { saveMode: "cloud" } )
-				: GSUpopup.confirm( "Warning", "Are you sure you want to discard unsaved works" )
+				: GSUpopup.$confirm( "Warning", "Are you sure you want to discard unsaved works" )
 					.then( b => b && this.#dawcore.$newComposition( { saveMode: "cloud" } ) )
 			).then( cmp => cmp && this.#dawcore.$openComposition( "cloud", cmp.id ) );
 		}
@@ -458,7 +458,7 @@ class GSDAW {
 	}
 	#oncmpClickOpen( saveMode, id ) {
 		if ( this.#dawcore.$compositionNeedSave() ) {
-			GSUpopup.confirm( "Warning",
+			GSUpopup.$confirm( "Warning",
 				"Are you sure you want to discard unsaved works"
 			).then( ok => ok && this.#dawcore.$openComposition( saveMode, id ) );
 		} else {
@@ -468,7 +468,7 @@ class GSDAW {
 	#oncmpClickDelete( saveMode, id ) {
 		const cmp = this.#dawcore.$getComposition( saveMode, id );
 
-		GSUpopup.confirm( "Warning",
+		GSUpopup.$confirm( "Warning",
 			`Are you sure you want to delete "${ cmp.name }" ? (no undo possible)`,
 			"Delete"
 		).then( b => {
@@ -478,7 +478,7 @@ class GSDAW {
 					: Promise.resolve() )
 					.catch( err => {
 						if ( err.code !== 404 ) {
-							GSUpopup.alert( `Error ${ err.code }`,
+							GSUpopup.$alert( `Error ${ err.code }`,
 								"An error happened while deleting " +
 								"your composition&nbsp;:<br/>" +
 								`<code>${ err.msg || err }</code>` );
@@ -503,7 +503,7 @@ class GSDAW {
 		const id = this.#dawcore.$getOpened( area );
 
 		if ( id ) {
-			GSUpopup.prompt( title, "", e.currentTarget.textContent, "Rename" )
+			GSUpopup.$prompt( title, "", e.currentTarget.textContent, "Rename" )
 				.then( name => this.#dawcore.$callAction( action, id, name ) );
 		}
 	}
@@ -528,7 +528,7 @@ class GSDAW {
 
 		return !cmpTo
 			? Promise.resolve( cmpFrom )
-			: GSUpopup.confirm( "Warning",
+			: GSUpopup.$confirm( "Warning",
 				"Are you sure you want to overwrite " +
 				`the <b>${ to }</b> composition <i>${ cmpTo.name || "Untitled" }</i>&nbsp;?` )
 				.then( b => {
@@ -549,14 +549,14 @@ class GSDAW {
 				.then( cmp => this.#authSaveComposition( cmp ) )
 				.then( cmp => this.#dawcore.$addCompositionByJSObject( cmp, { saveMode: "cloud" } ) );
 		} else {
-			GSUpopup.alert( "Error",
+			GSUpopup.$alert( "Error",
 				"You need to be connected to your account before uploading your composition" );
 		}
 	}
 	#authSaveComposition( cmp ) {
 		return gsapiClient.$saveComposition( cmp )
 			.then( () => cmp, err => {
-				GSUpopup.alert( `Error ${ err.code }`,
+				GSUpopup.$alert( `Error ${ err.code }`,
 					"An error happened while saving your composition&nbsp;:<br/>" +
 					`<code>${ err.msg || err }</code>`
 				);
@@ -737,7 +737,7 @@ class GSDAW {
 			if ( "name" in obj ) {
 				const name = obj.name;
 
-				this.#gsCmp.main?.rootElement.getBlocks().forEach( blc => {
+				this.#gsCmp.main?.rootElement.$getBlocks().forEach( blc => {
 					if ( blc.dataset.pattern === id ) {
 						blc.querySelector( ".gsuiPatternroll-block-name" ).textContent = name;
 					}
@@ -759,10 +759,10 @@ class GSDAW {
 		const sliBuf = patSli?.source && this.#dawcore.$getPattern( patSli.source ).buffer;
 
 		if ( sliBuf === id ) {
-			this.#gsCmp.slicer?.rootElement.setBuffer( objBuf.buffer );
+			this.#gsCmp.slicer?.rootElement.$setBuffer( objBuf.buffer );
 		}
 		this.#patterns.bufferLoaded( id, objBuf.buffer );
-		this.#gsCmp.main?.rootElement.getBlocks().forEach( ( elBlc, blcId ) => {
+		this.#gsCmp.main?.rootElement.$getBlocks().forEach( ( elBlc, blcId ) => {
 			const blc = this.#dawcore.$getBlock( blcId );
 			const pat = this.#dawcore.$getPattern( blc.pattern );
 

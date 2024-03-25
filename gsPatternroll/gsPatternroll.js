@@ -6,11 +6,11 @@ class GSPatternroll {
 	timeline = this.rootElement.timeline;
 	#dataTracks = new DAWCoreControllers.tracks( {
 		dataCallbacks: {
-			addTrack: id => this.rootElement.addTrack( id ),
-			removeTrack: id => this.rootElement.removeTrack( id ),
-			toggleTrack: ( id, b ) => this.rootElement.toggleTrack( id, b ),
-			renameTrack: ( id, s ) => this.rootElement.renameTrack( id, s ),
-			reorderTrack: ( id, n ) => this.rootElement.reorderTrack( id, n ),
+			addTrack: id => this.rootElement.$addTrack( id ),
+			removeTrack: id => this.rootElement.$removeTrack( id ),
+			toggleTrack: ( id, b ) => this.rootElement.$toggleTrack( id, b ),
+			renameTrack: ( id, s ) => this.rootElement.$renameTrack( id, s ),
+			reorderTrack: ( id, n ) => this.rootElement.$reorderTrack( id, n ),
 		}
 	} );
 	#dataBlocks = new DAWCoreControllers.blocks( {
@@ -21,19 +21,19 @@ class GSPatternroll {
 					? !!this.#dawcore.$getAudioBuffer( pat.buffer )
 					: true;
 
-				this.rootElement.addBlock( id, blc, { dataReady } );
+				this.rootElement.$addBlock( id, blc, { dataReady } );
 			},
-			removeBlock: id => this.rootElement.removeBlock( id ),
-			changeBlockProp: ( id, prop, val ) => this.rootElement.changeBlockProp( id, prop, val ),
-			updateBlockViewBox: ( id, blc ) => this.rootElement.updateBlockViewBox( id, blc ),
+			removeBlock: id => this.rootElement.$removeBlock( id ),
+			changeBlockProp: ( id, prop, val ) => this.rootElement.$changeBlockProp( id, prop, val ),
+			updateBlockViewBox: ( id, blc ) => this.rootElement.$updateBlockViewBox( id, blc ),
 		},
 	} );
 
 	constructor() {
 		Object.seal( this );
 
-		this.rootElement.setData( this.#dataBlocks.data );
-		this.rootElement.setCallbacks( {
+		this.rootElement.$setData( this.#dataBlocks.data );
+		this.rootElement.$setCallbacks( {
 			onchange: this.#onchange.bind( this ),
 			onaddBlock: this.#onaddBlock.bind( this ),
 			oneditBlock: this.#oneditBlock.bind( this ),
@@ -49,12 +49,12 @@ class GSPatternroll {
 		this.#dataTracks.change( obj );
 		this.#dataBlocks.change( obj );
 		if ( "loopA" in obj || "loopB" in obj ) {
-			this.rootElement.loop(
+			this.rootElement.$loop(
 				this.#dawcore.$getLoopA(),
 				this.#dawcore.$getLoopB() );
 		}
 		if ( "timedivision" in obj ) {
-			this.rootElement.timedivision( obj.timedivision );
+			this.rootElement.$timedivision( obj.timedivision );
 		}
 		if ( "patterns" in obj ) {
 			Object.entries( obj.patterns ).forEach( ( [ id, pat ] ) => {
@@ -93,9 +93,9 @@ class GSPatternroll {
 
 	// .........................................................................
 	#updatePattern( id ) {
-		this.rootElement.getBlocks().forEach( blc => {
+		this.rootElement.$getBlocks().forEach( blc => {
 			if ( blc.dataset.pattern === id ) {
-				this.rootElement.updateBlockViewBox( blc.dataset.id, this.#dataBlocks.data[ blc.dataset.id ] );
+				this.rootElement.$updateBlockViewBox( blc.dataset.id, this.#dataBlocks.data[ blc.dataset.id ] );
 			}
 		} );
 	}
