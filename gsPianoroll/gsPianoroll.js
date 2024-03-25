@@ -26,6 +26,10 @@ class GSPianoroll {
 					this.#dawcore.$callAction( "dropMidiOnKeys", this.#patternId, ...d.args );
 				},
 			},
+			gsuiBlocksManager: {
+				startPreviewAudio: d => this.#dawcore.$liveKeydown( d.args[ 1 ], this.#dataKeys.data[ d.args[ 0 ] ] ),
+				stopPreviewAudio: d => this.#dawcore.$liveKeyup( d.args[ 1 ] ),
+			},
 			gsuiTimeline: {
 				changeCurrentTime: d => {
 					this.#dawcore.$keysSetCurrentTime( d.args[ 0 ] );
