@@ -71,8 +71,10 @@ class GSDAW {
 			lowgraphics: !!+( localStorage.getItem( "gsuiWindows.lowGraphics" ) || "0" ),
 		} );
 		GSUsetAttribute( this.rootElement.clock, "mode", localStorage.getItem( "gsuiClock.display" ) || "second" );
-		gsuiClock.$numbering( localStorage.getItem( "uiTimeNumbering" ) || "1" );
-		gsuiTimeline.$numbering( localStorage.getItem( "uiTimeNumbering" ) || "1" );
+		GSUsetAttribute( this.rootElement, {
+			keynotation: localStorage.getItem( "uiKeyNotation" ) || "DoRéMi",
+			timelinenumbering: localStorage.getItem( "uiTimeNumbering" ) || "1",
+		} );
 		this.#elements = GSUfindElements( document.body, {
 			drumsName: "[data-target=drums]",
 			synthName: "[data-target=synth]",
@@ -99,7 +101,7 @@ class GSDAW {
 			.forEach( ( w, name ) => gsuiPeriodicWave.$addWave( name, w.real, w.imag ) );
 	}
 	#initEvents() {
-		window.onblur = () => this.#gsCmp.piano?.getUIKeys().midiReleaseAllKeys();
+		window.onblur = () => this.#gsCmp.piano?.getUIKeys().$midiReleaseAllKeys();
 		window.onkeyup = this.#onkeyup.bind( this );
 		window.onkeydown = this.#onkeydown.bind( this );
 		window.onbeforeunload = this.#oncmpBeforeUnload.bind( this );
@@ -193,13 +195,13 @@ class GSDAW {
 					this.#dawcore.$setLoopRate( data.uiRate === "auto" ? 60 : data.uiRate );
 					this.#dawcore.$setSampleRate( data.sampleRate );
 					GSUsetAttribute( this.#windows, "lowgraphics", data.windowsLowGraphics );
-					gsuiClock.$numbering( data.timelineNumbering );
-					gsuiTimeline.$numbering( data.timelineNumbering );
 					localStorage.setItem( "uiRefreshRate", data.uiRate );
 					localStorage.setItem( "gsuiWindows.lowGraphics", +data.windowsLowGraphics );
 					localStorage.setItem( "uiTimeNumbering", data.timelineNumbering );
+					localStorage.setItem( "uiKeyNotation", data.keyNotation );
 					GSUsetAttribute( this.rootElement, "uirate", data.uiRate );
 					GSUsetAttribute( this.rootElement, "samplerate", data.sampleRate );
+					GSUsetAttribute( this.rootElement, "keynotation", data.keyNotation );
 					GSUsetAttribute( this.rootElement, "timelinenumbering", data.timelineNumbering );
 					GSUsetAttribute( this.rootElement, "windowslowgraphics", data.windowsLowGraphics );
 				},
@@ -410,12 +412,12 @@ class GSDAW {
 		const uiKeys = this.#gsCmp.piano?.getUIKeys();
 
 		if ( uiKeys ) {
-			const midi = uiKeys.getMidiKeyFromKeyboard( e );
+			const midi = uiKeys.$getMidiKeyFromKeyboard( e );
 
 			if ( midi !== false ) {
 				status
-					? uiKeys.midiKeyDown( midi )
-					: uiKeys.midiKeyUp( midi );
+					? uiKeys.$midiKeyDown( midi )
+					: uiKeys.$midiKeyUp( midi );
 				return true;
 			}
 		}
