@@ -110,6 +110,15 @@ class GSPatterns {
 		if ( "synthOpened" in obj ) {
 			this.#uiPatterns.$selectSynth( obj.synthOpened );
 		}
+		if ( obj.buffers ) {
+			Object.entries( this.#dawcore.$getPatterns() ).forEach( ( [ id, pat ] ) => {
+				const objBuf = obj.buffers[ pat.buffer ];
+
+				if ( objBuf && "reverse" in objBuf ) {
+					this.#uiPatterns.$changePattern( id, "reverse", objBuf.reverse );
+				}
+			} );
+		}
 	}
 
 	// .........................................................................
