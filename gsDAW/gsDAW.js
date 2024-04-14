@@ -119,7 +119,7 @@ class GSDAW {
 				GSUsetAttribute( win, "currenttime", beat );
 			}
 		};
-		this.#dawcore.cb.buffersLoaded = ( id, objBuf ) => this.#onpatternsBuffersLoaded( id, objBuf );
+		this.#dawcore.cb.buffersLoaded = ( id, audioBuf ) => this.#onpatternsBuffersLoaded( id, audioBuf );
 		this.#dawcore.cb.buffersDropped = files => this.#libraries.addLocalSamples( files );
 		this.#dawcore.cb.compositionAdded = cmp => this.rootElement.addComposition( cmp );
 		this.#dawcore.cb.compositionOpened = cmp => {
@@ -756,14 +756,14 @@ class GSDAW {
 			}
 		}
 	}
-	#onpatternsBuffersLoaded( id, objBuf ) {
+	#onpatternsBuffersLoaded( id, audioBuf ) {
 		const patSli = this.#dawcore.$getPattern( this.#dawcore.$getOpened( "slices" ) );
 		const sliBuf = patSli?.source && this.#dawcore.$getPattern( patSli.source ).buffer;
 
 		if ( sliBuf === id ) {
-			this.#gsCmp.slicer?.rootElement.$setBuffer( objBuf.buffer );
+			this.#gsCmp.slicer?.rootElement.$setBuffer( audioBuf );
 		}
-		this.#patterns.bufferLoaded( id, objBuf.buffer );
+		this.#patterns.bufferLoaded( id, audioBuf );
 		this.#gsCmp.main?.rootElement.$getBlocks().forEach( ( elBlc, blcId ) => {
 			const blc = this.#dawcore.$getBlock( blcId );
 			const pat = this.#dawcore.$getPattern( blc.pattern );
