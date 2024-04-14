@@ -105,7 +105,7 @@ class GSPatternroll {
 			case "move": this.#dawcore.$callAction( "moveBlocks", ...args ); break;
 			case "cropEnd": this.#dawcore.$callAction( "cropEndBlocks", ...args ); break;
 			case "cropStart": this.#dawcore.$callAction( "cropStartBlocks", ...args ); break;
-			case "duplicate": this.#dawcore.$callAction( "duplicateSelectedBlocks", ...args ); break;
+			case "duplicate": this.#dawcore.$callAction( "cloneSelectedBlocks", ...args ); break;
 			case "deletion": this.#dawcore.$callAction( "removeBlocks", ...args ); break;
 			case "selection": this.#dawcore.$callAction( "selectBlocks", ...args ); break;
 			case "unselection": this.#dawcore.$callAction( "unselectAllBlocks", ...args ); break;
