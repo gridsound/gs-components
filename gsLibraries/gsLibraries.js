@@ -6,9 +6,9 @@ class GSLibraries {
 
 	constructor() {
 		this.rootElement = GSUcreateElement( "gsui-libraries" );
-		this.rootElement.getLibrary( "default" ).setLibrary( gsuiLibrarySamples );
-		GSUsetAttribute( this.rootElement.getLibrary( "local" ), "name", "local" );
-		GSUsetAttribute( this.rootElement.getLibrary( "default" ), "name", "default" );
+		this.rootElement.$getLibrary( "default" ).$setLibrary( gsuiLibrarySamples );
+		GSUsetAttribute( this.rootElement.$getLibrary( "local" ), "name", "local" );
+		GSUsetAttribute( this.rootElement.$getLibrary( "default" ), "name", "default" );
 		GSUlistenEvents( this.rootElement, {
 			gsuiLibrary: {
 				loadSample: ( d, tar ) => {
@@ -34,7 +34,7 @@ class GSLibraries {
 	}
 	addLocalSamples( files ) {
 		if ( files.length > 0 ) {
-			this.rootElement.getLibrary( "local" ).setLibrary( files.map( smp =>
+			this.rootElement.$getLibrary( "local" ).$setLibrary( files.map( smp =>
 				Array.isArray( smp )
 					? [ smp[ 0 ], gsuiWaveform.getPointsFromBuffer( 40, 10, smp[ 1 ] ), smp[ 2 ] ]
 					: smp
@@ -43,30 +43,30 @@ class GSLibraries {
 		}
 	}
 	stop() {
-		this.rootElement.getLibrary( "default" ).stopSample();
-		this.rootElement.getLibrary( "local" ).stopSample();
+		this.rootElement.$getLibrary( "default" ).$stopSample();
+		this.rootElement.$getLibrary( "local" ).$stopSample();
 	}
 	clear() {
 		this.stop();
-		this.rootElement.getLibrary( "default" ).unloadSamples();
-		this.rootElement.getLibrary( "local" ).clear();
+		this.rootElement.$getLibrary( "default" ).$unloadSamples();
+		this.rootElement.$getLibrary( "local" ).$clear();
 	}
 	$bookmarkBuffer( bufHash, b ) {
-		this.rootElement.getLibrary( "default" ).bookmarkSample( bufHash, b );
-		this.rootElement.getLibrary( "local" ).bookmarkSample( bufHash, b );
+		this.rootElement.$getLibrary( "default" ).$bookmarkSample( bufHash, b );
+		this.rootElement.$getLibrary( "local" ).$bookmarkSample( bufHash, b );
 	}
 
 	// .........................................................................
 	#loadSample( lib, id ) {
 		switch ( lib ) {
 			case "local":
-				this.rootElement.getLibrary( "local" ).readySample( id );
+				this.rootElement.$getLibrary( "local" ).$readySample( id );
 				return Promise.resolve();
 			case "default":
-				this.rootElement.getLibrary( "default" ).loadSample( id );
+				this.rootElement.$getLibrary( "default" ).$loadSample( id );
 				return this.#dawcore.$buffersLoadURLBuffer( id )
 					.then( buf => {
-						this.rootElement.getLibrary( "default" ).readySample( id );
+						this.rootElement.$getLibrary( "default" ).$readySample( id );
 						return buf;
 					} );
 		}
@@ -74,7 +74,7 @@ class GSLibraries {
 	#playSample( lib, id ) {
 		const buf = this.#dawcore.$buffersPlayBuffer( id );
 
-		this.rootElement.getLibrary( lib ).playSample( id, buf.duration );
+		this.rootElement.$getLibrary( lib ).$playSample( id, buf.duration );
 	}
 }
 
