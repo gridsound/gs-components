@@ -27,7 +27,7 @@ class GSMixer {
 			addEffect: ( id, obj ) => this.#effects.$addEffect( id, obj ),
 			removeEffect: id => this.#effects.$removeEffect( id ),
 			changeEffect: ( id, prop, val ) => this.#effects.$changeEffect( id, prop, val ),
-			changeEffectData: ( id, obj ) => this.#changeEffectData( id, obj ),
+			changeEffectData: ( id, obj, fxType ) => this.#changeEffectData( id, obj, fxType ),
 		},
 	} );
 
@@ -97,10 +97,16 @@ class GSMixer {
 	#onselectEffect( chanId, fxId ) {
 		this.#effects.$expandToggleEffect( fxId );
 	}
-	#changeEffectData( id, obj ) {
+	#changeEffectData( id, obj, fxType ) {
 		const uiFx = this.#effects.$getFxHTML( id ).uiFx;
 
-		Object.entries( obj ).forEach( kv => GSUsetAttribute( uiFx, ...kv ) );
+		Object.entries( obj ).forEach( kv => {
+			if ( fxType === "waveshaper" && kv[ 0 ] === "curve" ) {
+				uiFx.$changeCurveData( kv[ 1 ] );
+			} else {
+				GSUsetAttribute( uiFx, ...kv );
+			}
+		} );
 		uiFx.$updateWave?.();
 	}
 }
