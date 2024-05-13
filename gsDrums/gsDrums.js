@@ -6,14 +6,13 @@ class GSDrums {
 	#patternId = null;
 	rootElement = GSUcreateElement( "gsui-drums" );
 	timeline = this.rootElement.timeline;
-	#dataDrums = new DAWCoreControllers.drums( {
-		dataCallbacks: {
-			addDrum: ( id, drum ) => this.rootElement.$addDrum( id, drum ),
-			addDrumcut: ( id, drumcut ) => this.rootElement.$addDrumcut( id, drumcut ),
-			changeDrum: ( id, prop, val ) => this.rootElement.$changeDrum( id, prop, val ),
-			removeDrum: id => this.rootElement.$removeDrum( id ),
-			removeDrumcut: id => this.rootElement.$removeDrumcut( id ),
-		},
+	#dataDrums = new DAWCoreControllerDrums( {
+		$changeDuration: dur => this.rootElement.$changeDuration( dur ),
+		$addDrum: ( id, drum ) => this.rootElement.$addDrum( id, drum ),
+		$addDrumcut: ( id, drumcut ) => this.rootElement.$addDrumcut( id, drumcut ),
+		$changeDrum: ( id, prop, val ) => this.rootElement.$changeDrum( id, prop, val ),
+		$removeDrum: id => this.rootElement.$removeDrum( id ),
+		$removeDrumcut: id => this.rootElement.$removeDrumcut( id ),
 	} );
 	#dataDrumrows = new DAWCoreControllers.drumrows( {
 		dataCallbacks: {
@@ -88,14 +87,14 @@ class GSDrums {
 		if ( id !== this.#patternId ) {
 			this.#patternId = id;
 			this.#drumsId = null;
-			this.#dataDrums.clear();
+			this.#dataDrums.$clear();
 			GSUsetAttribute( this.rootElement, "disabled", !id );
 			if ( id ) {
 				const pat = this.#dawcore.$getPattern( id );
 				const drums = this.#dawcore.$getDrums( pat.drums );
 
 				this.#drumsId = pat.drums;
-				this.#dataDrums.change( drums );
+				this.#dataDrums.$change( drums );
 			}
 		}
 	}
@@ -113,10 +112,11 @@ class GSDrums {
 			this.rootElement.$reorderDrumrows( obj.drumrows );
 		}
 		if ( "timedivision" in obj ) {
+			this.#dataDrums.$setTimedivision( obj.timedivision );
 			GSUsetAttribute( this.rootElement, "timedivision", obj.timedivision );
 		}
 		if ( drmObj ) {
-			this.#dataDrums.change( drmObj );
+			this.#dataDrums.$change( drmObj );
 		}
 		if ( "patternDrumsOpened" in obj ) {
 			this.$selectPattern( obj.patternDrumsOpened );
