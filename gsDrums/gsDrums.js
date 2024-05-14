@@ -14,26 +14,24 @@ class GSDrums {
 		$removeDrum: id => this.rootElement.$removeDrum( id ),
 		$removeDrumcut: id => this.rootElement.$removeDrumcut( id ),
 	} );
-	#dataDrumrows = new DAWCoreControllers.drumrows( {
-		dataCallbacks: {
-			addDrumrow: id => this.rootElement.$addDrumrow( id ),
-			removeDrumrow: id => this.rootElement.$removeDrumrow( id ),
-			changeDrumrow: ( id, prop, val ) => {
-				switch ( prop ) {
-					default:
-						this.rootElement.$changeDrumrow( id, prop, val );
-						break;
-					case "pattern":
-						this.rootElement.$changeDrumrow( id, prop, gsuiSVGPatterns.$createSVG( "bufferHD", val ) );
-						break;
-					case "duration": {
-						const patId = this.#dawcore.$getDrumrow( id ).pattern;
-						const bufId = this.#dawcore.$getPattern( patId ).buffer;
+	#dataDrumrows = new DAWCoreControllerDrumrows( {
+		$addDrumrow: id => this.rootElement.$addDrumrow( id ),
+		$removeDrumrow: id => this.rootElement.$removeDrumrow( id ),
+		$changeDrumrow: ( id, prop, val ) => {
+			switch ( prop ) {
+				default:
+					this.rootElement.$changeDrumrow( id, prop, val );
+					break;
+				case "pattern":
+					this.rootElement.$changeDrumrow( id, prop, gsuiSVGPatterns.$createSVG( "bufferHD", val ) );
+					break;
+				case "duration": {
+					const patId = this.#dawcore.$getDrumrow( id ).pattern;
+					const bufId = this.#dawcore.$getPattern( patId ).buffer;
 
-						this.rootElement.$changeDrumrow( id, prop, this.#dawcore.$getBuffer( bufId ).duration );
-					} break;
-				}
-			},
+					this.rootElement.$changeDrumrow( id, prop, this.#dawcore.$getBuffer( bufId ).duration );
+				} break;
+			}
 		},
 	} );
 
@@ -107,7 +105,7 @@ class GSDrums {
 	change( obj ) {
 		const drmObj = obj.drums?.[ this.#drumsId ];
 
-		this.#dataDrumrows.change( obj );
+		this.#dataDrumrows.$change( obj );
 		if ( obj.drumrows ) {
 			this.rootElement.$reorderDrumrows( obj.drumrows );
 		}
@@ -124,7 +122,7 @@ class GSDrums {
 	}
 	clear() {
 		this.$selectPattern( null );
-		this.#dataDrumrows.clear();
+		this.#dataDrumrows.$clear();
 		this.#dawcore.$drumsClearLoop();
 	}
 }
