@@ -6,29 +6,25 @@ class GSMixer {
 	#channels = this.rootElement.$getChannels();
 	#effects = this.rootElement.$getEffects();
 	#destFilter = "main";
-	#ctrlChannels = new DAWCoreControllers.mixer( {
-		dataCallbacks: {
-			addChannel: ( id, chan ) => this.#channels.$addChannel( id, chan ),
-			removeChannel: id => this.#channels.$removeChannel( id ),
-			renameChannel: ( id, name ) => this.#channels.$renameChannel( id, name ),
-			redirectChannel: ( id, dest ) => this.#channels.$redirectChannel( id, dest ),
-			toggleChannel: ( id, b ) => this.#channels.$toggleChannel( id, b ),
-			reorderChannel: ( id, n ) => this.#channels.$reorderChannel( id, n ),
-			changePanChannel: ( id, val ) => this.#channels.$changePanChannel( id, val ),
-			changeGainChannel: ( id, val ) => this.#channels.$changeGainChannel( id, val ),
-			addEffect: ( chanId, fxId, obj ) => this.#channels.$getChannel( chanId ).$addEffect( fxId, obj ),
-			updateEffect: ( chanId, fxId, obj ) => this.#channels.$getChannel( chanId ).$updateEffect( fxId, obj ),
-			removeEffect: ( chanId, fxId ) => this.#channels.$getChannel( chanId ).$removeEffect( fxId ),
-		},
+	#ctrlChannels = new DAWCoreControllerMixer( {
+		$addChannel: ( id, chan ) => this.#channels.$addChannel( id, chan ),
+		$removeChannel: id => this.#channels.$removeChannel( id ),
+		$renameChannel: ( id, name ) => this.#channels.$renameChannel( id, name ),
+		$redirectChannel: ( id, dest ) => this.#channels.$redirectChannel( id, dest ),
+		$toggleChannel: ( id, b ) => this.#channels.$toggleChannel( id, b ),
+		$reorderChannel: ( id, n ) => this.#channels.$reorderChannel( id, n ),
+		$changePanChannel: ( id, val ) => this.#channels.$changePanChannel( id, val ),
+		$changeGainChannel: ( id, val ) => this.#channels.$changeGainChannel( id, val ),
+		$addEffect: ( chanId, fxId, obj ) => this.#channels.$getChannel( chanId ).$addEffect( fxId, obj ),
+		$updateEffect: ( chanId, fxId, obj ) => this.#channels.$getChannel( chanId ).$updateEffect( fxId, obj ),
+		$removeEffect: ( chanId, fxId ) => this.#channels.$getChannel( chanId ).$removeEffect( fxId ),
 	} );
-	#ctrlEffects = new DAWCoreControllers.effects( {
-		dataCallbacks: {
-			changeTimedivision: timediv => GSUsetAttribute( this.#effects, "timedivision", timediv ),
-			addEffect: ( id, obj ) => this.#effects.$addEffect( id, obj ),
-			removeEffect: id => this.#effects.$removeEffect( id ),
-			changeEffect: ( id, prop, val ) => this.#effects.$changeEffect( id, prop, val ),
-			changeEffectData: ( id, obj, fxType ) => this.#changeEffectData( id, obj, fxType ),
-		},
+	#ctrlEffects = new DAWCoreControllerEffects( {
+		$changeTimedivision: timediv => GSUsetAttribute( this.#effects, "timedivision", timediv ),
+		$addEffect: ( id, obj ) => this.#effects.$addEffect( id, obj ),
+		$removeEffect: id => this.#effects.$removeEffect( id ),
+		$changeEffect: ( id, prop, val ) => this.#effects.$changeEffect( id, prop, val ),
+		$changeEffectData: ( id, obj, fxType ) => this.#changeEffectData( id, obj, fxType ),
 	} );
 
 	constructor() {
@@ -57,7 +53,7 @@ class GSMixer {
 				},
 			},
 		} );
-		this.#ctrlEffects.setDestFilter( "main" );
+		this.#ctrlEffects.$setDestFilter( "main" );
 	}
 
 	// .........................................................................
@@ -65,13 +61,13 @@ class GSMixer {
 		this.#dawcore = core;
 	}
 	clear() {
-		this.#ctrlEffects.clear();
-		this.#ctrlChannels.clear();
+		this.#ctrlEffects.$clear();
+		this.#ctrlChannels.$clear();
 		this.#channels.$selectChannel( "main" );
 	}
 	change( obj ) {
-		this.#ctrlEffects.change( obj );
-		this.#ctrlChannels.change( obj );
+		this.#ctrlEffects.$change( obj );
+		this.#ctrlChannels.$change( obj );
 		if ( obj.effects ) {
 			this.#effects.$reorderEffects( obj.effects );
 		}
@@ -92,7 +88,7 @@ class GSMixer {
 	}
 	#onselectChan( id ) {
 		this.#destFilter = id;
-		this.#ctrlEffects.setDestFilter( id );
+		this.#ctrlEffects.$setDestFilter( id );
 	}
 	#onselectEffect( chanId, fxId ) {
 		this.#effects.$expandToggleEffect( fxId );
