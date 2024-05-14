@@ -13,26 +13,25 @@ class GSPatternroll {
 			reorderTrack: ( id, n ) => this.rootElement.$reorderTrack( id, n ),
 		}
 	} );
-	#dataBlocks = new DAWCoreControllers.blocks( {
-		dataCallbacks: {
-			addBlock: ( id, blc ) => {
-				const pat = this.#dawcore.$getPattern( blc.pattern );
-				const dataReady = pat.type === "buffer"
-					? !!this.#dawcore.$getAudioBuffer( pat.buffer )
-					: true;
+	#dataBlocks = new DAWCoreControllerBlocks( {
+		$changeDuration: dur => this.rootElement.$changeDuration( dur ),
+		$addBlock: ( id, blc ) => {
+			const pat = this.#dawcore.$getPattern( blc.pattern );
+			const dataReady = pat.type === "buffer"
+				? !!this.#dawcore.$getAudioBuffer( pat.buffer )
+				: true;
 
-				this.rootElement.$addBlock( id, blc, { dataReady } );
-			},
-			removeBlock: id => this.rootElement.$removeBlock( id ),
-			changeBlockProp: ( id, prop, val ) => this.rootElement.$changeBlockProp( id, prop, val ),
-			updateBlockViewBox: ( id, blc ) => this.rootElement.$updateBlockViewBox( id, blc ),
+			this.rootElement.$addBlock( id, blc, { dataReady } );
 		},
+		$removeBlock: id => this.rootElement.$removeBlock( id ),
+		$changeBlockProp: ( id, prop, val ) => this.rootElement.$changeBlockProp( id, prop, val ),
+		$updateBlockViewBox: ( id, blc ) => this.rootElement.$updateBlockViewBox( id, blc ),
 	} );
 
 	constructor() {
 		Object.seal( this );
 
-		this.rootElement.$setData( this.#dataBlocks.data );
+		this.rootElement.$setData( this.#dataBlocks.$data );
 		this.rootElement.$setCallbacks( {
 			onchange: this.#onchange.bind( this ),
 			onaddBlock: this.#onaddBlock.bind( this ),
@@ -47,7 +46,7 @@ class GSPatternroll {
 	}
 	change( obj ) {
 		this.#dataTracks.change( obj );
-		this.#dataBlocks.change( obj );
+		this.#dataBlocks.$change( obj );
 		if ( "loopA" in obj || "loopB" in obj ) {
 			this.rootElement.$loop(
 				this.#dawcore.$getLoopA(),
@@ -65,7 +64,7 @@ class GSPatternroll {
 		}
 	}
 	clear() {
-		this.#dataBlocks.clear();
+		this.#dataBlocks.$clear();
 		this.#dataTracks.clear();
 	}
 
@@ -95,7 +94,7 @@ class GSPatternroll {
 	#updatePattern( id ) {
 		this.rootElement.$getBlocks().forEach( blc => {
 			if ( blc.dataset.pattern === id ) {
-				this.rootElement.$updateBlockViewBox( blc.dataset.id, this.#dataBlocks.data[ blc.dataset.id ] );
+				this.rootElement.$updateBlockViewBox( blc.dataset.id, this.#dataBlocks.$data[ blc.dataset.id ] );
 			}
 		} );
 	}
