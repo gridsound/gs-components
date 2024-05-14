@@ -6,12 +6,11 @@ class GSPianoroll {
 	#patternId = null;
 	rootElement = new gsuiPianoroll();
 	timeline = this.rootElement.timeline;
-	#dataKeys = new DAWCoreControllers.keys( {
-		dataCallbacks: {
-			addKey: ( id, blc ) => this.rootElement.$addKey( id, blc ),
-			removeKey: id => this.rootElement.$removeKey( id ),
-			changeKeyProp: ( id, prop, val ) => this.rootElement.$changeKeyProp( id, prop, val ),
-		},
+	#dataKeys = new DAWCoreControllerKeys( {
+		$changeDuration: dur => this.rootElement.$changeDuration( dur ),
+		$addKey: ( id, blc ) => this.rootElement.$addKey( id, blc ),
+		$removeKey: id => this.rootElement.$removeKey( id ),
+		$changeKeyProp: ( id, prop, val ) => this.rootElement.$changeKeyProp( id, prop, val ),
 	} );
 
 	constructor() {
@@ -27,7 +26,7 @@ class GSPianoroll {
 				},
 			},
 			gsuiBlocksManager: {
-				startPreviewAudio: d => this.#dawcore.$liveKeydown( d.args[ 1 ], this.#dataKeys.data[ d.args[ 0 ] ] ),
+				startPreviewAudio: d => this.#dawcore.$liveKeydown( d.args[ 1 ], this.#dataKeys.$data[ d.args[ 0 ] ] ),
 				stopPreviewAudio: d => this.#dawcore.$liveKeyup( d.args[ 1 ] ),
 			},
 			gsuiTimeline: {
@@ -45,7 +44,7 @@ class GSPianoroll {
 				keyUp: d => { this.#dawcore.$liveKeyup( d.args[ 0 ] ); },
 			},
 		} );
-		this.rootElement.$setData( this.#dataKeys.data );
+		this.rootElement.$setData( this.#dataKeys.$data );
 		this.rootElement.$setCallbacks( {
 			onchange: this.#onchange.bind( this ),
 		} );
@@ -60,7 +59,7 @@ class GSPianoroll {
 		if ( id !== this.#patternId ) {
 			this.#patternId = id;
 			this.#keysId = null;
-			this.#dataKeys.clear();
+			this.#dataKeys.$clear();
 			this.rootElement.$reset();
 			GSUsetAttribute( this.rootElement, "disabled", !id );
 			if ( id ) {
@@ -68,7 +67,7 @@ class GSPianoroll {
 				const keys = this.#dawcore.$getKeys( pat.keys );
 
 				this.#keysId = pat.keys;
-				this.#dataKeys.change( keys );
+				this.#dataKeys.$change( keys );
 				this.rootElement.$scrollToKeys();
 			}
 		}
@@ -83,13 +82,13 @@ class GSPianoroll {
 			const keys = obj.keys && obj.keys[ this.#keysId ];
 
 			if ( keys ) {
-				this.#dataKeys.change( keys );
+				this.#dataKeys.$change( keys );
 			}
 		}
 	}
 	clear() {
 		this.$selectPattern( null );
-		this.#dataKeys.clear();
+		this.#dataKeys.$clear();
 		this.#dawcore.$keysClearLoop();
 	}
 	getUIKeys() {
