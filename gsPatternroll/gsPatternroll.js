@@ -4,14 +4,12 @@ class GSPatternroll {
 	#dawcore = null;
 	rootElement = GSUcreateElement( "gsui-patternroll" );
 	timeline = this.rootElement.timeline;
-	#dataTracks = new DAWCoreControllers.tracks( {
-		dataCallbacks: {
-			addTrack: id => this.rootElement.$addTrack( id ),
-			removeTrack: id => this.rootElement.$removeTrack( id ),
-			toggleTrack: ( id, b ) => this.rootElement.$toggleTrack( id, b ),
-			renameTrack: ( id, s ) => this.rootElement.$renameTrack( id, s ),
-			reorderTrack: ( id, n ) => this.rootElement.$reorderTrack( id, n ),
-		}
+	#dataTracks = new DAWCoreControllerTracks( {
+		$addTrack: id => this.rootElement.$addTrack( id ),
+		$removeTrack: id => this.rootElement.$removeTrack( id ),
+		$toggleTrack: ( id, b ) => this.rootElement.$toggleTrack( id, b ),
+		$renameTrack: ( id, s ) => this.rootElement.$renameTrack( id, s ),
+		$reorderTrack: ( id, n ) => this.rootElement.$reorderTrack( id, n ),
 	} );
 	#dataBlocks = new DAWCoreControllerBlocks( {
 		$changeDuration: dur => this.rootElement.$changeDuration( dur ),
@@ -45,7 +43,7 @@ class GSPatternroll {
 		this.#dawcore = core;
 	}
 	change( obj ) {
-		this.#dataTracks.change( obj );
+		this.#dataTracks.$change( obj );
 		this.#dataBlocks.$change( obj );
 		if ( "loopA" in obj || "loopB" in obj ) {
 			this.rootElement.$loop(
@@ -65,7 +63,7 @@ class GSPatternroll {
 	}
 	clear() {
 		this.#dataBlocks.$clear();
-		this.#dataTracks.clear();
+		this.#dataTracks.$clear();
 	}
 
 	// .........................................................................
