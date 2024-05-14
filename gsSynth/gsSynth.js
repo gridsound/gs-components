@@ -4,39 +4,37 @@ class GSSynth {
 	#dawcore = null;
 	#synthId = null;
 	rootElement = GSUcreateElement( "gsui-synthesizer" );
-	#dataSynth = new DAWCoreControllers.synth( {
-		dataCallbacks: {
-			addOsc: ( id, osc ) => {
-				const osc2 = { ...osc };
+	#dataSynth = new DAWCoreControllerSynth( {
+		$addOsc: ( id, osc ) => {
+			const osc2 = { ...osc };
 
-				if ( osc.source ) {
-					osc2.source = this.#dawcore.$getPattern( osc.source ).name;
-				}
+			if ( osc.source ) {
+				osc2.source = this.#dawcore.$getPattern( osc.source ).name;
+			}
 
-				const uiOsc = this.rootElement.$addOscillator( id, osc2 );
+			const uiOsc = this.rootElement.$addOscillator( id, osc2 );
 
-				if ( osc.source ) {
-					uiOsc.$updateSourceWaveform( gsuiSVGPatterns.$createSVG( "bufferHD", osc.source ) );
-				}
-			},
-			removeOsc: id => this.rootElement.$removeOscillator( id ),
-			changeOscProp: ( id, k, v ) => {
-				const uiOsc = this.rootElement.$getOscillator( id );
-
-				if ( k === 'source' && v ) {
-					const v2 = this.#dawcore.$getPattern( v ).name;
-
-					uiOsc.$updateSourceWaveform( gsuiSVGPatterns.$createSVG( "bufferHD", v ) );
-					GSUsetAttribute( uiOsc, k, v2 );
-				} else {
-					GSUsetAttribute( uiOsc, k, v );
-				}
-			},
-			changeEnvProp: ( k, v ) => this.rootElement.$changeEnvProp( k, v ),
-			changeLFOProp: ( k, v ) => this.rootElement.$changeLFOProp( k, v ),
-			updateEnvWave: () => this.rootElement.env.updateWave(),
-			updateLFOWave: () => this.rootElement.lfo.updateWave(),
+			if ( osc.source ) {
+				uiOsc.$updateSourceWaveform( gsuiSVGPatterns.$createSVG( "bufferHD", osc.source ) );
+			}
 		},
+		$removeOsc: id => this.rootElement.$removeOscillator( id ),
+		$changeOscProp: ( id, k, v ) => {
+			const uiOsc = this.rootElement.$getOscillator( id );
+
+			if ( k === 'source' && v ) {
+				const v2 = this.#dawcore.$getPattern( v ).name;
+
+				uiOsc.$updateSourceWaveform( gsuiSVGPatterns.$createSVG( "bufferHD", v ) );
+				GSUsetAttribute( uiOsc, k, v2 );
+			} else {
+				GSUsetAttribute( uiOsc, k, v );
+			}
+		},
+		$changeEnvProp: ( k, v ) => this.rootElement.$changeEnvProp( k, v ),
+		$changeLFOProp: ( k, v ) => this.rootElement.$changeLFOProp( k, v ),
+		$updateEnvWave: () => this.rootElement.env.updateWave(),
+		$updateLFOWave: () => this.rootElement.lfo.updateWave(),
 	} );
 
 	constructor() {
@@ -94,9 +92,9 @@ class GSSynth {
 	$selectSynth( id ) {
 		if ( id !== this.#synthId ) {
 			this.#synthId = id;
-			this.#dataSynth.clear();
+			this.#dataSynth.$clear();
 			if ( id ) {
-				this.#dataSynth.change( this.#dawcore.$getSynth( id ) );
+				this.#dataSynth.$change( this.#dawcore.$getSynth( id ) );
 			}
 		}
 	}
@@ -109,7 +107,7 @@ class GSSynth {
 		}
 		GSUforEach( obj.patterns, ( patId, patObj ) => {
 			if ( patObj && "name" in patObj ) {
-				GSUforEach( this.#dataSynth.data.oscillators, ( idOsc, osc ) => {
+				GSUforEach( this.#dataSynth.$data.oscillators, ( idOsc, osc ) => {
 					if ( osc.source === patId ) {
 						GSUsetAttribute( this.rootElement.$getOscillator( idOsc ), "source", patObj.name );
 					}
@@ -117,7 +115,7 @@ class GSSynth {
 			}
 		} );
 		if ( synObj ) {
-			this.#dataSynth.change( synObj );
+			this.#dataSynth.$change( synObj );
 			if ( synObj.oscillators ) {
 				this.rootElement.$reorderOscillators( synObj.oscillators );
 			}
@@ -127,7 +125,7 @@ class GSSynth {
 		}
 	}
 	clear() {
-		this.#dataSynth.clear();
+		this.#dataSynth.$clear();
 	}
 }
 
