@@ -50,34 +50,34 @@ class GSSynth {
 			switch ( d.component ) {
 				case "gsuiEnvelope":
 					switch ( d.eventName ) {
-						case "change": dc.$callAction( "changeEnv", id, ...a ); break;
+						case "change": dc.$callAction( DAWCoreActions_changeEnv, id, ...a ); break;
 						// case "liveChange": dc.$liveChangeSynth( id, { env: { [ a[ 0 ] ]: a[ 1 ] } } ); break;
 					}
 					break;
 				case "gsuiLFO":
 					switch ( d.eventName ) {
-						case "change": dc.$callAction( "changeLFO", id, ...a ); break;
+						case "change": dc.$callAction( DAWCoreActions_changeLFO, id, ...a ); break;
 						case "liveChange": dc.$liveChangeSynth( id, { lfo: { [ a[ 0 ] ]: a[ 1 ] } } ); break;
 					}
 					break;
 				case "gsuiSynthesizer":
 					switch ( d.eventName ) {
-						case "addNewBuffer": dc.$callAction( "addOscillatorSource", id, ...a ); break;
-						case "toggleEnv": dc.$callAction( "toggleEnv", id ); break;
-						case "toggleLFO": dc.$callAction( "toggleLFO", id ); break;
-						case "addOscillator": dc.$callAction( "addOscillator", id ); break;
-						case "reorderOscillator": dc.$callAction( "reorderOscillator", id, a[ 0 ] ); break;
+						case "addNewBuffer": dc.$callAction( DAWCoreActions_addOscillatorSource, id, ...a ); break;
+						case "toggleEnv": dc.$callAction( DAWCoreActions_toggleEnv, id ); break;
+						case "toggleLFO": dc.$callAction( DAWCoreActions_toggleLFO, id ); break;
+						case "addOscillator": dc.$callAction( DAWCoreActions_addOscillator, id ); break;
+						case "reorderOscillator": dc.$callAction( DAWCoreActions_reorderOscillator, id, a[ 0 ] ); break;
 					}
 					break;
 				case "gsuiOscillator": {
 					const oscId = e.target.dataset.id;
 
 					switch ( d.eventName ) {
-						case "remove": dc.$callAction( "removeOscillator", id, oscId ); break;
-						case "change": dc.$callAction( "changeOscillator", id, oscId, ...a ); break;
+						case "remove": dc.$callAction( DAWCoreActions_removeOscillator, id, oscId ); break;
+						case "change": dc.$callAction( DAWCoreActions_changeOscillator, id, oscId, ...a ); break;
 						case "liveChange": dc.$liveChangeSynth( id, { oscillators: { [ oscId ]: { [ a[ 0 ] ]: a[ 1 ] } } } ); break;
 						case "wavedrop":
-						case "drop": dc.$callAction( "changeOscillatorSource", id, oscId, ...a, d.eventName === "drop" ); break;
+						case "drop": dc.$callAction( DAWCoreActions_changeOscillatorSource, id, oscId, ...a, d.eventName === "drop" ); break;
 					}
 				} break;
 			}

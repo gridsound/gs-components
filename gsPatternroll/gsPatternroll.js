@@ -25,15 +25,31 @@ class GSPatternroll {
 		$changeBlockProp: ( id, prop, val ) => this.rootElement.$changeBlockProp( id, prop, val ),
 		$updateBlockViewBox: ( id, blc ) => this.rootElement.$updateBlockViewBox( id, blc ),
 	} );
+	#tracksAction = {
+		renameTrack: DAWCoreActions_renameTrack,
+		toggleTrack: DAWCoreActions_toggleTrack,
+		toggleSoloTrack: DAWCoreActions_toggleSoloTrack,
+	};
+	#pianorollActions = {
+		add: DAWCoreActions_addBlock,
+		move: DAWCoreActions_moveBlocks,
+		cropEnd: DAWCoreActions_cropEndBlocks,
+		cropStart: DAWCoreActions_cropStartBlocks,
+		duplicate: DAWCoreActions_cloneSelectedBlocks,
+		deletion: DAWCoreActions_removeBlocks,
+		selection: DAWCoreActions_selectBlocks,
+		unselection: DAWCoreActions_unselectAllBlocks,
+		unselectionOne: DAWCoreActions_unselectBlock,
+	};
 
 	constructor() {
 		Object.seal( this );
 
 		this.rootElement.$setData( this.#dataBlocks.$data );
 		this.rootElement.$setCallbacks( {
-			onchange: this.#onchange.bind( this ),
-			onaddBlock: this.#onaddBlock.bind( this ),
-			oneditBlock: this.#oneditBlock.bind( this ),
+			$onchange: this.#onchange.bind( this ),
+			$onaddBlock: this.#onaddBlock.bind( this ),
+			$oneditBlock: this.#oneditBlock.bind( this ),
 		} );
 		this.rootElement.addEventListener( "gsuiEvents", this.#ongsuiEvents.bind( this ) );
 	}
@@ -72,12 +88,12 @@ class GSPatternroll {
 
 		switch ( d.component ) {
 			case "gsuiTracklist":
-				this.#dawcore.$callAction( d.eventName, ...d.args );
+				this.#dawcore.$callAction( this.#tracksAction[ d.eventName ], ...d.args );
 				break;
 			case "gsuiTimeline":
 				switch ( d.eventName ) {
 					case "changeLoop":
-						this.#dawcore.$callAction( "changeLoop", ...d.args );
+						this.#dawcore.$callAction( DAWCoreActions_changeLoop, ...d.args );
 						break;
 					case "changeCurrentTime":
 						this.#dawcore.$compositionSetCurrentTime( d.args[ 0 ] );
@@ -97,17 +113,7 @@ class GSPatternroll {
 		} );
 	}
 	#onchange( obj, ...args ) {
-		switch ( obj ) { // tmp
-			case "add": this.#dawcore.$callAction( "addBlock", ...args ); break;
-			case "move": this.#dawcore.$callAction( "moveBlocks", ...args ); break;
-			case "cropEnd": this.#dawcore.$callAction( "cropEndBlocks", ...args ); break;
-			case "cropStart": this.#dawcore.$callAction( "cropStartBlocks", ...args ); break;
-			case "duplicate": this.#dawcore.$callAction( "cloneSelectedBlocks", ...args ); break;
-			case "deletion": this.#dawcore.$callAction( "removeBlocks", ...args ); break;
-			case "selection": this.#dawcore.$callAction( "selectBlocks", ...args ); break;
-			case "unselection": this.#dawcore.$callAction( "unselectAllBlocks", ...args ); break;
-			case "unselectionOne": this.#dawcore.$callAction( "unselectBlock", ...args ); break;
-		}
+		this.#dawcore.$callAction( this.#pianorollActions[ obj ], ...args );
 	}
 	#oneditBlock( id, obj, blc ) {
 		if ( blc._gsuiSVGform ) {
@@ -124,7 +130,7 @@ class GSPatternroll {
 		blc._gsuiSVGform = svg;
 		blc.children[ 3 ].append( svg );
 		gsuiSVGPatterns.$setSVGViewbox( pat.type, svg, obj.offset, obj.duration, this.#dawcore.$getBPS() );
-		blc.ondblclick = () => this.#dawcore.$callAction( "openPattern", obj.pattern );
+		blc.ondblclick = () => this.#dawcore.$callAction( DAWCoreActions_openPattern, obj.pattern );
 		blc.querySelector( ".gsuiPatternroll-block-name" ).textContent = pat.name;
 	}
 }

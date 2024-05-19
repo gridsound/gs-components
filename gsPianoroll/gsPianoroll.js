@@ -12,6 +12,17 @@ class GSPianoroll {
 		$removeKey: id => this.rootElement.$removeKey( id ),
 		$changeKeyProp: ( id, prop, val ) => this.rootElement.$changeKeyProp( id, prop, val ),
 	} );
+	#pianorollActions = {
+		add: DAWCoreActions_addKey,
+		move: DAWCoreActions_moveKeys,
+		clone: DAWCoreActions_cloneSelectedKeys,
+		remove: DAWCoreActions_removeKeys,
+		cropEnd: DAWCoreActions_cropEndKeys,
+		redirect: DAWCoreActions_redirectKey,
+		selection: DAWCoreActions_selectKeys,
+		unselection: DAWCoreActions_unselectAllKeys,
+		unselectionOne: DAWCoreActions_unselectKey,
+	};
 
 	constructor() {
 		Object.seal( this );
@@ -19,10 +30,10 @@ class GSPianoroll {
 		GSUlistenEvents( this.rootElement, {
 			gsuiPianoroll: {
 				changeKeysProps: d => {
-					this.#dawcore.$callAction( "changeKeysProps", this.#patternId, ...d.args );
+					this.#dawcore.$callAction( DAWCoreActions_changeKeysProps, this.#patternId, ...d.args );
 				},
 				midiDropped: d => {
-					this.#dawcore.$callAction( "dropMidiOnKeys", this.#patternId, ...d.args );
+					this.#dawcore.$callAction( DAWCoreActions_dropMidiOnKeys, this.#patternId, ...d.args );
 				},
 			},
 			gsuiBlocksManager: {
@@ -46,7 +57,7 @@ class GSPianoroll {
 		} );
 		this.rootElement.$setData( this.#dataKeys.$data );
 		this.rootElement.$setCallbacks( {
-			onchange: this.#onchange.bind( this ),
+			$onchange: this.#onchange.bind( this ),
 		} );
 		GSUsetAttribute( this.rootElement, "disabled", true );
 	}
@@ -97,17 +108,7 @@ class GSPianoroll {
 
 	// .........................................................................
 	#onchange( obj, ...args ) {
-		switch ( obj ) { // tmp
-			case "add": this.#dawcore.$callAction( "addKey", this.#patternId, ...args ); break;
-			case "move": this.#dawcore.$callAction( "moveKeys", this.#patternId, ...args ); break;
-			case "clone": this.#dawcore.$callAction( "cloneSelectedKeys", this.#patternId, ...args ); break;
-			case "remove": this.#dawcore.$callAction( "removeKeys", this.#patternId, ...args ); break;
-			case "cropEnd": this.#dawcore.$callAction( "cropEndKeys", this.#patternId, ...args ); break;
-			case "redirect": this.#dawcore.$callAction( "redirectKey", this.#patternId, ...args ); break;
-			case "selection": this.#dawcore.$callAction( "selectKeys", this.#patternId, ...args ); break;
-			case "unselection": this.#dawcore.$callAction( "unselectAllKeys", this.#patternId, ...args ); break;
-			case "unselectionOne": this.#dawcore.$callAction( "unselectKey", this.#patternId, ...args ); break;
-		}
+		this.#dawcore.$callAction( this.#pianorollActions[ obj ], this.#patternId, ...args );
 	}
 }
 

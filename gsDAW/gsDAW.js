@@ -1,6 +1,8 @@
 "use strict";
 
 class GSDAW {
+	static #audioMIMEs = [ "audio/wav", "audio/wave", "audio/flac", "audio/webm", "audio/ogg", "audio/mpeg", "audio/mp3", "audio/mp4" ];
+	static #dropExtensions = { gs: true, txt: true, json: true };
 	#dawcore = new DAWCore();
 	#libraries = new GSLibraries();
 	#patterns = new GSPatterns();
@@ -39,8 +41,6 @@ class GSDAW {
 		piano: GSPianoroll,
 		main: GSPatternroll,
 	} );
-	static #audioMIMEs = [ "audio/wav", "audio/wave", "audio/flac", "audio/webm", "audio/ogg", "audio/mpeg", "audio/mp3", "audio/mp4" ];
-	static #dropExtensions = { gs: true, txt: true, json: true };
 
 	constructor() {
 		Object.seal( this );
@@ -89,10 +89,10 @@ class GSDAW {
 		this.#libraries.setDAWCore( this.#dawcore );
 		this.rootElement.querySelector( ".gsuiDAW-patterns" ).append( this.#patterns.rootElement );
 		this.rootElement.querySelector( ".gsuiDAW-libraries" ).append( this.#libraries.rootElement );
-		this.#elements.synthName.onclick = this.#onclickName.bind( this, "Rename synthesizer", "renameSynth", "synth" );
-		this.#elements.drumsName.onclick = this.#onclickName.bind( this, "Rename pattern", "renamePattern", "drums" );
-		this.#elements.slicesName.onclick = this.#onclickName.bind( this, "Rename pattern", "renamePattern", "slices" );
-		this.#elements.pianorollName.onclick = this.#onclickName.bind( this, "Rename pattern", "renamePattern", "keys" );
+		this.#elements.synthName.onclick = this.#onclickName.bind( this, "Rename synthesizer", DAWCoreActions_renameSynth, "synth" );
+		this.#elements.drumsName.onclick = this.#onclickName.bind( this, "Rename pattern", DAWCoreActions_renamePattern, "drums" );
+		this.#elements.slicesName.onclick = this.#onclickName.bind( this, "Rename pattern", DAWCoreActions_renamePattern, "slices" );
+		this.#elements.pianorollName.onclick = this.#onclickName.bind( this, "Rename pattern", DAWCoreActions_renamePattern, "keys" );
 		this.#elements.synthChannelBtn.onclick = this.#onclickSynthChannel.bind( this );
 		this.#patterns.setLibraries( this.#libraries );
 		this.#windows.$window( "main" ).$open();
@@ -229,7 +229,7 @@ class GSDAW {
 				tempo: d => {
 					const o = d.args[ 0 ];
 
-					this.#dawcore.$callAction( "changeTempo", o.bpm, o.timedivision );
+					this.#dawcore.$callAction( DAWCoreActions_changeTempo, o.bpm, o.timedivision );
 				},
 				logout: () => {
 					GSUsetAttribute( this.rootElement, "logging", true );
@@ -252,7 +252,7 @@ class GSDAW {
 				closeWindow: d => this.#windows.$window( d.args[ 0 ] ).$close(),
 				focusSwitch: () => this.#dawcore.$focusSwitch(),
 				volume: d => this.#dawcore.$destinationSetGain( d.args[ 0 ] ),
-				rename: d => this.#dawcore.$callAction( "renameComposition", d.args[ 0 ] ),
+				rename: d => this.#dawcore.$callAction( DAWCoreActions_renameComposition, d.args[ 0 ] ),
 				currentTimeLive: d => {
 					const win = this.#controlsGetFocusedGrid();
 
@@ -363,9 +363,9 @@ class GSDAW {
 	}
 	#oncloseWindow( win ) {
 		switch ( win.dataset.id ) {
-			case "piano": this.#dawcore.$callAction( "closePattern", "keys" ); break;
-			case "drums": this.#dawcore.$callAction( "closePattern", "drums" ); break;
-			case "slicer": this.#dawcore.$callAction( "closePattern", "slices" ); break;
+			case "piano": this.#dawcore.$callAction( DAWCoreActions_closePattern, "keys" ); break;
+			case "drums": this.#dawcore.$callAction( DAWCoreActions_closePattern, "drums" ); break;
+			case "slicer": this.#dawcore.$callAction( DAWCoreActions_closePattern, "slices" ); break;
 		}
 		this.rootElement.toggleWindow( win.dataset.id, false );
 		this.#gsCmp[ win.dataset.id ].clear();
@@ -516,7 +516,7 @@ class GSDAW {
 			gsuiChannels.$openSelectChannelPopup(
 				this.#dawcore.$getChannels(),
 				this.#dawcore.$getSynth( id ).dest
-			).then( chanId => chanId && this.#dawcore.$callAction( "redirectSynth", id, chanId ) );
+			).then( chanId => chanId && this.#dawcore.$callAction( DAWCoreActions_redirectSynth, id, chanId ) );
 		}
 	}
 	#ondrop( e ) {

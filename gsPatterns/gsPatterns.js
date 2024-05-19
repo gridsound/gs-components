@@ -7,13 +7,29 @@ class GSPatterns {
 	#synthsCrud = null;
 	#patternsCrud = null;
 	#channelsCrud = null;
+	#patternsActions = {
+		clonePattern: DAWCoreActions_clonePattern,
+		removePattern: DAWCoreActions_removePattern,
+		openPattern: DAWCoreActions_openPattern,
+		openSynth: DAWCoreActions_openSynth,
+		addPatternKeys: DAWCoreActions_addPatternKeys,
+		removeSynth: DAWCoreActions_removeSynth,
+		addPatternSlices: DAWCoreActions_addPatternSlices,
+		addPatternDrums: DAWCoreActions_addPatternDrums,
+		addSynth: DAWCoreActions_addSynth,
+		reorderPattern: DAWCoreActions_reorderPattern,
+		redirectPatternKeys: DAWCoreActions_redirectPatternKeys,
+		changePatternBufferInfo: DAWCoreActions_changePatternBufferInfo,
+		redirectPatternBuffer: DAWCoreActions_redirectPatternBuffer,
+		redirectSynth: DAWCoreActions_redirectSynth,
+	};
 
 	constructor() {
 		const uiPatterns = GSUcreateElement( "gsui-patterns" );
 
 		uiPatterns.onpatternDataTransfer = elPat => elPat.dataset.id;
 		uiPatterns.onchange = ( act, ...args ) => {
-			if ( DAWCoreActions.has( act ) ) {
+			if ( act in this.#patternsActions ) {
 				const daw = this.#dawcore;
 
 				if ( act === "removePattern" && daw.$isPlaying() ) {
@@ -24,7 +40,7 @@ class GSPatterns {
 						daw.$stop();
 					}
 				}
-				daw.$callAction( act, ...args );
+				daw.$callAction( this.#patternsActions[ act ], ...args );
 			} else {
 				console.log( "GSPatterns.onchange", act, ...args );
 			}
@@ -32,7 +48,7 @@ class GSPatterns {
 		uiPatterns.$getChannels = () => this.#dawcore.$getChannels();
 		GSUlistenEvents( uiPatterns, {
 			gsuiPatterns: {
-				libraryBufferDropped: d => this.#dawcore.$callAction( "addPatternBuffer", ...d.args ),
+				libraryBufferDropped: d => this.#dawcore.$callAction( DAWCoreActions_addPatternBuffer, ...d.args ),
 			},
 		} );
 		this.data = Object.freeze( {

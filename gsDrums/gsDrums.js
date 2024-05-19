@@ -34,26 +34,41 @@ class GSDrums {
 			}
 		},
 	} );
+	#drumsActions = {
+		addDrums: DAWCoreActions_addDrums,
+		addDrumcuts: DAWCoreActions_addDrumcuts,
+		removeDrums: DAWCoreActions_removeDrums,
+		removeDrumcuts: DAWCoreActions_removeDrumcuts,
+	};
+	#drumrowsActions = {
+		addDrumrow: DAWCoreActions_addDrumrow,
+		changeDrumrow: DAWCoreActions_changeDrumrow,
+		changeDrumrowPattern: DAWCoreActions_changeDrumrowPattern,
+	};
 
 	constructor() {
 		Object.seal( this );
 
 		GSUlistenEvents( this.rootElement, {
 			gsuiDrumrows: {
-				remove: d => { this.#dawcore.$callAction( "removeDrumrow", d.args[ 0 ] ); },
-				change: d => { this.#dawcore.$callAction( ...d.args ); },
-				toggle: d => { this.#dawcore.$callAction( "toggleDrumrow", d.args[ 0 ] ); },
-				toggleSolo: d => { this.#dawcore.$callAction( "toggleSoloDrumrow", d.args[ 0 ] ); },
+				remove: d => { this.#dawcore.$callAction( DAWCoreActions_removeDrumrow, d.args[ 0 ] ); },
+				change: d => {
+					const [ act, ...args ] = d.args;
+
+					this.#dawcore.$callAction( this.#drumrowsActions[ act ], ...args );
+				},
+				toggle: d => { this.#dawcore.$callAction( DAWCoreActions_toggleDrumrow, d.args[ 0 ] ); },
+				toggleSolo: d => { this.#dawcore.$callAction( DAWCoreActions_toggleSoloDrumrow, d.args[ 0 ] ); },
 				liveStopDrum: d => { this.#dawcore.$liveDrumStop( ...d.args ); },
 				liveStartDrum: d => { this.#dawcore.$liveDrumStart( ...d.args ); },
 				liveChangeDrumrow: d => { this.#dawcore.$liveDrumrowChange( ...d.args ); },
 			},
 			gsuiDrums: {
-				reorderDrumrow: d => this.#dawcore.$callAction( "reorderDrumrow", ...d.args ),
+				reorderDrumrow: d => this.#dawcore.$callAction( DAWCoreActions_reorderDrumrow, ...d.args ),
 				change: d => {
 					const [ act, ...args ] = d.args;
 
-					this.#dawcore.$callAction( act, this.#patternId, ...args );
+					this.#dawcore.$callAction( this.#drumsActions[ act ], this.#patternId, ...args );
 				},
 			},
 			gsuiTimeline: {
@@ -70,7 +85,7 @@ class GSDrums {
 			},
 			gsuiSliderGroup: {
 				change: d => {
-					this.#dawcore.$callAction( "changeDrumsProps", this.#patternId, ...d.args );
+					this.#dawcore.$callAction( DAWCoreActions_changeDrumsProps, this.#patternId, ...d.args );
 				},
 			},
 		} );

@@ -26,6 +26,20 @@ class GSMixer {
 		$changeEffect: ( id, prop, val ) => this.#effects.$changeEffect( id, prop, val ),
 		$changeEffectData: ( id, obj, fxType ) => this.#changeEffectData( id, obj, fxType ),
 	} );
+	#channelsActions = {
+		addChannel: DAWCoreActions_addChannel,
+		changeChannel: DAWCoreActions_changeChannel,
+		toggleChannel: DAWCoreActions_toggleChannel,
+		reorderChannel: DAWCoreActions_reorderChannel,
+		removeChannel: DAWCoreActions_removeChannel,
+		redirectChannel: DAWCoreActions_redirectChannel,
+		renameChannel: DAWCoreActions_renameChannel,
+	};
+	#effectsActions = {
+		toggleEffect: DAWCoreActions_toggleEffect,
+		removeEffect: DAWCoreActions_removeEffect,
+		changeEffectProp: DAWCoreActions_changeEffectProp,
+	};
 
 	constructor() {
 		Object.seal( this );
@@ -46,10 +60,10 @@ class GSMixer {
 				},
 				addEffect: d => {
 					d.args.unshift( this.#destFilter );
-					this.#dawcore.$callAction( "addEffect", ...d.args );
+					this.#dawcore.$callAction( DAWCoreActions_addEffect, ...d.args );
 				},
 				default: d => {
-					this.#dawcore.$callAction( d.eventName, ...d.args );
+					this.#dawcore.$callAction( this.#effectsActions[ d.eventName ], ...d.args );
 				},
 			},
 		} );
@@ -84,7 +98,7 @@ class GSMixer {
 		this.#dawcore.$liveChangeChannel( id, prop, val );
 	}
 	#onchange( act, ...args ) {
-		this.#dawcore.$callAction( act, ...args );
+		this.#dawcore.$callAction( this.#channelsActions[ act ], ...args );
 	}
 	#onselectChan( id ) {
 		this.#destFilter = id;
