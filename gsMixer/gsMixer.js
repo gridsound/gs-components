@@ -2,7 +2,9 @@
 
 class GSMixer {
 	#dawcore = null;
-	rootElement = GSUcreateElement( "gsui-mixer" );
+	rootElement = GSUcreateElement( "gsui-mixer", {
+		analyser: localStorage.getItem( "gsuiMixer.analyserType" ) || "td",
+	} );
 	#channels = this.rootElement.$getChannels();
 	#effects = this.rootElement.$getEffects();
 	#destFilter = "main";
@@ -54,6 +56,12 @@ class GSMixer {
 			}
 		};
 		GSUlistenEvents( this.rootElement, {
+			gsuiMixer: {
+				changeAnalyser: d => {
+					this.#dawcore.$mixerChangeAnalyser( d.args[ 0 ] );
+					localStorage.setItem( "gsuiMixer.analyserType", d.args[ 0 ] );
+				},
+			},
 			gsuiEffects: {
 				liveChangeEffect: d => {
 					this.#dawcore.$liveChangeEffect( ...d.args );
@@ -73,6 +81,7 @@ class GSMixer {
 	// .........................................................................
 	setDAWCore( core ) {
 		this.#dawcore = core;
+		this.#dawcore.$mixerChangeAnalyser( GSUgetAttribute( this.rootElement, "analyser" ) );
 	}
 	clear() {
 		this.#ctrlEffects.$clear();
@@ -92,6 +101,9 @@ class GSMixer {
 	updateAudioData( chanId, ldata, rdata ) {
 		this.#channels.$updateAudioData( chanId, ldata, rdata );
 	}
+	$updateVu( ldata, rdata ) {
+		this.#channels.$updateVu( ldata, rdata );
+	}
 
 	// .........................................................................
 	#oninput( id, prop, val ) {
@@ -101,6 +113,7 @@ class GSMixer {
 		this.#dawcore.$callAction( this.#channelsActions[ act ], ...args );
 	}
 	#onselectChan( id ) {
+		this.#dawcore.$callAction( DAWCoreActions_openChannel, id );
 		this.#destFilter = id;
 		this.#ctrlEffects.$setDestFilter( id );
 	}
