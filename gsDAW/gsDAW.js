@@ -6,7 +6,7 @@ class GSDAW {
 	#dawcore = new DAWCore();
 	#libraries = new GSLibraries();
 	#patterns = new GSPatterns();
-	#midiControllersManager = new gswaMIDIControllersManager();
+	#midiDevices = new gswaMIDIDevices();
 	#windows = null;
 	rootElement = GSUcreateElement( "gsui-daw", {
 		version: "0.0.0",
@@ -18,7 +18,7 @@ class GSDAW {
 	} );
 	#elements = null;
 	#keyboardFns = [
-		[ true,  false, "o", () => this.rootElement.showOpenPopup() ],
+		[ true,  false, "o", () => this.rootElement.$showOpenPopup() ],
 		[ true,  false, "s", () => this.#dawcore.$saveComposition() ],
 		[ true,  true,  "n", () => this.#oncmpClickNewLocal() ],
 		[ true,  false, "z", () => this.#dawcore.$historyUndo() ],
@@ -48,9 +48,9 @@ class GSDAW {
 		this.#initHTML();
 		this.#initWindowsHTML();
 		this.#initWindows();
-		this.#initMIDIAccess();
 		this.#initComponents();
 		this.#authGetMe();
+		this.#midiDevices.$init();
 	}
 
 	// .........................................................................
@@ -70,7 +70,7 @@ class GSDAW {
 			nominimize: true,
 			lowgraphics: !!+( localStorage.getItem( "gsuiWindows.lowGraphics" ) || "0" ),
 		} );
-		GSUsetAttribute( this.rootElement.clock, "mode", localStorage.getItem( "gsuiClock.display" ) || "second" );
+		GSUsetAttribute( this.rootElement.$clock, "mode", localStorage.getItem( "gsuiClock.display" ) || "second" );
 		GSUsetAttribute( this.rootElement, {
 			keynotation: localStorage.getItem( "uiKeyNotation" ) || "DoRéMi",
 			timelinenumbering: localStorage.getItem( "uiTimeNumbering" ) || "1",
@@ -105,8 +105,8 @@ class GSDAW {
 		window.onkeyup = this.#onkeyup.bind( this );
 		window.onkeydown = this.#onkeydown.bind( this );
 		window.onbeforeunload = this.#oncmpBeforeUnload.bind( this );
+		this.rootElement.oncontextmenu = location.host === "localhost" ? null : GSUnoopFalse;
 		this.rootElement.ondragover = GSUnoopFalse;
-		this.rootElement.oncontextmenu = () => location.host === "localhost" ? undefined : false;
 		this.rootElement.addEventListener( "wheel", GSDAW.#onwheel, { passive: false } );
 		this.rootElement.addEventListener( "drop", this.#ondrop.bind( this ) );
 
@@ -121,7 +121,7 @@ class GSDAW {
 		};
 		this.#dawcore.cb.buffersLoaded = ( id, audioBuf ) => this.#onpatternsBuffersLoaded( id, audioBuf );
 		this.#dawcore.cb.buffersDropped = files => this.#libraries.addLocalSamples( files );
-		this.#dawcore.cb.compositionAdded = cmp => this.rootElement.addComposition( cmp );
+		this.#dawcore.cb.compositionAdded = cmp => this.rootElement.$addComposition( cmp );
 		this.#dawcore.cb.compositionOpened = cmp => {
 			GSUsetAttribute( this.rootElement, "currentcomposition", `${ cmp.options.saveMode }:${ cmp.id }` );
 			this.#patterns.rootElement.$expandSynth( cmp.synthOpened, true );
@@ -129,25 +129,30 @@ class GSDAW {
 		};
 		this.#dawcore.cb.compositionClosed = this.#oncmpClosed.bind( this );
 		this.#dawcore.cb.compositionChanged = this.#oncmpChanged.bind( this );
-		this.#dawcore.cb.compositionDeleted = cmp => this.rootElement.deleteComposition( cmp );
+		this.#dawcore.cb.compositionDeleted = cmp => this.rootElement.$deleteComposition( cmp );
 		this.#dawcore.cb.compositionLoading = ( cmp, loading ) => GSUsetAttribute( this.rootElement, "saving", loading );
 		this.#dawcore.cb.compositionSavedStatus = ( cmp, saved ) => {
 			GSUsetAttribute( this.rootElement, "saved", saved );
 			this.#setTitle( cmp.name );
 		};
 		this.#dawcore.cb.compositionSavingPromise = this.#authSaveComposition.bind( this );
-		this.#dawcore.cb.historyUndo = () => this.rootElement.undo();
-		this.#dawcore.cb.historyRedo = () => this.rootElement.redo();
-		this.#dawcore.cb.historyAddAction = act => this.rootElement.stackAction( act.icon, act.desc );
+		this.#dawcore.cb.historyUndo = () => this.rootElement.$undo();
+		this.#dawcore.cb.historyRedo = () => this.rootElement.$redo();
+		this.#dawcore.cb.historyAddAction = act => this.rootElement.$stackAction( act.icon, act.desc );
 		this.#dawcore.cb.onstartdrum = rowId => this.#gsCmp.drums?.onstartdrum( rowId );
 		this.#dawcore.cb.onstopdrumrow = rowId => this.#gsCmp.drums?.onstopdrumrow( rowId );
-		this.#dawcore.cb.analyserFilled = data => this.rootElement.updateSpectrum( data );
-		this.#dawcore.cb.channelAnalyserFilled = ( chanId, ldata, rdata ) => this.#gsCmp.mixer?.updateAudioData( chanId, ldata, rdata );
+		this.#dawcore.cb.analyserFilled = data => this.rootElement.$updateSpectrum( data );
+		this.#dawcore.cb.channelVuFilled = ( ldata, rdata ) => {
+			this.#gsCmp.mixer?.$updateVu( ldata, rdata );
+		};
+		this.#dawcore.cb.channelAnalyserFilled = ( chanId, ldata, rdata ) => {
+			this.#gsCmp.mixer?.updateAudioData( chanId, ldata, rdata );
+		};
 		this.#dawcore.cb.pause =
 		this.#dawcore.cb.stop = () => GSUsetAttribute( this.rootElement, "playing", false );
 		this.#dawcore.cb.play = () => GSUsetAttribute( this.rootElement, "playing", true );
 
-		this.rootElement.onSubmitLogin = ( email, pass ) => {
+		this.rootElement.$onSubmitLogin = ( email, pass ) => {
 			GSUsetAttribute( this.rootElement, "logging", true );
 			GSUsetAttribute( this.rootElement, "errauth", false );
 			return gsapiClient.$login( email, pass )
@@ -166,7 +171,7 @@ class GSDAW {
 				} )
 				.finally( () => GSUsetAttribute( this.rootElement, "logging", false ) );
 		};
-		this.rootElement.onSubmitOpen = ( url, file ) => {
+		this.rootElement.$onSubmitOpen = ( url, file ) => {
 			if ( url || file[ 0 ] ) {
 				return ( url
 					? this.#dawcore.$addCompositionByURL( url )
@@ -174,7 +179,7 @@ class GSDAW {
 				).then( cmp => this.#dawcore.$openComposition( "local", cmp.id ) );
 			}
 		};
-		this.rootElement.onExportJSON = ( saveMode, id ) => this.#dawcore.$compositionExportJSON( saveMode, id );
+		this.rootElement.$onExportJSON = ( saveMode, id ) => this.#dawcore.$compositionExportJSON( saveMode, id );
 
 		GSUlistenEvents( this.rootElement, {
 			gsuiWindows: {
@@ -219,7 +224,7 @@ class GSDAW {
 					this.#dawcore.$compositionExportWAV().then( obj => {
 						clearInterval( intervalId );
 						GSUsetAttribute( this.rootElement, "exporting", 1 );
-						this.rootElement.readyToDownload( obj.url, obj.name );
+						this.rootElement.$readyToDownload( obj.url, obj.name );
 					} );
 				},
 				abortExport: () => this.#dawcore.$compositionAbortWAV(),
@@ -350,7 +355,7 @@ class GSDAW {
 		} else if ( id === "piano" ) {
 			winCnt.rootElement.onfocus = () => this.#dawcore.$focusOn( "keys" );
 			winCnt.rootElement.$octaves( 1, 7 );
-			this.#linkMidiToPianoroll();
+			this.#midiDevices.$setPianorollKeys( winCnt.getUIKeys() );
 		} else if ( id === "drums" ) {
 			winCnt.rootElement.onfocus = () => this.#dawcore.$focusOn( "drums" );
 		} else if ( id === "slicer" ) {
@@ -359,7 +364,7 @@ class GSDAW {
 		if ( cmpData ) {
 			winCnt.change( cmpData );
 		}
-		this.rootElement.toggleWindow( id, true );
+		this.rootElement.$toggleWindow( id, true );
 	}
 	#oncloseWindow( win ) {
 		switch ( win.dataset.id ) {
@@ -367,7 +372,7 @@ class GSDAW {
 			case "drums": this.#dawcore.$callAction( DAWCoreActions_closePattern, "drums" ); break;
 			case "slicer": this.#dawcore.$callAction( DAWCoreActions_closePattern, "slices" ); break;
 		}
-		this.rootElement.toggleWindow( win.dataset.id, false );
+		this.rootElement.$toggleWindow( win.dataset.id, false );
 		this.#gsCmp[ win.dataset.id ].clear();
 		this.#gsCmp[ win.dataset.id ] = null;
 	}
@@ -662,18 +667,18 @@ class GSDAW {
 		} ],
 		[ "bpm", function( { bpm } ) {
 			GSUsetAttribute( this.rootElement, "bpm", bpm );
-			this.rootElement.updateComposition( this.#dawcore.$getCmp() );
+			this.rootElement.$updateComposition( this.#dawcore.$getCmp() );
 		} ],
 		[ "name", function( { name } ) {
 			this.#setTitle( name );
-			this.rootElement.updateComposition( this.#dawcore.$getCmp() );
+			this.rootElement.$updateComposition( this.#dawcore.$getCmp() );
 			GSUsetAttribute( this.rootElement, "name", name );
 		} ],
 		[ "duration", function( { duration } ) {
 			if ( this.#dawcore.$getFocusedName() === "composition" ) {
 				GSUsetAttribute( this.rootElement, "duration", duration );
 			}
-			this.rootElement.updateComposition( this.#dawcore.$getCmp() );
+			this.rootElement.$updateComposition( this.#dawcore.$getCmp() );
 		} ],
 		[ "patternSlicesOpened", function( obj ) {
 			if ( obj.patternSlicesOpened ) {
@@ -775,28 +780,6 @@ class GSDAW {
 				gsuiSVGPatterns.$setSVGViewbox( "buffer", elBlc._gsuiSVGform, blc.offset, blc.duration, bpm / 60 );
 			}
 		} );
-	}
-	#initMIDIAccess() {
-		navigator.requestMIDIAccess( { sysex: true } )
-			.then( midiAccess => this.#onMIDISuccess( midiAccess, true ),
-				msg => this.#onMIDIFailure( msg, true ) );
-	}
-	#linkMidiToPianoroll() {
-		this.#midiControllersManager.$setPianorollKeys( this.#gsCmp.piano.getUIKeys() );
-	}
-	#onMIDISuccess( midiAccess, sysex = false ) {
-		if ( sysex === false ) {
-			console.log( "GSLogs: Sysex is not allowed. Some features of your devices may be disabled." );
-		}
-		this.#midiControllersManager.$initMidiAccess( midiAccess );
-	}
-	#onMIDIFailure( msg, sysex = false ) {
-		if ( sysex === true ) {
-			navigator.requestMIDIAccess().then( onMIDISuccess, onMIDIFailure )
-		} else {
-			console.log( "GSLogs: Failed to get MIDI access - " + msg );
-			console.log( "GSLogs: MIDI devices are disabled" );
-		}
 	}
 }
 
