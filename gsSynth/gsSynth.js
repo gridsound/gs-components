@@ -105,9 +105,9 @@ class GSSynth {
 			GSUsetAttribute( this.rootElement.env, "timedivision", obj.timedivision );
 			GSUsetAttribute( this.rootElement.lfo, "timedivision", obj.timedivision );
 		}
-		GSUforEach( obj.patterns, ( patId, patObj ) => {
+		GSUforEach( obj.patterns, ( patObj, patId ) => {
 			if ( patObj && "name" in patObj ) {
-				GSUforEach( this.#dataSynth.$data.oscillators, ( idOsc, osc ) => {
+				GSUforEach( this.#dataSynth.$data.oscillators, ( osc, idOsc ) => {
 					if ( osc.source === patId ) {
 						GSUsetAttribute( this.rootElement.$getOscillator( idOsc ), "source", patObj.name );
 					}
