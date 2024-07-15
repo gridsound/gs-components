@@ -11,12 +11,7 @@ class GSMixer {
 	#ctrlChannels = new DAWCoreControllerMixer( {
 		$addChannel: ( id, chan ) => this.#channels.$addChannel( id, chan ),
 		$removeChannel: id => this.#channels.$removeChannel( id ),
-		$renameChannel: ( id, name ) => this.#channels.$renameChannel( id, name ),
-		$redirectChannel: ( id, dest ) => this.#channels.$redirectChannel( id, dest ),
-		$toggleChannel: ( id, b ) => this.#channels.$toggleChannel( id, b ),
-		$reorderChannel: ( id, n ) => this.#channels.$reorderChannel( id, n ),
-		$changePanChannel: ( id, val ) => this.#channels.$changePanChannel( id, val ),
-		$changeGainChannel: ( id, val ) => this.#channels.$changeGainChannel( id, val ),
+		$changeChannel: ( id, prop, val, prev ) => this.#channels.$changeChannel( id, prop, val, prev ),
 		$addEffect: ( chanId, fxId, obj ) => this.#channels.$getChannel( chanId ).$addEffect( fxId, obj ),
 		$updateEffect: ( chanId, fxId, obj ) => this.#channels.$getChannel( chanId ).$updateEffect( fxId, obj ),
 		$removeEffect: ( chanId, fxId ) => this.#channels.$getChannel( chanId ).$removeEffect( fxId ),
